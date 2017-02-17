@@ -47,8 +47,8 @@ public final class SalesforceConstants
     public static final Pattern EMAIL_PATTERN = Pattern.compile("([a-zA-Z0-9_\\-\\.]+)@((\\[a-z]{1,3}\\.[a-z]{1,3}\\.[a-z]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})");
 
 
-    public static final String CF_SUFFIX = "__c";
-    public static final String PKG_PREFIX = "${package.namespace}";
+    private static final String CF_SUFFIX = "__c";
+    private static final String PKG_PREFIX = "${package.namespace}";
 
     public static final String OBJ_USER = "User";
     public static final String OBJ_ACCOUNT = "Account";
