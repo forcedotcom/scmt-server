@@ -813,7 +813,8 @@ public final class DeskUtil
         GroupService service = getDeskClient().groups();
 
         //get All SFDC users
-        List<SObject> sfUsers = getSalesforceService().query("SELECT Id, SCMT__DeskID__c FROM User WHERE SCMT__DeskId__c != null");
+        String query = String.format("Select %s, %s From %s Where %s != null", UserFields.Id, UserFields.DeskId, SalesforceConstants.OBJ_USER, UserFields.DeskId);
+        List<SObject> sfUsers = getSalesforceService().query(query);
 
         //map deskId to sfdcId
         Map<Integer, String> deskIdToSfdcId = new HashMap<Integer, String>();
