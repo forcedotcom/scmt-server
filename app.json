@@ -1,6 +1,6 @@
 {
-  "name": "Service Cloud Migration Tool - Backend",
-  "description": "This is the backbone to the Service Cloud Migration Tool package. It utilizes the Desk.com and Salesforce APIs to create the metadata and migrate the data from a Desk.com instance into Salesforce.",
+  "name": "Service Cloud Migration Tool",
+  "description": "The backend to the Service Cloud Migration Tool package. Utilizes the Desk.com and Salesforce APIs to create the metadata and data.",
   "keywords": [ "salesforce", "service", "desk.com", "data migration" ],
   "repository": "https://github.com/forcedotcom/scmt-server",
   "logo": "https://avatars0.githubusercontent.com/u/464563?v=3&s=200",
