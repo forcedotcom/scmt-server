@@ -1,6 +1,34 @@
 {
-  "name": "Getting Started with Java on Heroku",
-  "description": "A barebones Java app, which can easily be deployed to Heroku.",
+  "name": "Service Cloud Migration Tool - Backend",
+  "description": "This is the backbone to the Service Cloud Migration Tool package. It utilizes the Desk.com and Salesforce APIs to create the metadata and migrate the data from a Desk.com instance into Salesforce.",
+  "keywords": [ "salesforce", "service", "desk.com", "data migration" ],
+  "repository": "https://github.com/forcedotcom/scmt-server",
+  "logo": "https://avatars0.githubusercontent.com/u/464563?v=3&s=200",
+  "success_url": "https://appexchange.salesforce.com/servlet/servlet.FileDownload?file=00P3A00000WIcRGUA1",
+  "env": {
+    "CLOUDAMQP_HEARTBEAT": "30",
+    "CLOUDAMQP_TIMEOUT": "30",
+    "DESK_API_LOG_LEVEL": "BASIC",
+    "JAVA_OPTS": "-XX:+UseCompressedOops",
+    "SALESFORCE_TRACE_BULK": "1",
+    "SALESFORCE_TRACE_METADATA": "1",
+    "SALESFORCE_TRACE_PARTNER": "1",
+    "PACKAGE_NAMESPACE": ""
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    },
+    "formula1": {
+      "quantity": 1,
+      "size": "standard-1x"
+    },
+    "tractor": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  },
   "image": "heroku/java",
-  "addons": [ "heroku-postgresql" ]
+  "addons": [ "cloudamqp:lemur", "papertrail:choklad" ]
 }
