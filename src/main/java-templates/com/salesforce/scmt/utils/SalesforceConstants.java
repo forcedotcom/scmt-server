@@ -48,7 +48,7 @@ public final class SalesforceConstants
 
 
     private static final String CF_SUFFIX = "__c";
-    private static final String PKG_PREFIX = "SCMT__";
+    private static final String PKG_PREFIX = "${package.namespace}";
 
     public static final String OBJ_USER = "User";
     public static final String OBJ_ACCOUNT = "Account";
