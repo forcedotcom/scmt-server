@@ -152,6 +152,19 @@
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <package.namespace>${env.PACKAGE_NAMESPACE}</package.namespace>
+        <package.namespace></package.namespace>
     </properties>
+    <profiles>
+        <profile>
+            <id>namespace-is-set</id>
+            <activation>
+                <property>
+                    <name>env.PACKAGE_NAMESPACE</name>
+                </property>
+            </activation>
+            <properties>
+                <package.namespace>${env.PACKAGE_NAMESPACE}</package.namespace>
+            </properties>
+        </profile>
+    </profiles>
 </project>

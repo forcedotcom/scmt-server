@@ -12,12 +12,7 @@
     "JAVA_OPTS": "-XX:+UseCompressedOops",
     "SALESFORCE_TRACE_BULK": "1",
     "SALESFORCE_TRACE_METADATA": "1",
-    "SALESFORCE_TRACE_PARTNER": "1",
-    "PACKAGE_NAMESPACE": {
-      "description": "The namespace of the managed package.",
-      "value": "",
-      "required": false
-    }
+    "SALESFORCE_TRACE_PARTNER": "1"
   },
   "formation": {
     "web": {
