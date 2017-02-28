@@ -9,12 +9,10 @@
     "CLOUDAMQP_HEARTBEAT": "30",
     "CLOUDAMQP_TIMEOUT": "30",
     "DESK_API_LOG_LEVEL": "BASIC",
-    "JAVA_ENV": "development",
     "JAVA_OPTS": "-XX:+UseCompressedOops",
     "SALESFORCE_TRACE_BULK": "1",
     "SALESFORCE_TRACE_METADATA": "1",
     "SALESFORCE_TRACE_PARTNER": "1",
-    "SALESFORCE_TRACE_MESSAGES": "1",
     "PACKAGE_NAMESPACE": {
       "description": "The namespace of the managed package.",
       "value": "",
