@@ -56,12 +56,12 @@ public class SiteSetting implements Serializable
     
     public Integer getValueAsInteger()
     {
-        return (this.value == null) ? null : (Integer) this.value;
+        return (this.value == null) ? null : (Integer) Integer.parseInt(this.value.toString());
     }
     
     public Boolean getValueAsBoolean()
     {
-        return (this.value == null) ? null : (Boolean) this.value;
+        return (this.value == null) ? null : (Boolean) Boolean.parseBoolean(this.value.toString());
     }
 
     @NotNull
@@ -84,7 +84,7 @@ public class SiteSetting implements Serializable
     @NotNull
     public String getSelfLinkUrl()
     {
-        return getLinks().getSelfUrl();
+        return getLinks().getSelf().getUrl();
     }
 
     @Override
