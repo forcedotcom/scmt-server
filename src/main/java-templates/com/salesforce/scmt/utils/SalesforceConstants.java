@@ -85,8 +85,8 @@ public final class SalesforceConstants
         public static final String RecordTypeId = "RecordTypeId";
 
         // Custom Fields
-        public static final String DeskId = PKG_PREFIX + "DeskId" + CF_SUFFIX;
-        public static final String DeskExternalId = PKG_PREFIX + "DeskExternalId" + CF_SUFFIX;
+        public static final String DeskId = "DeskId" + CF_SUFFIX;
+        public static final String DeskExternalId = "DeskExternalId" + CF_SUFFIX;
     }
 
     public class TopicFields
@@ -134,6 +134,7 @@ public final class SalesforceConstants
         // Custom Fields
         public static final String DeskCreatedAt = PKG_PREFIX + "DeskCreatedAt" + CF_SUFFIX;
         public static final String DeskUpdatedAt = PKG_PREFIX + "DeskUpdatedAt" + CF_SUFFIX;
+        public static final String Domains = PKG_PREFIX + "Domains" + CF_SUFFIX;
     }
 
     public class ContactFields extends SalesforceConstants.Fields
@@ -149,12 +150,12 @@ public final class SalesforceConstants
         public static final String MobilePhone = "MobilePhone";
         public static final String OtherPhone = "OtherPhone";
         public static final String Account = "Account";
-        public static final String HomeAddress = PKG_PREFIX + "HomeAddress" + CF_SUFFIX;
-        public static final String WorkAddress = PKG_PREFIX + "WorkAddress" + CF_SUFFIX;
+        public static final String HomeAddress = "HomeAddress" + CF_SUFFIX;
+        public static final String WorkAddress = "WorkAddress" + CF_SUFFIX;
 
         // Custom Fields
-        public static final String DeskCreatedAt = PKG_PREFIX + "DeskCreatedAt" + CF_SUFFIX;
-        public static final String DeskUpdatedAt = PKG_PREFIX + "DeskUpdatedAt" + CF_SUFFIX;
+        public static final String DeskCreatedAt = "DeskCreatedAt" + CF_SUFFIX;
+        public static final String DeskUpdatedAt = "DeskUpdatedAt" + CF_SUFFIX;
     }
 
     public class CaseFields extends SalesforceConstants.Fields
@@ -189,7 +190,7 @@ public final class SalesforceConstants
         public static final String Account = "Account";
 
         // Custom Fields
-        public static final String DeskExternalId = PKG_PREFIX + "DeskExternalId" + CF_SUFFIX;
+        public static final String DeskExternalId = "DeskExternalId" + CF_SUFFIX;
         public static final String Language = PKG_PREFIX + "Language" + CF_SUFFIX;
         public static final String DeskChangedDate = PKG_PREFIX + "DeskChangedDate" + CF_SUFFIX;
         public static final String DeskActiveDate = PKG_PREFIX + "DeskActiveDate" + CF_SUFFIX;
