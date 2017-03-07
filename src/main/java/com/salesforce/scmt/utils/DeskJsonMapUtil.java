@@ -127,7 +127,10 @@ public final class DeskJsonMapUtil
         // set the website URL if set on desk
         if (company.getDomains().length > 0)
         {
+            String joinedDomains = String.join(", ", company.getDomains());
+
             mapObj.put(AccountFields.Website, "http://" + company.getDomains()[0]);
+            mapObj.put(AccountFields.Domains, joinedDomains);
         }
 
         mapObj.put(AccountFields.RecordTypeId, config.get("account_record_type_id"));
