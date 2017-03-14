@@ -179,6 +179,7 @@ public class Interaction implements Serializable
     {
         return direction;
     }
+    public void setDirection(String d) { this.direction = d; }
 
     /**
      * Retrieve the status of the interaction.
@@ -201,6 +202,7 @@ public class Interaction implements Serializable
     {
         return from;
     }
+    public void setFrom(String f) { this.from = f; }
 
     /**
      * Retrieve the to address of the interaction.

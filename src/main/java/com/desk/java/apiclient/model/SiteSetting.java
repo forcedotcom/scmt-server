@@ -84,7 +84,7 @@ public class SiteSetting implements Serializable
     @NotNull
     public String getSelfLinkUrl()
     {
-        return getLinks().getSelf().getUrl();
+        return getSelfLink().getUrl();
     }
 
     @Override

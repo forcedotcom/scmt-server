@@ -100,7 +100,7 @@ public class SiteLanguage implements Serializable{
 
     @NotNull
     public String getSelfLinkUrl() {
-        return getLinks().getSelfUrl();
+        return getSelfLink().getUrl();
     }
 
     @Override

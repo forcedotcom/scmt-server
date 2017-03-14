@@ -294,7 +294,7 @@ public class Message implements Serializable {
 
     @NotNull
     public String getSelfLinkUrl() {
-        return getLinks().getSelfUrl();
+        return getSelfLink().getUrl();
     }
 
     @NotNull
@@ -409,29 +409,29 @@ public class Message implements Serializable {
         
 
         result.append(this.getClass().getName() + " Object {");      
-        result.append(" \n id" + this.id);
-		result.append(" \n subject" + this.subject);
-		result.append(" \n body" + this.body);
-		result.append(" \n direction" + this.direction);
-		result.append(" \n status" + this.status);
-		result.append(" \n to" + this.to);
-		result.append(" \n from" + this.from);
-		result.append(" \n cc" + this.cc);
-		result.append(" \n bcc" + this.bcc);
-		result.append(" \n type" + this.type);
-		result.append(" \n hidden" + this.hidden);
-		result.append(" \n isBestAnswer" + this.isBestAnswer);
-		result.append(" \n hiddenAt" + this.hiddenAt);
-		result.append(" \n fromFacebookName" + this.fromFacebookName);
-		result.append(" \n answersDisallowedAt" + this.answersDisallowedAt);
-		result.append(" \n disallowCommunityAnswers" + this.disallowCommunityAnswers);
-		result.append(" \n areAnswersDisallowed" + this.areAnswersDisallowed);
-		result.append(" \n clientType" + this.clientType);
-		result.append(" \n enteredAt" + this.enteredAt);
-		result.append(" \n createdAt" + this.createdAt);
-		result.append(" \n updatedAt" + this.updatedAt);
-		result.append(" \n _embedded" + this._embedded);
-		result.append(" \n _links" + this._links);
+        result.append(" \n id" + this.getId());
+		result.append(" \n subject" + this.getSubject());
+		result.append(" \n body" + this.getBody());
+		result.append(" \n direction" + this.getDirection());
+		result.append(" \n status" + this.getStatus());
+		result.append(" \n to" + this.getTo());
+		result.append(" \n from" + this.getFrom());
+		result.append(" \n cc" + this.getCc());
+		result.append(" \n bcc" + this.getBcc());
+		result.append(" \n type" + this.getType());
+		result.append(" \n hidden" + this.getHidden());
+		result.append(" \n isBestAnswer" + this.getIsBestAnswer());
+		result.append(" \n hiddenAt" + this.getHiddenAt());
+		result.append(" \n fromFacebookName" + this.getFromFacebookName());
+		result.append(" \n answersDisallowedAt" + this.getAnswersDisallowedAt());
+		result.append(" \n disallowCommunityAnswers" + this.getDisallowCommunityAnswers());
+		result.append(" \n areAnswersDisallowed" + this.getAreAnswersDisallowed());
+		result.append(" \n clientType" + this.getClientType());
+		result.append(" \n enteredAt" + this.getEnteredAt());
+		result.append(" \n createdAt" + this.getCreatedAt());
+		result.append(" \n updatedAt" + this.getUpdatedAt());
+		result.append(" \n _embedded" + this.getEmbedded());
+		result.append(" \n _links" + this.getLinks());
         result.append(" \n }");
 
         return result.toString();
