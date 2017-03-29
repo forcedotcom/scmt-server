@@ -221,7 +221,7 @@ public abstract class DeskBase<D extends Serializable>
         objectBulkUploadComplete(du, config);
     }
 
-    private DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du)
+    protected DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du)
     {
         DeployResponse dr = new DeployResponse();
 
