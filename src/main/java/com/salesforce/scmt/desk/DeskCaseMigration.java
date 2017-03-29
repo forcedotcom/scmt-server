@@ -25,8 +25,10 @@ import java.util.Map;
 
 import com.desk.java.apiclient.model.ApiResponse;
 import com.desk.java.apiclient.model.Case;
+import com.desk.java.apiclient.model.CaseStatus;
 import com.desk.java.apiclient.model.SortDirection;
 import com.desk.java.apiclient.service.CaseService;
+import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.rabbitmq.RabbitConfiguration;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.JsonUtil;
@@ -212,5 +214,61 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
 			dr.addError(e.toString());
 		}
         return a;
+    }
+
+    @Override
+    protected DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du)
+    {
+        DeployResponse dr = new DeployResponse();
+
+        try
+        {
+            Utils.log("Bulk Upload");
+            List<Map<String, Object>> sfRecs = new ArrayList<>();
+            int counter = 0;
+
+            for (D d : deskObjects)
+            {
+                // don't migrate deleted cases
+                if (((Case) d).getStatus() == CaseStatus.DELETED) { continue; }
+                // convert the desk case to the Map for conversion to JSON
+                // sfRecs.add(d);
+                List<Map<String, Object>> obj = deskObjectToSalesforceObject(du, d);
+                sfRecs.addAll(obj);
+
+                // increment the counter
+                counter = counter + obj.size();
+
+                // submit a bulk job every 10k records
+                if ((counter % SalesforceConstants.BULK_MAX_SIZE) == 0)
+                {
+                    du.getSalesforceService().addBatchToJob(jobId, sfRecs);
+
+                    //update dr success count
+                    dr.incrementSuccessCount(sfRecs.size());
+                    // clear the lists
+                    sfRecs.clear();
+                    //reset counter
+                    counter = 0;
+                }
+            }
+
+            // check if there are records that still need to be bulk upserted
+            if (!sfRecs.isEmpty())
+            {
+                du.getSalesforceService().addBatchToJob(jobId, sfRecs);
+
+                // update dr success count
+                dr.incrementSuccessCount(sfRecs.size());
+            }
+        }
+        catch (Exception e)
+        {
+
+            Utils.logException(e);
+        }
+
+        return dr;
+
     }
 }
