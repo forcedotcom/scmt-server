@@ -134,6 +134,7 @@ public final class SalesforceConstants
         // Custom Fields
         public static final String DeskCreatedAt = PKG_PREFIX + "DeskCreatedAt" + CF_SUFFIX;
         public static final String DeskUpdatedAt = PKG_PREFIX + "DeskUpdatedAt" + CF_SUFFIX;
+        public static final String Domains = PKG_PREFIX + "Domains" + CF_SUFFIX;
     }
 
     public class ContactFields extends SalesforceConstants.Fields
