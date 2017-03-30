@@ -133,4 +133,10 @@ public class DeskUserMigration<D extends Serializable> extends DeskBase<D> {
 		return a;	
 	}
 
+	@Override
+	protected boolean skipObject(D d) {
+		// skip if user is deleted
+		return ((User) d).getDeleted();
+	}
+
 }
