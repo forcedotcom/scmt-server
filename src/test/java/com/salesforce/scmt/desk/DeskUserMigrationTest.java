@@ -1,12 +1,9 @@
 package com.salesforce.scmt.desk;
 
 import com.desk.java.apiclient.model.User;
-import com.salesforce.scmt.service.DeskService;
-import com.salesforce.scmt.utils.DeskUtil;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +38,7 @@ import static org.junit.Assert.*;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-public class DeskUserMigrationTest<D extends Serializable> {
+public class DeskUserMigrationTest {
 
     private DeskUserMigration<com.desk.java.apiclient.model.User> userMigration;
 
