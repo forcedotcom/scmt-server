@@ -221,7 +221,7 @@ public abstract class DeskBase<D extends Serializable>
         objectBulkUploadComplete(du, config);
     }
 
-    protected DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du)
+    private DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du)
     {
         DeployResponse dr = new DeployResponse();
 
@@ -233,6 +233,9 @@ public abstract class DeskBase<D extends Serializable>
 
             for (D d : deskObjects)
             {
+                // skip object
+                if (skipObject(d)) continue;
+
                 // convert the desk case to the Map for conversion to JSON
                 // sfRecs.add(d);
             	List<Map<String, Object>> obj = deskObjectToSalesforceObject(du, d); 
@@ -343,6 +346,8 @@ public abstract class DeskBase<D extends Serializable>
             
         }
     }
+
+    protected boolean skipObject(D d) { return false; }
 
     protected abstract int getId(D d);
 
