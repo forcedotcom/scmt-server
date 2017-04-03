@@ -25,8 +25,10 @@ import java.util.Map;
 
 import com.desk.java.apiclient.model.ApiResponse;
 import com.desk.java.apiclient.model.Case;
+import com.desk.java.apiclient.model.CaseStatus;
 import com.desk.java.apiclient.model.SortDirection;
 import com.desk.java.apiclient.service.CaseService;
+import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.rabbitmq.RabbitConfiguration;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.JsonUtil;
@@ -212,5 +214,10 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
 			dr.addError(e.toString());
 		}
         return a;
+    }
+
+    @Override
+    protected boolean skipObject(D d) {
+        return ((Case) d).getStatus() == CaseStatus.DELETED;
     }
 }
