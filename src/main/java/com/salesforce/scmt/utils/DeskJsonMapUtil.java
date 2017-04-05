@@ -699,7 +699,7 @@ public final class DeskJsonMapUtil
 //        mapObj.put(EmailMessageFields.IsExternallyVisible, false);
 
         // The date the email was sent. If sent_at is null then use created_at.
-        if (interaction.getSentAt() == null || interaction.getSentAt().isEmpty()) {
+        if (interaction.getSentAt() == null) {
 
             mapObj.put(EmailMessageFields.MessageDate, SalesforceUtil.sfdcDateTimeFormat(interaction.getCreatedAt()));
         } else {

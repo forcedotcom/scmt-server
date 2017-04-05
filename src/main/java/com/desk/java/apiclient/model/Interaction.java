@@ -34,7 +34,7 @@ public class Interaction implements Serializable
     private int id;
     private Date created_at;
     private Date updated_at;
-    private String sent_at;
+    private Date sent_at;
     private String erased_at;
     private String body;
     private String direction;
