@@ -698,9 +698,13 @@ public final class DeskJsonMapUtil
 //        // external users in the case feed. Update is not supported if the record Status is Draft.
 //        mapObj.put(EmailMessageFields.IsExternallyVisible, false);
 
-        // The date the email was created.
-        mapObj.put(EmailMessageFields.MessageDate, SalesforceUtil.sfdcDateTimeFormat(interaction.getCreatedAt()));
+        // The date the email was sent. If sent_at is null then use created_at.
+        if (interaction.getSentAt() == null) {
 
+            mapObj.put(EmailMessageFields.MessageDate, SalesforceUtil.sfdcDateTimeFormat(interaction.getCreatedAt()));
+        } else {
+            mapObj.put(EmailMessageFields.MessageDate, SalesforceUtil.sfdcDateTimeFormat(interaction.getSentAt()));
+        }
         // Case to which the email is associated.
         mapObj.put(EmailMessageFields.Parent, getCaseMap(interaction.getCaseId()));
 

@@ -34,7 +34,7 @@ public class Interaction implements Serializable
     private int id;
     private Date created_at;
     private Date updated_at;
-    private String sent_at;
+    private Date sent_at;
     private String erased_at;
     private String body;
     private String direction;
@@ -130,7 +130,7 @@ public class Interaction implements Serializable
      * Retrieve the date/time that the interaction was sent.
      * @return the date/time that the interaction was sent.
      */
-    public String getSentAt()
+    public Date getSentAt()
     {
         return sent_at;
     }
