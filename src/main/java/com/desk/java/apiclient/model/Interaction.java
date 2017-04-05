@@ -130,7 +130,7 @@ public class Interaction implements Serializable
      * Retrieve the date/time that the interaction was sent.
      * @return the date/time that the interaction was sent.
      */
-    public String getSentAt()
+    public Date getSentAt()
     {
         return sent_at;
     }
