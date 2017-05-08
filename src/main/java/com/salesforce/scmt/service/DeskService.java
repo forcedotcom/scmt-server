@@ -34,6 +34,7 @@ import com.desk.java.apiclient.DeskClient;
 import com.desk.java.apiclient.DeskClientBuilder;
 import com.desk.java.apiclient.model.CustomField;
 import com.desk.java.apiclient.model.Group;
+import com.desk.java.apiclient.model.User;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.JsonUtil;
@@ -61,6 +62,7 @@ public class DeskService
     
     // these are used for caching
     public List<Group> _deskGroups;
+    public List<User> _deskUsers;
     public Map<Integer, String> _deskGroupId2Name;
     
     public DeskService(Map<String, Object> config)
@@ -110,15 +112,25 @@ public class DeskService
     {
         _migrationId = migrationId;
     }
-    
+
     public List<Group> getDeskGroups()
     {
         return _deskGroups;
     }
-    
+
     public void setDeskGroups(List<Group> groups)
     {
         _deskGroups = groups;
+    }
+
+    public List<User> getDeskUsers()
+    {
+        return _deskUsers;
+    }
+
+    public void setDeskUsers(List<User> users)
+    {
+        _deskUsers = users;
     }
     
     public Map<Integer, String> getDeskGroupId2Name()
@@ -336,5 +348,48 @@ public class DeskService
         RabbitUtil.publishToQueue(QUEUE_DESK_ATTACHMENT, EXCHANGE_TRACTOR, JsonUtil.toJson(postParams).getBytes());
 
         return "SUBMITTED";
+    }
+
+    public static Object retrieveMetadata(Request req, Response res) throws Exception
+    {
+        // get the post parameters in a hash map
+        Map<String, String> postParams = getPostParamsFromRequest(req, new String[] { "deskUrl", "consumerKey", "consumerSecret", "accessToken",
+                "accessTokenSecret" });
+
+        // response map
+        Map<String, Object> response = new TreeMap<>();
+        DeskService deskService;
+        try
+        {
+            // create a DeskService instance based on the data posted (e.g. tokens, url, session id, etc.)
+            deskService = new DeskService(postParams.get("deskUrl"), postParams.get("consumerKey"),
+                    postParams.get("consumerSecret"), postParams.get("accessToken"), postParams.get("accessTokenSecret"),
+                    (postParams.containsKey("desk_migration_id") ? postParams.get("desk_migration_id") : null),
+                    postParams.get("server_url"), postParams.get("session_id"),
+                    (postParams.containsKey("auditEnabled") ? Boolean.valueOf(postParams.get("auditEnabled")) : false));
+
+
+            // build a DeskUtil (this has some non-static pieces so we can cache desk groups)
+            DeskUtil deskUtil = new DeskUtil(deskService);
+
+            // get the groups
+            List<Group> groups = deskUtil.getDeskGroups();
+
+            // get the users
+            List<User> users = deskUtil.getDeskUsers();
+
+            // get the custom fields
+            List<CustomField> custom_fields = deskUtil.getDeskCustomFields();
+
+            // build response and return it
+            response.put("groups", groups);
+            response.put("users", users);
+            response.put("custom_fields", custom_fields);
+        }
+        catch(Exception unknownHost)
+        {
+            throw new Exception("Unable to connect to Desk.com API");
+        }
+        return response;
     }
 }

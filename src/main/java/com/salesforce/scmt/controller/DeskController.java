@@ -30,5 +30,7 @@ public class DeskController
         post(PREFIX_URI + "/MigrateMetadata", (req, res) -> { return DeskService.migrateMetadata(req, res); }, new JsonTransformer());
         post(PREFIX_URI + "/MigrateData", (req, res) -> { return DeskService.migrateData(req, res); }, new JsonTransformer());
         post(PREFIX_URI + "/MigrateAttachments", (req, res) -> { return DeskService.migrateAttachments(req, res); }, new JsonTransformer());
+
+        post(PREFIX_URI + "/retrieveMetadata", (req, res) -> { return DeskService.retrieveMetadata(req, res); }, new JsonTransformer());
     }
 }
