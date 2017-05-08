@@ -479,6 +479,40 @@ public final class DeskUtil
         return getDeskService().getDeskGroupId2Name();
     }
 
+    public List<User> getDeskUsers() throws Exception
+    {
+        if (getDeskService().getDeskUsers() == null || getDeskService().getDeskUsers().isEmpty()) {
+            int page = 1;
+            boolean bRetry = false;
+            Response<ApiResponse<User>> resp = null;
+            ApiResponse<User> apiResp = null;
+            getDeskService().setDeskUsers(new ArrayList<>());
+            UserService service = getDeskClient().users();
+
+            do {
+                bRetry = false;
+                resp = service.getUsers(DESK_PAGE_SIZE_USER, page).execute();
+                if (resp.isSuccess()) {
+                    apiResp = resp.body();
+                    getDeskService().getDeskUsers().addAll(apiResp.getEntriesAsList());
+                    page++;
+                } else {
+                    if (resp.code() == 429) {
+                        bRetry = true;
+                    } else if (resp.code() == java.net.HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                        bRetry = true;
+                    } else {
+                        Utils.log(resp.headers().toString());
+                        throw new Exception(
+                                String.format("Error (%d): %s\n%s", resp.code(), resp.message(), resp.errorBody().string()));
+                    }
+                }
+            } while (bRetry || (resp.isSuccess() && apiResp.hasNextPage()));
+        }
+
+        return getDeskService().getDeskUsers();
+    }
+
     public List<Group> getDeskGroups() throws Exception
     {
         // check if we have retrieved the groups already
