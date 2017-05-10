@@ -330,12 +330,6 @@ public class DeskService
     public static Object migrateData(Request req, Response res) throws Exception
     {
         // get the post parameters in a hash map
-        Map<String, String> postParams = getPostParamsFromRequest(req);
-
-        // publish the job to RabbitMQ
-        RabbitUtil.publishToQueue(QUEUE_DESK_DATA_MIGRATION, EXCHANGE_TRACTOR, JsonUtil.toJson(postParams).getBytes());
-
-        // get the post parameters in a hash map
         Map<String, String> postParams = getPostParamsFromRequest(req, new String[] { "server_url", "session_id",
                 "deskUrl", "consumerKey", "consumerSecret", "accessToken", "accessTokenSecret"});
 
@@ -350,6 +344,9 @@ public class DeskService
         DeskUtil deskUtil = new DeskUtil(deskService);
 
         deskUtil.updateMigrationStatus(DeskMigrationFields.StatusQueued, "", null);
+
+        // publish the job to RabbitMQ
+        RabbitUtil.publishToQueue(QUEUE_DESK_DATA_MIGRATION, EXCHANGE_TRACTOR, JsonUtil.toJson(postParams).getBytes());
 
         return "SUBMITTED";
     }
