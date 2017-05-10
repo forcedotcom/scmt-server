@@ -36,13 +36,12 @@ import com.desk.java.apiclient.model.CustomField;
 import com.desk.java.apiclient.model.Group;
 import com.desk.java.apiclient.model.User;
 import com.salesforce.scmt.model.DeployResponse;
-import com.salesforce.scmt.utils.DeskUtil;
-import com.salesforce.scmt.utils.JsonUtil;
-import com.salesforce.scmt.utils.RabbitUtil;
-import com.salesforce.scmt.utils.Utils;
+import com.salesforce.scmt.utils.*;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
+
+import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 
 import spark.Request;
 import spark.Response;
@@ -331,7 +330,20 @@ public class DeskService
     public static Object migrateData(Request req, Response res) throws Exception
     {
         // get the post parameters in a hash map
-        Map<String, String> postParams = getPostParamsFromRequest(req);
+        Map<String, String> postParams = getPostParamsFromRequest(req, new String[] { "server_url", "session_id",
+                "deskUrl", "consumerKey", "consumerSecret", "accessToken", "accessTokenSecret"});
+
+        // create a DeskService instance based on the data posted (e.g. tokens, url, session id, etc.)
+        DeskService deskService = new DeskService(postParams.get("deskUrl"), postParams.get("consumerKey"),
+                postParams.get("consumerSecret"), postParams.get("accessToken"), postParams.get("accessTokenSecret"),
+                (postParams.containsKey("desk_migration_id") ? postParams.get("desk_migration_id") : null),
+                postParams.get("server_url"), postParams.get("session_id"),
+                (postParams.containsKey("auditEnabled") ? Boolean.valueOf(postParams.get("auditEnabled")) : false));
+
+        // build a DeskUtil (this has some non-static pieces so we can cache desk groups)
+        DeskUtil deskUtil = new DeskUtil(deskService);
+
+        deskUtil.updateMigrationStatus(DeskMigrationFields.StatusQueued, "", null);
 
         // publish the job to RabbitMQ
         RabbitUtil.publishToQueue(QUEUE_DESK_DATA_MIGRATION, EXCHANGE_TRACTOR, JsonUtil.toJson(postParams).getBytes());

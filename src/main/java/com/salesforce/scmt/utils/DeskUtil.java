@@ -1537,6 +1537,8 @@ public final class DeskUtil
 
     public void migrateDeskAttachments(List<Integer> caseIds) throws Exception
     {
+        updateMigrationStatus(DeskMigrationFields.StatusRunning, "Attachments", null);
+
         // get a service
         CaseService service = getDeskClient().cases();
 
@@ -1663,7 +1665,7 @@ public final class DeskUtil
         } // FOR Case Id
 
         // update the migration status
-        updateMigrationStatus("Complete", "Desk Attachments", dr);
+        updateMigrationStatus(DeskMigrationFields.StatusComplete, "Attachments", dr);
     }
 
     private static SObject getDeskMessageCaseAttachment(int caseId, List<String> errMessages)

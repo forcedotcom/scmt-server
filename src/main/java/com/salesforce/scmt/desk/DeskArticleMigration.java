@@ -33,6 +33,7 @@ import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseFields;
+import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.sforce.async.OperationEnum;
 
 import retrofit.Response;
@@ -113,7 +114,7 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
 
 	@Override
 	protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
-		du.updateMigrationStatus("Complete", "Articles", dr);
+		du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Articles", dr);
 		
 	}
 

@@ -35,6 +35,7 @@ import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.RabbitUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseFields;
+import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.salesforce.scmt.utils.Utils;
 import com.sforce.async.OperationEnum;
 
@@ -179,7 +180,7 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
             attachmentIdList.subList(0, iMax).clear();
         }
         
-        du.updateMigrationStatus("Complete", "Cases", dr);
+        du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Cases", dr);
     }
 
     @Override

@@ -29,6 +29,7 @@ import com.desk.java.apiclient.service.UserService;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
+import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.sforce.async.OperationEnum;
 
 import retrofit.Response;
@@ -105,7 +106,7 @@ public class DeskUserMigration<D extends Serializable> extends DeskBase<D> {
 	@Override
 	protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
 		System.out.println("success size" + dr.getSuccessCount());
-		du.updateMigrationStatus("Complete", "User", dr);
+		du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "User", dr);
 		
 	}
 
