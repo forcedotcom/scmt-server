@@ -105,7 +105,7 @@ public class DeskUserMigration<D extends Serializable> extends DeskBase<D> {
 	@Override
 	protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
 		System.out.println("success size" + dr.getSuccessCount());
-		du.updateMigrationStatus("Complete", "User", dr);
+		du.updateMigrationStatus(SalesforceConstants.DeskMigrationFields.StatusComplete, "User", dr);
 		
 	}
 

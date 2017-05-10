@@ -113,7 +113,7 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
 
 	@Override
 	protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
-		du.updateMigrationStatus("Complete", "Articles", dr);
+		du.updateMigrationStatus(SalesforceConstants.DeskMigrationFields.StatusComplete, "Articles", dr);
 		
 	}
 

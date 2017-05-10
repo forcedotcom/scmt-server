@@ -179,7 +179,7 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
             attachmentIdList.subList(0, iMax).clear();
         }
         
-        du.updateMigrationStatus("Complete", "Cases", dr);
+        du.updateMigrationStatus(SalesforceConstants.DeskMigrationFields.StatusComplete, "Cases", dr);
     }
 
     @Override

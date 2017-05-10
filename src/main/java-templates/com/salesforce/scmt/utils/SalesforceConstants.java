@@ -333,6 +333,7 @@ public final class SalesforceConstants
         public static final String Log = PKG_PREFIX + "Log" + CF_SUFFIX;
         public static final String ResumePoint = PKG_PREFIX + "RestartPoint" + CF_SUFFIX;
         public static final String ResultLink = PKG_PREFIX + "ResultLink" + CF_SUFFIX;
+        public static final String Object = PKG_PREFIX + "Object" + CF_SUFFIX;
 
         // status picklist values
         public static final String StatusNew = "New";
@@ -340,6 +341,17 @@ public final class SalesforceConstants
         public static final String StatusRunning = "Running";
         public static final String StatusComplete = "Complete";
         public static final String StatusFailed = "Failed";
+
+        // object piclickst values
+        public static final String ObjectUser = "User";
+        public static final String ObjectGroupMember = "Group Member";
+        public static final String ObjectAccount = "Account";
+        public static final String ObjectContact = "Contact";
+        public static final String ObjectCase = "Case";
+        public static final String ObjectNote = "Note";
+        public static final String ObjectInteraction = "Interaction";
+        public static final String ObjectAttachment = "Attachment";
+        public static final String ObjectArticle = "Article";
     }
 
     public class DeskMessageFields

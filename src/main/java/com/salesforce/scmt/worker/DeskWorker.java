@@ -43,6 +43,7 @@ import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.RabbitUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMessageFields;
+import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
 import com.salesforce.scmt.utils.Utils;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
@@ -347,14 +348,14 @@ public final class DeskWorker
         {
             DeployResponse dr = new DeployResponse();
             dr.addError(String.format("[%s] %s", e.getExceptionCode().name(), e.getExceptionMessage()));
-            deskUtil.updateMigrationStatus(e.getExceptionCode().name(), "Attachments", dr);
+            deskUtil.updateMigrationStatus(DeskMigrationFields.StatusFailed, "Attachments", dr);
             Utils.logException(e);
         }
         catch (Exception e)
         {
             DeployResponse dr = new DeployResponse();
             dr.addError(e.getMessage());
-            deskUtil.updateMigrationStatus("Failed", "Attachments", dr);
+            deskUtil.updateMigrationStatus(DeskMigrationFields.StatusFailed, "Attachments", dr);
             Utils.logException(e);
         }
     }

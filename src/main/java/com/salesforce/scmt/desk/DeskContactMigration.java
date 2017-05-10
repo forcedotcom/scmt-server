@@ -129,7 +129,7 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
     @Override
     protected void objectSpecificBulkComplete(DeskUtil du) throws Exception
     {
-    	du.updateMigrationStatus("Complete", "Contact", dr);
+    	du.updateMigrationStatus(SalesforceConstants.DeskMigrationFields.StatusComplete, "Contact", dr);
     }
 
     @Override
