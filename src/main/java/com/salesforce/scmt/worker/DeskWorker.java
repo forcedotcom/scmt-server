@@ -347,14 +347,14 @@ public final class DeskWorker
         {
             DeployResponse dr = new DeployResponse();
             dr.addError(String.format("[%s] %s", e.getExceptionCode().name(), e.getExceptionMessage()));
-            deskUtil.updateMigrationStatus(e.getExceptionCode().name(), "Desk Attachments", dr);
+            deskUtil.updateMigrationStatus(e.getExceptionCode().name(), "Attachments", dr);
             Utils.logException(e);
         }
         catch (Exception e)
         {
             DeployResponse dr = new DeployResponse();
             dr.addError(e.getMessage());
-            deskUtil.updateMigrationStatus("Failed", "Desk Attachments", dr);
+            deskUtil.updateMigrationStatus("Failed", "Attachments", dr);
             Utils.logException(e);
         }
     }

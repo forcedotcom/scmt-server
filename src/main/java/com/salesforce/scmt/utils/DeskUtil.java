@@ -1663,7 +1663,7 @@ public final class DeskUtil
         } // FOR Case Id
 
         // update the migration status
-        updateMigrationStatus("Complete", "Desk Attachments", dr);
+        updateMigrationStatus("Complete", "Attachments", dr);
     }
 
     private static SObject getDeskMessageCaseAttachment(int caseId, List<String> errMessages)
