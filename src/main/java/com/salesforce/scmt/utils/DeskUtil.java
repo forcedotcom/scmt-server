@@ -1537,6 +1537,8 @@ public final class DeskUtil
 
     public void migrateDeskAttachments(List<Integer> caseIds) throws Exception
     {
+        updateMigrationStatus(DeskMigrationFields.StatusRunning, "Attachments", null);
+
         // get a service
         CaseService service = getDeskClient().cases();
 

@@ -190,6 +190,7 @@ public abstract class DeskBase<D extends Serializable>
                         Utils.log(dResp.getHeaders().toString());
                         // throw new Exception(String.format("Error (%d): %s\n%s", dResp.code(), dResp.message(),
                         // dResp.errorBody().toString()));
+                        du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "", dr);
                         throw new Exception(String.format("Error %s", dResp.getMessage()));
                     }
                 }
@@ -206,6 +207,7 @@ public abstract class DeskBase<D extends Serializable>
                     
 //                    Utils.sendEmail();
                     // we retried 5 times, let exception go
+                    du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "", dr);
                     throw e;
                 }
                 else
