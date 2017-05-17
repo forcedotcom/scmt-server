@@ -264,6 +264,8 @@ public final class DeskUtil
     private static final int DESK_COMPANY_ID_MAX = 50;
 
     private DeskService _deskService;
+
+    private List<CustomField> _deskCustomFields;
     
     /**
      * Private constructor for utility class.
@@ -411,51 +413,59 @@ public final class DeskUtil
         }
     }
 
-    public List<CustomField> getDeskCustomFields() throws Exception
+    public CustomField getDeskCustomField(String name) throws Exception
     {
-        // declare page counter
-        int page = 0;
-
-        // declare the response objects at this scope so I can check them in the do/while loop
-        Response<ApiResponse<CustomField>> resp = null;
-        ApiResponse<CustomField> apiResp = null;
-
-        // declare the list that will be returned
-        List<CustomField> recList = new ArrayList<>();
-
-        // get a service
-        CustomFieldsService service = getDeskClient().customFields();
-
-        // loop through retrieving records
-        do
-        {
-            // increment the page counter
-            page++;
-
-            // retrieve the records synchronously
-            resp = service.getCustomFields(DESK_PAGE_SIZE_CF, page).execute();
-
-            // check for success
-            if (resp.isSuccess())
-            {
-                // get the response body
-                apiResp = resp.body();
-
-                // add the list of records to the return list
-                recList.addAll(apiResp.getEntriesAsList());
-            }
-            else
-            {
-                Utils.log(resp.headers().toString());
-                throw new Exception(
-                    String.format("Error (%d): %s\n%s", resp.code(), resp.message(), resp.errorBody().string()));
+        for (CustomField cf : getDeskCustomFields()) {
+            if (cf.getName().equals(name)) {
+                return cf;
             }
         }
-        // continue to loop while the request is successful and there are subsequent pages of results
-        while (resp.isSuccess() && apiResp.hasNextPage());
+        return null;
+    }
+
+    public List<CustomField> getDeskCustomFields() throws Exception
+    {
+        if (_deskCustomFields == null) {
+            // declare page counter
+            int page = 0;
+
+            // declare the response objects at this scope so I can check them in the do/while loop
+            Response<ApiResponse<CustomField>> resp = null;
+            ApiResponse<CustomField> apiResp = null;
+
+            // declare the list that will be returned
+            _deskCustomFields = new ArrayList<>();
+
+            // get a service
+            CustomFieldsService service = getDeskClient().customFields();
+
+            // loop through retrieving records
+            do {
+                // increment the page counter
+                page++;
+
+                // retrieve the records synchronously
+                resp = service.getCustomFields(DESK_PAGE_SIZE_CF, page).execute();
+
+                // check for success
+                if (resp.isSuccess()) {
+                    // get the response body
+                    apiResp = resp.body();
+
+                    // add the list of records to the return list
+                    _deskCustomFields.addAll(apiResp.getEntriesAsList());
+                } else {
+                    Utils.log(resp.headers().toString());
+                    throw new Exception(
+                            String.format("Error (%d): %s\n%s", resp.code(), resp.message(), resp.errorBody().string()));
+                }
+            }
+            // continue to loop while the request is successful and there are subsequent pages of results
+            while (resp.isSuccess() && apiResp.hasNextPage());
+        }
 
         // return the list of records
-        return recList;
+        return _deskCustomFields;
     }
 
     public Map<Integer, String> getDeskGroupIdAndName() throws Exception
