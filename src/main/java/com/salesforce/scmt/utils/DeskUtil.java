@@ -99,11 +99,7 @@ import com.salesforce.scmt.utils.SalesforceConstants.TopicFields;
 import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.OperationEnum;
-import com.sforce.soap.metadata.FieldType;
-import com.sforce.soap.metadata.Picklist;
-import com.sforce.soap.metadata.PicklistValue;
-import com.sforce.soap.metadata.Queue;
-import com.sforce.soap.metadata.QueueSobject;
+import com.sforce.soap.metadata.*;
 import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.fault.ExceptionCode;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
@@ -668,7 +664,7 @@ public final class DeskUtil
     public DeployResponse createCustomFields(String json) throws Exception
     {
         // define the list of custom fields to create using the Salesforce metadata API
-        List<com.sforce.soap.metadata.CustomField> sfCFs = new ArrayList<>();
+        List<com.sforce.soap.metadata.Metadata> sfCFs = new ArrayList<>();
 
         Utils.log("Custom Field JSON: " + json);
 
@@ -681,12 +677,52 @@ public final class DeskUtil
 
         for (CustomField cf : jsonObj)
         {
-            sfCFs.add(deskCustomFieldToSalesforceCustomField(cf));
+            com.sforce.soap.metadata.CustomField sfCF = deskCustomFieldToSalesforceCustomField(cf);
+            sfCFs.add(sfCF);
         }
 
         getSalesforceService().addCustomFields(sfCFs);
         Utils.log("SF Custom Fields"+ sfCFs);
         return getSalesforceService().deploy();
+    }
+
+    public DeployResponse createFieldPermissions(String json) throws Exception
+    {
+        // define the list of custom fields to create using the Salesforce metadata API
+        List<com.sforce.soap.metadata.Metadata> sfCFs = new ArrayList<>();
+        // create permissionset
+        PermissionSet orgPermSet = getSalesforceService().getPermissionSet("SCMT_Audit");
+        PermissionSet permissionSet = new PermissionSet();
+        permissionSet.setFullName(orgPermSet.getFullName());
+        permissionSet.setLabel(orgPermSet.getLabel());
+
+        List<PermissionSetFieldPermissions> fieldPermissions = new ArrayList<>();
+
+        // deserialize the JSON into an object
+        Type listType = new TypeToken<List<CustomField>>() {}.getType();
+        @SuppressWarnings("unchecked")
+        List<CustomField> jsonObj = (List<CustomField>) JsonUtil.fromJson(json, listType);
+
+        for (CustomField cf : jsonObj)
+        {
+            com.sforce.soap.metadata.CustomField sfCF = deskCustomFieldToSalesforceCustomField(cf);
+            fieldPermissions.add(permissionSetFieldPermissionsFromCustomField(sfCF));
+        }
+
+        permissionSet.setFieldPermissions(fieldPermissions.toArray(new PermissionSetFieldPermissions[fieldPermissions.size()]));
+        sfCFs.add(permissionSet);
+
+        getSalesforceService().addCustomFields(sfCFs);
+        return getSalesforceService().deploy();
+    }
+
+    private static com.sforce.soap.metadata.PermissionSetFieldPermissions permissionSetFieldPermissionsFromCustomField(com.sforce.soap.metadata.CustomField cf)
+    {
+        PermissionSetFieldPermissions perm = new PermissionSetFieldPermissions();
+        perm.setEditable(true);
+        perm.setReadable(true);
+        perm.setField(cf.getFullName());
+        return perm;
     }
 
     private static com.sforce.soap.metadata.CustomField deskCustomFieldToSalesforceCustomField(CustomField cf)
@@ -706,7 +742,7 @@ public final class DeskUtil
         sfCF.setFullName(sfObjectName + ".Desk_" + cf.getName() + "__c");
 
         sfCF.setDescription("Field migrated from Desk.com by Service Cloud Migration Tool.");
-        
+
         if (cf.getLabel() == null)
         {
             Utils.log("Label is null! Name: " + cf.getName());
