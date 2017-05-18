@@ -663,34 +663,14 @@ public final class DeskUtil
 
     public DeployResponse createCustomFields(String json) throws Exception
     {
-        // define the list of custom fields to create using the Salesforce metadata API
-        List<com.sforce.soap.metadata.Metadata> sfCFs = new ArrayList<>();
-
-        Utils.log("Custom Field JSON: " + json);
-
-        // deserialize the JSON into an object
-        Type listType = new TypeToken<List<CustomField>>() {}.getType();
-        @SuppressWarnings("unchecked")
-        List<CustomField> jsonObj = (List<CustomField>) JsonUtil.fromJson(json, listType);
-        
-        Utils.log("Custom Field Count: " + jsonObj.size());
-
-        for (CustomField cf : jsonObj)
-        {
-            com.sforce.soap.metadata.CustomField sfCF = deskCustomFieldToSalesforceCustomField(cf);
-            sfCFs.add(sfCF);
-        }
-
-        getSalesforceService().addCustomFields(sfCFs);
-        Utils.log("SF Custom Fields"+ sfCFs);
+        getSalesforceService().addCustomFields(convertCustomFields(json));
         return getSalesforceService().deploy();
     }
 
     public DeployResponse createFieldPermissions(String json) throws Exception
     {
-        // define the list of custom fields to create using the Salesforce metadata API
-        List<com.sforce.soap.metadata.Metadata> sfCFs = new ArrayList<>();
-        // create permissionset
+        List<Metadata> sfCFs = convertCustomFields(json);
+
         PermissionSet orgPermSet = getSalesforceService().getPermissionSet("SCMT_Audit");
         PermissionSet permissionSet = new PermissionSet();
         permissionSet.setFullName(orgPermSet.getFullName());
@@ -698,30 +678,45 @@ public final class DeskUtil
 
         List<PermissionSetFieldPermissions> fieldPermissions = new ArrayList<>();
 
-        // deserialize the JSON into an object
-        Type listType = new TypeToken<List<CustomField>>() {}.getType();
-        @SuppressWarnings("unchecked")
-        List<CustomField> jsonObj = (List<CustomField>) JsonUtil.fromJson(json, listType);
 
-        for (CustomField cf : jsonObj)
+        for (com.sforce.soap.metadata.Metadata cf : sfCFs)
         {
-            com.sforce.soap.metadata.CustomField sfCF = deskCustomFieldToSalesforceCustomField(cf);
-            fieldPermissions.add(permissionSetFieldPermissionsFromCustomField(sfCF));
+            fieldPermissions.add(permissionSetFieldPermissionsFromCustomField(cf.getFullName()));
         }
 
         permissionSet.setFieldPermissions(fieldPermissions.toArray(new PermissionSetFieldPermissions[fieldPermissions.size()]));
-        sfCFs.add(permissionSet);
 
-        getSalesforceService().addCustomFields(sfCFs);
+        getSalesforceService().addCustomFields(Arrays.asList(permissionSet));
         return getSalesforceService().deploy();
     }
 
-    private static com.sforce.soap.metadata.PermissionSetFieldPermissions permissionSetFieldPermissionsFromCustomField(com.sforce.soap.metadata.CustomField cf)
+    private static List<com.sforce.soap.metadata.Metadata> convertCustomFields(String json)
+    {
+        // define the list of custom fields to create using the Salesforce metadata API
+        List<com.sforce.soap.metadata.Metadata> sfCFs = new ArrayList<>();
+
+        for (CustomField cf : parseCustomFields(json))
+        {
+            com.sforce.soap.metadata.CustomField sfCF = deskCustomFieldToSalesforceCustomField(cf);
+            sfCFs.add(sfCF);
+        }
+
+        return sfCFs;
+    }
+
+    private static List<CustomField> parseCustomFields(String json)
+    {
+        // deserialize the JSON into an object
+        Type listType = new TypeToken<List<CustomField>>() {}.getType();
+        return (List<CustomField>) JsonUtil.fromJson(json, listType);
+    }
+
+    private static com.sforce.soap.metadata.PermissionSetFieldPermissions permissionSetFieldPermissionsFromCustomField(String name)
     {
         PermissionSetFieldPermissions perm = new PermissionSetFieldPermissions();
         perm.setEditable(true);
         perm.setReadable(true);
-        perm.setField(cf.getFullName());
+        perm.setField(name);
         return perm;
     }
 

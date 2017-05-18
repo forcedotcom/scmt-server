@@ -241,9 +241,7 @@ public abstract class DeskBase<D extends Serializable>
 
                 // convert the desk case to the Map for conversion to JSON
                 // sfRecs.add(d);
-                Utils.log("beforeObjectToSalesforce: " + String.valueOf(d));
             	List<Map<String, Object>> obj = deskObjectToSalesforceObject(du, d);
-            	Utils.log("deskObjectToSalesforceObject: " + String.valueOf(obj));
                 sfRecs.addAll(obj);
                 
                 // increment the counter 
