@@ -148,7 +148,7 @@ public class DeskAccountMigration<D extends Serializable> extends DeskBase<D>
         {  
         	
         	
-        	a.add(deskCompanyToSalesforceJsonMap((Company) d, config));
+        	a.add(deskCompanyToSalesforceJsonMap(du, (Company) d, config));
         }
         catch(Exception e)
 		{

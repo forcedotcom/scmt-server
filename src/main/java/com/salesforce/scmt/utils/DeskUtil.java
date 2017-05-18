@@ -99,11 +99,7 @@ import com.salesforce.scmt.utils.SalesforceConstants.TopicFields;
 import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.OperationEnum;
-import com.sforce.soap.metadata.FieldType;
-import com.sforce.soap.metadata.Picklist;
-import com.sforce.soap.metadata.PicklistValue;
-import com.sforce.soap.metadata.Queue;
-import com.sforce.soap.metadata.QueueSobject;
+import com.sforce.soap.metadata.*;
 import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.fault.ExceptionCode;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
@@ -264,6 +260,8 @@ public final class DeskUtil
     private static final int DESK_COMPANY_ID_MAX = 50;
 
     private DeskService _deskService;
+
+    private List<CustomField> _deskCustomFields;
     
     /**
      * Private constructor for utility class.
@@ -411,51 +409,59 @@ public final class DeskUtil
         }
     }
 
-    public List<CustomField> getDeskCustomFields() throws Exception
+    public CustomField getDeskCustomField(String name) throws Exception
     {
-        // declare page counter
-        int page = 0;
-
-        // declare the response objects at this scope so I can check them in the do/while loop
-        Response<ApiResponse<CustomField>> resp = null;
-        ApiResponse<CustomField> apiResp = null;
-
-        // declare the list that will be returned
-        List<CustomField> recList = new ArrayList<>();
-
-        // get a service
-        CustomFieldsService service = getDeskClient().customFields();
-
-        // loop through retrieving records
-        do
-        {
-            // increment the page counter
-            page++;
-
-            // retrieve the records synchronously
-            resp = service.getCustomFields(DESK_PAGE_SIZE_CF, page).execute();
-
-            // check for success
-            if (resp.isSuccess())
-            {
-                // get the response body
-                apiResp = resp.body();
-
-                // add the list of records to the return list
-                recList.addAll(apiResp.getEntriesAsList());
-            }
-            else
-            {
-                Utils.log(resp.headers().toString());
-                throw new Exception(
-                    String.format("Error (%d): %s\n%s", resp.code(), resp.message(), resp.errorBody().string()));
+        for (CustomField cf : getDeskCustomFields()) {
+            if (cf.getName().equals(name)) {
+                return cf;
             }
         }
-        // continue to loop while the request is successful and there are subsequent pages of results
-        while (resp.isSuccess() && apiResp.hasNextPage());
+        return null;
+    }
+
+    public List<CustomField> getDeskCustomFields() throws Exception
+    {
+        if (_deskCustomFields == null) {
+            // declare page counter
+            int page = 0;
+
+            // declare the response objects at this scope so I can check them in the do/while loop
+            Response<ApiResponse<CustomField>> resp = null;
+            ApiResponse<CustomField> apiResp = null;
+
+            // declare the list that will be returned
+            _deskCustomFields = new ArrayList<>();
+
+            // get a service
+            CustomFieldsService service = getDeskClient().customFields();
+
+            // loop through retrieving records
+            do {
+                // increment the page counter
+                page++;
+
+                // retrieve the records synchronously
+                resp = service.getCustomFields(DESK_PAGE_SIZE_CF, page).execute();
+
+                // check for success
+                if (resp.isSuccess()) {
+                    // get the response body
+                    apiResp = resp.body();
+
+                    // add the list of records to the return list
+                    _deskCustomFields.addAll(apiResp.getEntriesAsList());
+                } else {
+                    Utils.log(resp.headers().toString());
+                    throw new Exception(
+                            String.format("Error (%d): %s\n%s", resp.code(), resp.message(), resp.errorBody().string()));
+                }
+            }
+            // continue to loop while the request is successful and there are subsequent pages of results
+            while (resp.isSuccess() && apiResp.hasNextPage());
+        }
 
         // return the list of records
-        return recList;
+        return _deskCustomFields;
     }
 
     public Map<Integer, String> getDeskGroupIdAndName() throws Exception
@@ -657,26 +663,61 @@ public final class DeskUtil
 
     public DeployResponse createCustomFields(String json) throws Exception
     {
-        // define the list of custom fields to create using the Salesforce metadata API
-        List<com.sforce.soap.metadata.CustomField> sfCFs = new ArrayList<>();
+        getSalesforceService().addCustomFields(convertCustomFields(json));
+        return getSalesforceService().deploy();
+    }
 
-        Utils.log("Custom Field JSON: " + json);
+    public DeployResponse createFieldPermissions(String json) throws Exception
+    {
+        List<Metadata> sfCFs = convertCustomFields(json);
 
-        // deserialize the JSON into an object
-        Type listType = new TypeToken<List<CustomField>>() {}.getType();
-        @SuppressWarnings("unchecked")
-        List<CustomField> jsonObj = (List<CustomField>) JsonUtil.fromJson(json, listType);
-        
-        Utils.log("Custom Field Count: " + jsonObj.size());
+        PermissionSet orgPermSet = getSalesforceService().getPermissionSet("SCMT_Audit");
+        PermissionSet permissionSet = new PermissionSet();
+        permissionSet.setFullName(orgPermSet.getFullName());
+        permissionSet.setLabel(orgPermSet.getLabel());
 
-        for (CustomField cf : jsonObj)
+        List<PermissionSetFieldPermissions> fieldPermissions = new ArrayList<>();
+
+
+        for (com.sforce.soap.metadata.Metadata cf : sfCFs)
         {
-            sfCFs.add(deskCustomFieldToSalesforceCustomField(cf));
+            fieldPermissions.add(permissionSetFieldPermissionsFromCustomField(cf.getFullName()));
         }
 
-        getSalesforceService().addCustomFields(sfCFs);
-        Utils.log("SF Custom Fields"+ sfCFs);
+        permissionSet.setFieldPermissions(fieldPermissions.toArray(new PermissionSetFieldPermissions[fieldPermissions.size()]));
+
+        getSalesforceService().addCustomFields(Arrays.asList(permissionSet));
         return getSalesforceService().deploy();
+    }
+
+    private static List<com.sforce.soap.metadata.Metadata> convertCustomFields(String json)
+    {
+        // define the list of custom fields to create using the Salesforce metadata API
+        List<com.sforce.soap.metadata.Metadata> sfCFs = new ArrayList<>();
+
+        for (CustomField cf : parseCustomFields(json))
+        {
+            com.sforce.soap.metadata.CustomField sfCF = deskCustomFieldToSalesforceCustomField(cf);
+            sfCFs.add(sfCF);
+        }
+
+        return sfCFs;
+    }
+
+    private static List<CustomField> parseCustomFields(String json)
+    {
+        // deserialize the JSON into an object
+        Type listType = new TypeToken<List<CustomField>>() {}.getType();
+        return (List<CustomField>) JsonUtil.fromJson(json, listType);
+    }
+
+    private static com.sforce.soap.metadata.PermissionSetFieldPermissions permissionSetFieldPermissionsFromCustomField(String name)
+    {
+        PermissionSetFieldPermissions perm = new PermissionSetFieldPermissions();
+        perm.setEditable(true);
+        perm.setReadable(true);
+        perm.setField(name);
+        return perm;
     }
 
     private static com.sforce.soap.metadata.CustomField deskCustomFieldToSalesforceCustomField(CustomField cf)
@@ -696,7 +737,7 @@ public final class DeskUtil
         sfCF.setFullName(sfObjectName + ".Desk_" + cf.getName() + "__c");
 
         sfCF.setDescription("Field migrated from Desk.com by Service Cloud Migration Tool.");
-        
+
         if (cf.getLabel() == null)
         {
             Utils.log("Label is null! Name: " + cf.getName());

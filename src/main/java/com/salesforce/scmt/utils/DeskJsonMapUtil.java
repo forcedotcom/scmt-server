@@ -15,26 +15,12 @@
 
 package com.salesforce.scmt.utils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
-import com.desk.java.apiclient.model.Article;
-import com.desk.java.apiclient.model.Case;
-import com.desk.java.apiclient.model.CaseStatus;
-import com.desk.java.apiclient.model.CaseType;
-import com.desk.java.apiclient.model.Company;
-import com.desk.java.apiclient.model.Customer;
-import com.desk.java.apiclient.model.CustomerContact;
-import com.desk.java.apiclient.model.Interaction;
+import com.desk.java.apiclient.model.*;
 import com.desk.java.apiclient.model.Interaction.InteractionType;
-import com.desk.java.apiclient.model.Label;
-import com.desk.java.apiclient.model.Note;
-import com.desk.java.apiclient.model.User;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.utils.SalesforceConstants.AccountFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseCommentFields;
@@ -54,10 +40,10 @@ public final class DeskJsonMapUtil
      */
     private DeskJsonMapUtil() {}
 
-    private static Map<String, String> deskCustomFieldsToSalesforceJsonMap(Map<String, String> deskCFs)
+    private static Map<String, Object> deskCustomFieldsToSalesforceJsonMap(Map<String, String> deskCFs, DeskUtil deskUtil) throws Exception
     {
         // declare the Salesforce custom fields map
-        Map<String, String> sfCFs = new HashMap<>();
+        Map<String, Object> sfCFs = new HashMap<>();
 
         // migrate custom fields
         if (deskCFs != null && !deskCFs.isEmpty())
@@ -65,10 +51,23 @@ public final class DeskJsonMapUtil
             // key is the field name
             for (String key : deskCFs.keySet())
             {
-                // set the custom field
-                sfCFs.put("Desk_" + key + "__c", deskCFs.get(key));
+                String sfCFkey = "Desk_" + key + "__c";
+                CustomField cf = deskUtil.getDeskCustomField(key);
+
+                if (deskCFs.get(key) == null) continue;
+
+                if (cf.getData().getType() == CustomFieldDataType.BOOLEAN)
+                    sfCFs.put(sfCFkey, Boolean.valueOf(deskCFs.get(key)));
+                else if (cf.getData().getType() == CustomFieldDataType.INTEGER && deskCFs.get(key) != null) {
+                    sfCFs.put(sfCFkey, Integer.valueOf(deskCFs.get(key)));
+                } else
+                    sfCFs.put(sfCFkey, String.valueOf(deskCFs.get(key)));
             }
         }
+
+        sfCFs.values().removeIf(Objects::isNull);
+        Predicate<Object> removePredicate = (Object o) -> String.valueOf(o).isEmpty();
+        sfCFs.values().removeIf(removePredicate);
 
         return sfCFs;
     }
@@ -113,7 +112,7 @@ public final class DeskJsonMapUtil
         return userMap;
     }
 
-    public static Map<String, Object> deskCompanyToSalesforceJsonMap(Company company, Map<String, String> config)
+    public static Map<String, Object> deskCompanyToSalesforceJsonMap(DeskUtil deskUtil, Company company, Map<String, String> config) throws Exception
     {
         Map<String, Object> mapObj = new HashMap<>();
         mapObj.put(AccountFields.DeskId, company.getId());
@@ -135,7 +134,7 @@ public final class DeskJsonMapUtil
 
         mapObj.put(AccountFields.RecordTypeId, config.get("account_record_type_id"));
         // add the desk custom fields
-        mapObj.putAll(deskCustomFieldsToSalesforceJsonMap(company.getCustomFields()));
+        mapObj.putAll(deskCustomFieldsToSalesforceJsonMap(company.getCustomFields(), deskUtil));
 
         return mapObj;
     }
@@ -249,7 +248,7 @@ public final class DeskJsonMapUtil
         }
 
         // add the desk custom fields
-        mapObj.putAll(deskCustomFieldsToSalesforceJsonMap(deskCase.getCustomFields()));
+        mapObj.putAll(deskCustomFieldsToSalesforceJsonMap(deskCase.getCustomFields(), deskUtil));
 
         // put the labels into the long text area custom field, separated by newline
         mapObj.put(CaseFields.DeskLabels, String.join("\n", deskCase.getLabels()));
@@ -262,7 +261,7 @@ public final class DeskJsonMapUtil
         return mapObj;
     }
 
-    public static Map<String, Object> deskCustomerToSalesforceJsonMap(Customer customer, DeployResponse deployResponse, Map<String, String> config) throws Exception
+    public static Map<String, Object> deskCustomerToSalesforceJsonMap(DeskUtil deskUtil, Customer customer, DeployResponse deployResponse, Map<String, String> config) throws Exception
     {
         // create the map
         Map<String, Object> mapObj = new HashMap<>();
@@ -412,7 +411,7 @@ public final class DeskJsonMapUtil
         }
 
         // add the desk custom fields
-        mapObj.putAll(deskCustomFieldsToSalesforceJsonMap(customer.getCustomFields()));
+        mapObj.putAll(deskCustomFieldsToSalesforceJsonMap(customer.getCustomFields(), deskUtil));
 
         return mapObj;
     }

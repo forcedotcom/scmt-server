@@ -38,12 +38,7 @@ import com.sforce.async.ContentType;
 import com.sforce.async.JobInfo;
 import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
-import com.sforce.soap.metadata.CustomField;
-import com.sforce.soap.metadata.DataCategoryGroup;
-import com.sforce.soap.metadata.Metadata;
-import com.sforce.soap.metadata.MetadataConnection;
-import com.sforce.soap.metadata.Queue;
-import com.sforce.soap.metadata.QueueSobject;
+import com.sforce.soap.metadata.*;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
@@ -279,13 +274,21 @@ public final class SalesforceService
         setBulkConnection(new BulkConnection(bulkConfig));
     }
 
+    public PermissionSet getPermissionSet(String name) throws Exception
+    {
+        createMetadataConnection();
+        ReadResult readResult = getMetadataConnection().readMetadata("PermissionSet", new String[] { name });
+        Metadata[] mdInfo = readResult.getRecords();
+        return (PermissionSet) mdInfo[0];
+    }
+
     /**
      * Add a list of Salesforce Metadata API custom fields to be created.
      * 
      * @param customFields
      *            The list of custom fields to be created.
      */
-    public void addCustomFields(List<CustomField> customFields)
+    public void addCustomFields(List<Metadata> customFields)
     {
         // check if the metadata list needs to be initialized
         if (_metadata == null)
