@@ -786,7 +786,7 @@ public final class DeskUtil
             List<PicklistValue> plvs = new ArrayList<>();
 
             // loop through the desk choices
-            for (String choice : cf.getData().getChoices())
+            for (String choice : cleanDataChoices(cf.getData().getChoices()))
             {
                 PicklistValue plv = new PicklistValue();
                 // TODO: 'safe' the choice
@@ -813,6 +813,21 @@ public final class DeskUtil
 
         // return the Salesforce custom field
         return sfCF;
+    }
+
+    private static HashSet<String> cleanDataChoices(String[] choices) {
+        HashSet<String> clean = new HashSet<>();
+        HashSet<String> clone = new HashSet<>();
+
+        for (String choice : choices) {
+            choice = choice.trim();
+            if (!clone.contains(choice.toLowerCase())) {
+                clone.add(choice.toLowerCase());
+                clean.add(choice);
+            }
+        }
+
+        return clean;
     }
 
     public DeployResponse createQueues(String json) throws Exception
