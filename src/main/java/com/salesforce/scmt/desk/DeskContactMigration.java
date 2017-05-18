@@ -145,7 +145,7 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
         ArrayList<Map<String, Object>> a = new ArrayList<Map<String, Object>>();
         try
         {
-        	a.add(deskCustomerToSalesforceJsonMap((Customer) d, new DeployResponse(), config));        	
+        	a.add(deskCustomerToSalesforceJsonMap(du, (Customer) d, new DeployResponse(), config));
         }
         catch(Exception e)
 		{

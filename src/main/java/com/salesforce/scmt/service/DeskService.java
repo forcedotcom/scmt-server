@@ -315,6 +315,7 @@ public class DeskService
         {
             // create the custom fields that were passed
             response.addDeployResponse(deskUtil.createCustomFields(postParams.get("custom_fields")));
+            response.addDeployResponse(deskUtil.createFieldPermissions(postParams.get("custom_fields")));
         }
         
         // check if groups were passed
