@@ -903,7 +903,9 @@ public final class DeskUtil
         GroupService service = getDeskClient().groups();
 
         //get All SFDC users
-        String query = String.format("Select %s, %s, %s From %s Where %s != null", UserFields.Id, UserFields.DeskId, UserFields.Email, SalesforceConstants.OBJ_USER, UserFields.DeskId);
+        String query = String.format("Select %s, %s, %s From %s Where %s != null Or %s = '%s'",
+                UserFields.Id, UserFields.DeskId, UserFields.Email, SalesforceConstants.OBJ_USER, UserFields.DeskId,
+                UserFields.Email, config.get("user_email"));
         List<SObject> sfUsers = getSalesforceService().query(query);
 
         String currentUserId = null;
@@ -915,9 +917,12 @@ public final class DeskUtil
         {
             if (u.getField(UserFields.Email).equals(config.get("user_email")))
                 currentUserId = (String) u.getField(UserFields.Id);
-            // better way to not lose precision? Values come back from sfdc as sci notation eg. 2.3091629E7
-            int deskId = new BigDecimal(String.valueOf(u.getField(UserFields.DeskId))).intValue();
-            deskIdToSfdcId.put(deskId, (String) u.getField(UserFields.Id));
+
+            if (u.getField(UserFields.DeskId) != null) {
+                // better way to not lose precision? Values come back from sfdc as sci notation eg. 2.3091629E7
+                int deskId = new BigDecimal(String.valueOf(u.getField(UserFields.DeskId))).intValue();
+                deskIdToSfdcId.put(deskId, (String) u.getField(UserFields.Id));
+            }
         }
 
         // unassigned record
