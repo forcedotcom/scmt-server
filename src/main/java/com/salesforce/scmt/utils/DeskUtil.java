@@ -981,6 +981,8 @@ public final class DeskUtil
                         {
                             // create the group members
                             dr.addDeployResponse(createGroupMembers(jobId, recList));
+                            //update dr success count
+                            dr.incrementSuccessCount(recList.size());
 
                             // clear the records that were bulk inserted
                             recList.subList(0, SalesforceConstants.BULK_MAX_SIZE).clear();
@@ -1030,10 +1032,14 @@ public final class DeskUtil
         if (!recList.isEmpty() && !SalesforceConstants.READ_ONLY)
         {
             dr.addDeployResponse(createGroupMembers(jobId, recList));
+            //update dr success count
+            dr.incrementSuccessCount(recList.size());
         }
 
         // close the bulk job
         getSalesforceService().closeBulkJob(jobId);
+
+        updateMigrationStatus(DeskMigrationFields.StatusComplete, "Group Member", dr);
 
         return dr;
     }
