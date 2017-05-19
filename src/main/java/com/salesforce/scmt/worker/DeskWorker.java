@@ -113,7 +113,7 @@ public final class DeskWorker
             	Set<Integer> groupIds = deskUtil.getDeskGroupIdAndName().keySet();            	
             	
             	 //get and create sfdc queue members from desk group members           	
-            	dr.addDeployResponse(deskUtil.getDeskGroupMembers(groupIds));
+            	dr.addDeployResponse(deskUtil.getDeskGroupMembers(groupIds, config));
             }
             
             if (Boolean.valueOf(config.get("migrateCompanies")) && !bigCompanies)
