@@ -935,6 +935,8 @@ public final class DeskUtil
         String jobId = getSalesforceService().createBulkJob(SalesforceConstants.OBJ_GROUP_MEMBER,
             SalesforceConstants.Fields.Id, OperationEnum.insert);
 
+        updateMigrationStatus(DeskMigrationFields.StatusRunning, "", dr, jobId);
+
         for (Integer groupId : groupIds)
         {
             // declare the retry flag
@@ -2292,6 +2294,11 @@ public final class DeskUtil
     
     public void updateMigrationStatus(String status, String stage, DeployResponse dr)
     {
+        updateMigrationStatus(status, stage, dr, null);
+    }
+
+    public void updateMigrationStatus(String status, String stage, DeployResponse dr, String jobId)
+    {
         try
         {
             SObject deskMigration = new SObject(SalesforceConstants.OBJ_DESK_MIGRATION);
@@ -2362,6 +2369,10 @@ public final class DeskUtil
             if (stage != null)
             {
                 deskMigration.setField(DeskMigrationFields.Stage, stage);
+            }
+
+            if (jobId != null) {
+                deskMigration.setField(DeskMigrationFields.JobId, jobId);
             }
     
             // TODO: Set this with a workflow rule

@@ -334,6 +334,7 @@ public final class SalesforceConstants
         public static final String ResumePoint = PKG_PREFIX + "RestartPoint" + CF_SUFFIX;
         public static final String ResultLink = PKG_PREFIX + "ResultLink" + CF_SUFFIX;
         public static final String Object = PKG_PREFIX + "Object" + CF_SUFFIX;
+        public static final String JobId = PKG_PREFIX + "JobId" + CF_SUFFIX;
 
         // status picklist values
         public static final String StatusNew = "New";

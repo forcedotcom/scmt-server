@@ -78,7 +78,6 @@ public abstract class DeskBase<D extends Serializable>
     public void migrate() throws Exception
     {
         Utils.log("Entered DeskBase::migrate()");
-        du.updateMigrationStatus(DeskMigrationFields.StatusRunning, "", null);
 
         // initialize a flag which indicates if this is a delta migration
         delta = (config.get("updated_at") != null && config.get("updated_at") != "null");
@@ -97,6 +96,8 @@ public abstract class DeskBase<D extends Serializable>
 
         // create initial bulk job, each object has implementation
         jobId = createJob(du);
+
+        du.updateMigrationStatus(DeskMigrationFields.StatusRunning, "", null, jobId);
 
         // loop through retrieving records
         do
