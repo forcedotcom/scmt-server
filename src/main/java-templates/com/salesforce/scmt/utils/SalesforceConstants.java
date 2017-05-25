@@ -41,6 +41,8 @@ public final class SalesforceConstants
 
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
+    public static final String PERMSET = "SCMT_Audit";
+
     // declare the email regex pattern
     // https://help.salesforce.com/apex/HTViewSolution?id=000170904&language=en_US
 //    public static final Pattern EMAIL_PATTERN = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+");
@@ -63,8 +65,6 @@ public final class SalesforceConstants
     public static final String OBJ_CHAT_VISITOR = "LiveChatVisitor";
     public static final String OBJ_GROUP_MEMBER = "GroupMember";
     public static final String OBJ_ARTICLE = "Desk_com_Article__kav";
-
-    public static final String PERMSET = "SCMT_Audit";
 
     // custom objects from SCMT package
     public static final String OBJ_DESK_MIGRATION = PKG_PREFIX + "Desk_Migration" + CF_SUFFIX;
