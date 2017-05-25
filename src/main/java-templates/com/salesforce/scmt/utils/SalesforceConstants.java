@@ -64,6 +64,8 @@ public final class SalesforceConstants
     public static final String OBJ_GROUP_MEMBER = "GroupMember";
     public static final String OBJ_ARTICLE = "Desk_com_Article__kav";
 
+    public static final String PERMSET = "SCMT_Audit";
+
     // custom objects from SCMT package
     public static final String OBJ_DESK_MIGRATION = PKG_PREFIX + "Desk_Migration" + CF_SUFFIX;
     public static final String OBJ_DESK_MESSAGE = PKG_PREFIX + "Desk_Message" + CF_SUFFIX;

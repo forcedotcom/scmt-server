@@ -671,10 +671,8 @@ public final class DeskUtil
     {
         List<Metadata> sfCFs = convertCustomFields(json);
 
-        PermissionSet orgPermSet = getSalesforceService().getPermissionSet("SCMT_Audit");
         PermissionSet permissionSet = new PermissionSet();
-        permissionSet.setFullName(orgPermSet.getFullName());
-        permissionSet.setLabel(orgPermSet.getLabel());
+        permissionSet.setFullName(SalesforceConstants.PERMSET);
 
         List<PermissionSetFieldPermissions> fieldPermissions = new ArrayList<>();
 
