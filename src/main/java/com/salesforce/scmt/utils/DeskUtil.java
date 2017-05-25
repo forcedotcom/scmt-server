@@ -1167,8 +1167,13 @@ public final class DeskUtil
             // initialize the lists in the map
             recLists.put(soType, new ArrayList<>());
 
+            String jobId = getSalesforceService().createBulkJob(soType, null, OperationEnum.insert);
+
             // create initial bulk jobs
-            jobIds.put(soType, getSalesforceService().createBulkJob(soType, null, OperationEnum.insert));
+            jobIds.put(soType, jobId);
+
+            if (soType.equals(SalesforceConstants.OBJ_EMAIL_MESSAGE))
+                updateMigrationStatus(DeskMigrationFields.StatusRunning, "", null, jobId);
         }
         
         // get a service
