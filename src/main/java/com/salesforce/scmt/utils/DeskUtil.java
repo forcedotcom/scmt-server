@@ -672,7 +672,8 @@ public final class DeskUtil
         List<Metadata> sfCFs = convertCustomFields(json);
 
         PermissionSet permissionSet = new PermissionSet();
-        permissionSet.setFullName(SalesforceConstants.PERMSET);
+        permissionSet.setFullName(SalesforceConstants.PERMSET_NAME);
+        permissionSet.setLabel(SalesforceConstants.PERMSET_LABEL);
 
         List<PermissionSetFieldPermissions> fieldPermissions = new ArrayList<>();
 

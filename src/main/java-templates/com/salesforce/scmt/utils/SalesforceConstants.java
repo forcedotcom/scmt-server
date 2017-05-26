@@ -41,7 +41,8 @@ public final class SalesforceConstants
 
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    public static final String PERMSET = "SCMT_Audit";
+    public static final String PERMSET_NAME = "SCMT_Audit";
+    public static final String PERMSET_LABEL = "SCMT Audit";
 
     // declare the email regex pattern
     // https://help.salesforce.com/apex/HTViewSolution?id=000170904&language=en_US
