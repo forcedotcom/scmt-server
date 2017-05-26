@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import com.desk.java.apiclient.model.*;
 import com.desk.java.apiclient.model.Interaction.InteractionType;
 import com.salesforce.scmt.model.DeployResponse;
+import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.AccountFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseCommentFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseFields;
