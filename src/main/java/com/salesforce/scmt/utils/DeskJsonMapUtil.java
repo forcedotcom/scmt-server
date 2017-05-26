@@ -51,7 +51,7 @@ public final class DeskJsonMapUtil
             // key is the field name
             for (String key : deskCFs.keySet())
             {
-                String sfCFkey = "Desk_" + key + "__c";
+                String sfCFkey = SalesforceConstants.PKG_PREFIX + "Desk_" + key + "__c";
                 CustomField cf = deskUtil.getDeskCustomField(key);
 
                 if (deskCFs.get(key) == null) continue;
