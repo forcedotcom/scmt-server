@@ -196,7 +196,6 @@ public class DeskService
                 }
             }
 
-            // add the limit override header
             Interceptor requestHeader = new Interceptor()
             {
                 @Override
@@ -206,6 +205,7 @@ public class DeskService
 
                     com.squareup.okhttp.Request request = original.newBuilder()                        
                         .method(original.method(), original.body())
+                        .header("X-SCMT-Migration", deskUrl)
                         .build();
 
                     return chain.proceed(request);
@@ -213,7 +213,7 @@ public class DeskService
             };
 
             // add the interceptors
-            clientBuilder.applicationInterceptors(Arrays.asList(logging, requestHeader));
+            clientBuilder.applicationInterceptors(Arrays.asList(requestHeader, logging));
             
             // create the client and assign to private member variable
             _client = DeskClient.create(clientBuilder);
