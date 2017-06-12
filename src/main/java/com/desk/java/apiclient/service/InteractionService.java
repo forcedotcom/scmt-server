@@ -26,7 +26,9 @@ public interface InteractionService
 {
 
     String INTERACTION_URI = "interactions"
-    private String fields = "body,body_html,body_text,id,created_at,updated_at,sent_at,direction,sent_at,to,from,cc,bcc,status,subject,hidden_at,type,entered_at,twitter_status_id,facebook_id,facebook_id,facebook_name,liked,event_type,public_url,answers_disallowed_at,agent_answer_count,customer_answer_count,rating,rating_count,rating_score";
+    + "?fields=" +
+    "body,body_html,body_text,id,created_at,updated_at,sent_at,direction,sent_at,to,from,cc,bcc,status,subject,hidden_at,type,entered_at,twitter_status_id,facebook_id,facebook_id,facebook_name,liked,event_type,public_url,answers_disallowed_at,agent_answer_count,customer_answer_count,rating,rating_count,rating_score";
+
 
     /**
      * Retrieve a page of notes
@@ -36,5 +38,5 @@ public interface InteractionService
      * @return an interaction api response
      */
     @GET(INTERACTION_URI + "")
-    Call<ApiResponse<Interaction>> getInteractions(@Query("per_page") int perPage, @Query("since_id") int since_id, @Query("fields") String fields);
+    Call<ApiResponse<Interaction>> getInteractions(@Query("per_page") int perPage, @Query("since_id") int since_id);
 }

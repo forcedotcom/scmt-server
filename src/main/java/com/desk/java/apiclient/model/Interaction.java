@@ -51,6 +51,8 @@ public class Interaction implements Serializable
     private String client_type;
     private String subject;
     private boolean hidden;
+    private String body_html;
+    private String body_text;
 
     // phone_call fields
     private String entered_at;
