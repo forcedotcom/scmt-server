@@ -162,6 +162,15 @@ public class Interaction implements Serializable
         return body;
     }
 
+    public String getHtmlBody()
+    {
+        return body_html;
+    }
+
+    public String getTextBody()
+    {
+        return body_text;
+    }
     /**
      * Set the Message body.
      * @param string Message body.
