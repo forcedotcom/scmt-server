@@ -164,22 +164,30 @@ public class Interaction implements Serializable
         return body;
     }
 
+
+    public void setBody(String string)
+    {
+        this.body = string;
+    }
+
     public String getHtmlBody()
     {
         return body_html;
+    }
+
+    public void setHtmlBody(String string)
+    {
+        this.body_html = string;
     }
 
     public String getTextBody()
     {
         return body_text;
     }
-    /**
-     * Set the Message body.
-     * @param string Message body.
-     */
-    public void setBody(String string)
+
+    public void setTextBody(String string)
     {
-        this.body = string;
+        this.body_text = string;
     }
 
     /**
