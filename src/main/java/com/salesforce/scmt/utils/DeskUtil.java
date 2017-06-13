@@ -1266,7 +1266,7 @@ public final class DeskUtil
                             while(recLists.get(soType).size() > 0 && !SalesforceConstants.READ_ONLY)
                             {
                                 // Email Messages will submit a batch every 3k records in an attempt to not hit the 10mb limit
-                                int batchMaxSize = (SalesforceConstants.OBJ_EMAIL_MESSAGE.equalsIgnoreCase(soType) ? 3000 :
+                                int batchMaxSize = (SalesforceConstants.OBJ_EMAIL_MESSAGE.equalsIgnoreCase(soType) ? 100 :
                                     SalesforceConstants.BULK_MAX_SIZE);
                                 
                                 // get the upper boundary of the record list
