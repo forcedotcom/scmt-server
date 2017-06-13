@@ -687,7 +687,33 @@ public final class DeskJsonMapUtil
             deployResponse.addErrorWithId(msg, interaction.getId());
             interaction.setBody(interaction.getBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
-        mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
+
+        if (interaction.getTextBody() != null && interaction.getTextBody().length() > SalesforceConstants.EMAIL_BODY_LENGTH)
+        {
+            String msg = String.format(
+                    "Interaction body exceeds max length and will be truncted! ");
+            Utils.log(msg);
+            deployResponse.addErrorWithId(msg, interaction.getId());
+            interaction.setTextBody(interaction.getTextBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
+        }
+
+        if (interaction.getHtmlBody() != null && interaction.getHtmlBody().length() > SalesforceConstants.EMAIL_BODY_LENGTH)
+        {
+            String msg = String.format(
+                    "Interaction body exceeds max length and will be truncted! ");
+            Utils.log(msg);
+            deployResponse.addErrorWithId(msg, interaction.getId());
+            interaction.setHtmlBody(interaction.getHtmlBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
+        }
+
+        mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
+
+        if (interaction.getTextBody() !=null) {
+            mapObj.put(EmailMessageFields.TextBody, interaction.getTextBody());
+        } else {
+            mapObj.put(EmailMessageFields.TextBody, interaction.getBody());
+        }
+
 
         // Indicates whether the email was received (true) or sent (false).
         mapObj.put(EmailMessageFields.Incoming, interaction.isIncoming());
