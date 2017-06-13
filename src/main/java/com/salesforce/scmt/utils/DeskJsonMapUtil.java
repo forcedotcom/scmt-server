@@ -688,14 +688,6 @@ public final class DeskJsonMapUtil
             interaction.setBody(interaction.getBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
 
-        if (interaction.getTextBody() != null && interaction.getTextBody().length() > SalesforceConstants.EMAIL_BODY_LENGTH)
-        {
-            String msg = String.format(
-                    "Interaction body exceeds max length and will be truncted! ");
-            Utils.log(msg);
-            deployResponse.addErrorWithId(msg, interaction.getId());
-            interaction.setTextBody(interaction.getTextBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
-        }
 
         if (interaction.getHtmlBody() != null && interaction.getHtmlBody().length() > SalesforceConstants.EMAIL_BODY_LENGTH)
         {

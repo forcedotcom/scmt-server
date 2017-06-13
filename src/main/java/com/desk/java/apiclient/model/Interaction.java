@@ -180,15 +180,6 @@ public class Interaction implements Serializable
         this.body_html = string;
     }
 
-    public String getTextBody()
-    {
-        return body_text;
-    }
-
-    public void setTextBody(String string)
-    {
-        this.body_text = string;
-    }
 
     /**
      * Retrieve the direction of the interaction (in/out).

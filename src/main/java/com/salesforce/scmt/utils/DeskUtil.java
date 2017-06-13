@@ -1958,9 +1958,6 @@ public final class DeskUtil
         // The body of the email in HTML format.
         so.addField(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
 
-        //Body of the email in Text format.
-        so.addField(EmailMessageFields.TextBody, interaction.getTextBody());
-        
         // Indicates whether the email was received (true) or sent (false).
         so.addField(EmailMessageFields.Incoming, interaction.isIncoming());
         
