@@ -25,7 +25,10 @@ import retrofit.http.Query;
 public interface InteractionService
 {
 
-    String INTERACTION_URI = "interactions";
+    String INTERACTION_URI = "interactions"
+    + "?fields=" +
+    "body,body_html,id,created_at,updated_at,sent_at,direction,sent_at,to,from,cc,bcc,status,subject,hidden_at,type,entered_at,twitter_status_id,facebook_id,facebook_id,facebook_name,liked,event_type,public_url,answers_disallowed_at,agent_answer_count,customer_answer_count,rating,rating_count,rating_score";
+
 
     /**
      * Retrieve a page of notes

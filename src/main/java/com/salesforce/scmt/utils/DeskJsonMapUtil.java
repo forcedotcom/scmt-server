@@ -687,7 +687,21 @@ public final class DeskJsonMapUtil
             deployResponse.addErrorWithId(msg, interaction.getId());
             interaction.setBody(interaction.getBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
-        mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
+
+        if (interaction.getHtmlBody() != null && interaction.getHtmlBody().length() > SalesforceConstants.EMAIL_BODY_LENGTH)
+        {
+            String msg = String.format(
+                    "Interaction body exceeds max length and will be truncted! ");
+            Utils.log(msg);
+            deployResponse.addErrorWithId(msg, interaction.getId());
+            interaction.setHtmlBody(interaction.getHtmlBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
+        }
+
+        if (interaction.getHtmlBody() !=null && !interaction.getHtmlBody().isEmpty()) {
+            mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
+        } else {
+            mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
+        }
 
         // Indicates whether the email was received (true) or sent (false).
         mapObj.put(EmailMessageFields.Incoming, interaction.isIncoming());

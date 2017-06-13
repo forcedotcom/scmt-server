@@ -51,6 +51,7 @@ public class Interaction implements Serializable
     private String client_type;
     private String subject;
     private boolean hidden;
+    private String body_html;
 
     // phone_call fields
     private String entered_at;
@@ -157,19 +158,28 @@ public class Interaction implements Serializable
      * Retrieve the Message body.
      * @return Message body.
      */
-    public String getBody()
-    {
-        return body;
-    }
+    public String getBody() { return body; }
 
     /**
-     * Set the Message body.
-     * @param string Message body.
+     * Set the message body.
+     *
      */
     public void setBody(String string)
     {
         this.body = string;
     }
+
+    /**
+     * Retreive the HTML body.
+     * @return HTML body
+     */
+    public String getHtmlBody() { return body_html; }
+
+    /**
+     * Set the HTML body.
+     *
+     */
+    public void setHtmlBody(String string) { this.body_html = string; }
 
     /**
      * Retrieve the direction of the interaction (in/out).
