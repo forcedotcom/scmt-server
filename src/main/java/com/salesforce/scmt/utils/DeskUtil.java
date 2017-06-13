@@ -1956,7 +1956,7 @@ public final class DeskUtil
         so.addField(EmailMessageFields.HasAttachment, (interaction.getLinks().getAttachments().getCount() > 0));
         
         // The body of the email in HTML format.
-        so.addField(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
+        so.addField(EmailMessageFields.HtmlBody, interaction.getBody());
 
         // Indicates whether the email was received (true) or sent (false).
         so.addField(EmailMessageFields.Incoming, interaction.isIncoming());

@@ -688,7 +688,6 @@ public final class DeskJsonMapUtil
             interaction.setBody(interaction.getBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
 
-
         if (interaction.getHtmlBody() != null && interaction.getHtmlBody().length() > SalesforceConstants.EMAIL_BODY_LENGTH)
         {
             String msg = String.format(
@@ -698,13 +697,11 @@ public final class DeskJsonMapUtil
             interaction.setHtmlBody(interaction.getHtmlBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
 
-
-        if (interaction.getHtmlBody() !=null && interaction.getHtmlBody() != "") {
+        if (interaction.getHtmlBody() !=null && interaction.getHtmlBody() != "" && !interaction.getHtmlBody().isEmpty()) {
             mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
         } else {
             mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
         }
-
 
         // Indicates whether the email was received (true) or sent (false).
         mapObj.put(EmailMessageFields.Incoming, interaction.isIncoming());
