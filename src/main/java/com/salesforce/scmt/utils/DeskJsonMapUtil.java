@@ -706,12 +706,11 @@ public final class DeskJsonMapUtil
             interaction.setHtmlBody(interaction.getHtmlBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
 
-        mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
 
-        if (interaction.getTextBody() !=null) {
-            mapObj.put(EmailMessageFields.TextBody, interaction.getTextBody());
+        if (interaction.getHtmlBody() !=null) {
+            mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
         } else {
-            mapObj.put(EmailMessageFields.TextBody, interaction.getBody());
+            mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
         }
 
 
