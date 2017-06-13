@@ -697,7 +697,7 @@ public final class DeskJsonMapUtil
             interaction.setHtmlBody(interaction.getHtmlBody().substring(0, SalesforceConstants.EMAIL_BODY_LENGTH));
         }
 
-        if (interaction.getHtmlBody() !=null && interaction.getHtmlBody() != "" && !interaction.getHtmlBody().isEmpty()) {
+        if (interaction.getHtmlBody() !=null && !interaction.getHtmlBody().isEmpty()) {
             mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
         } else {
             mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
