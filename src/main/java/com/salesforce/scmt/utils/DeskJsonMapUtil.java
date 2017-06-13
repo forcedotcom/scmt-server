@@ -707,7 +707,7 @@ public final class DeskJsonMapUtil
         }
 
 
-        if (interaction.getHtmlBody() !=null) {
+        if (interaction.getHtmlBody() !=null && interaction.getHtmlBody() != "") {
             mapObj.put(EmailMessageFields.HtmlBody, interaction.getHtmlBody());
         } else {
             mapObj.put(EmailMessageFields.HtmlBody, interaction.getBody());
