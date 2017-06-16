@@ -53,6 +53,7 @@ public class DeskService
     private static final String DESK_API_LOG_LEVEL_BASIC = "BASIC";
     private static final String DESK_API_LOG_LEVEL_HEADERS = "HEADERS";
     private static final String DESK_API_LOG_LEVEL_BODY = "BODY";
+    private static final String DESK_API_MIGRATION_HEADER = "DESKCOM-SC-MIGRATION";
 
     private String _migrationId;
     private DeskClient _client;
@@ -206,6 +207,7 @@ public class DeskService
 
                     com.squareup.okhttp.Request request = original.newBuilder()                        
                         .method(original.method(), original.body())
+                        .header(DESK_API_MIGRATION_HEADER, deskUrl)
                         .build();
 
                     return chain.proceed(request);
@@ -213,7 +215,7 @@ public class DeskService
             };
 
             // add the interceptors
-            clientBuilder.applicationInterceptors(Arrays.asList(logging, requestHeader));
+            clientBuilder.applicationInterceptors(Arrays.asList(requestHeader, logging));
             
             // create the client and assign to private member variable
             _client = DeskClient.create(clientBuilder);
