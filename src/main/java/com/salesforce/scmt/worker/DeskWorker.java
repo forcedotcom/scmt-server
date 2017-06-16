@@ -17,6 +17,7 @@ package com.salesforce.scmt.worker;
 
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_FORMULA1;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACHMENT_BACKGROUND;
+import static java.lang.System.getenv;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,9 +49,14 @@ import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
 import com.salesforce.scmt.utils.Utils;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.soap.partner.sobject.SObject;
+import com.sendgrid.*;
 
 public final class DeskWorker
 {
+    private static final String EMAIL_ADDRESS = "EMAIL_ADDRESS";
+    private static final String SENDGRID_USERNAME = "SENDGRID_USERNAME";
+    private static final String SENDGRID_PASSWORD = "SENDGRID_PASSWORD";
+
     /**
      * default constructor
      */
@@ -378,6 +384,44 @@ public final class DeskWorker
         }
         catch (Exception e)
         {
+            Utils.logException(e);
+        }
+    }
+
+    public static void sendEmail(String json)
+    {
+        Utils.log("[DESK] DeskWorker::sendEmail() entered.");
+
+        // deserialize the data
+        @SuppressWarnings("unchecked")
+        Map<String, String> config = (Map<String, String>) JsonUtil.fromJson(json, Map.class);
+
+        SendGrid sendgrid = new SendGrid(getenv(SENDGRID_USERNAME), getenv(SENDGRID_PASSWORD));
+        SendGrid.Email email = new SendGrid.Email();
+        String object = "";
+
+        if (Boolean.valueOf(config.get("migrateUsers"))) object = "Users";
+        if (Boolean.valueOf(config.get("migrateGroupMembers"))) object = "Group Members";
+        if (Boolean.valueOf(config.get("migrateCompanies"))) object = "Companies";
+        if (Boolean.valueOf(config.get("migrateCustomers"))) object = "Customers";
+        if (Boolean.valueOf(config.get("migrateCases"))) object = "Cases";
+        if (Boolean.valueOf(config.get("migrateNotes"))) object = "Notes";
+        if (Boolean.valueOf(config.get("migrateInteractions"))) object = "Interactions";
+        if (Boolean.valueOf(config.get("migrateArticles"))) object = "Articles";
+
+        email.addTo(getenv(EMAIL_ADDRESS));
+        email.setFrom("scmt@herokuapp.com");
+        email.setSubject("[SCMT] Data Migration Scheduled");
+        email.setText(String.join("\n",
+                "A new data migration has been scheduled with the following configuration:",
+                "    Desk.com URL: " + config.get("deskUrl").toString(),
+                "    Object: " + object
+        ));
+
+        try {
+            SendGrid.Response response = sendgrid.send(email);
+            Utils.log(response.getMessage());
+        } catch (SendGridException e) {
             Utils.logException(e);
         }
     }
