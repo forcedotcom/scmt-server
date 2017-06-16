@@ -69,6 +69,11 @@ public final class RabbitConfiguration
     public final static String QUEUE_DESK_ATTACHMENT_BACKGROUND = "desk_attachment_migration_background";
 
     /**
+     * The queue name used for processing emails.
+     */
+    public final static String QUEUE_DESK_EMAIL = "desk_email";
+
+    /**
      * Local static instance
      */
     private static ConnectionFactory _factory;

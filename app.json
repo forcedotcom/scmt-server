@@ -12,7 +12,8 @@
     "JAVA_OPTS": "-XX:+UseCompressedOops",
     "SALESFORCE_TRACE_BULK": "1",
     "SALESFORCE_TRACE_METADATA": "1",
-    "SALESFORCE_TRACE_PARTNER": "1"
+    "SALESFORCE_TRACE_PARTNER": "1",
+    "EMAIL_ADDRESS": "desk.scmt@salesforce.com"
   },
   "formation": {
     "web": {
@@ -29,5 +30,5 @@
     }
   },
   "image": "heroku/java",
-  "addons": [ "cloudamqp:lemur", "papertrail:choklad" ]
+  "addons": [ "cloudamqp:lemur", "papertrail:choklad", "sendgrid:starter" ]
 }

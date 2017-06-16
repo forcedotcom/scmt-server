@@ -18,6 +18,7 @@ package com.salesforce.scmt.service;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_TRACTOR;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_DATA_MIGRATION;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACHMENT;
+import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_EMAIL;
 import static com.salesforce.scmt.utils.Utils.getPostParamsFromRequest;
 import static java.lang.System.getenv;
 
@@ -335,6 +336,9 @@ public class DeskService
         // get the post parameters in a hash map
         Map<String, String> postParams = getPostParamsFromRequest(req, new String[] { "server_url", "session_id",
                 "deskUrl", "consumerKey", "consumerSecret", "accessToken", "accessTokenSecret"});
+
+        // publish the job to RabbitMQ
+        RabbitUtil.publishToQueue(QUEUE_DESK_EMAIL, EXCHANGE_TRACTOR, JsonUtil.toJson(postParams).getBytes());
 
         // create a DeskService instance based on the data posted (e.g. tokens, url, session id, etc.)
         DeskService deskService = new DeskService(postParams.get("deskUrl"), postParams.get("consumerKey"),

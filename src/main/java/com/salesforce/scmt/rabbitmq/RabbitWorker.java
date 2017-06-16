@@ -24,16 +24,7 @@ import com.rabbitmq.client.Envelope;
 import com.salesforce.scmt.utils.Utils;
 import com.salesforce.scmt.worker.DeskWorker;
 import java.io.IOException;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.connectionFactory;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_TYPE;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_TRACTOR;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_FORMULA1;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_DATA_MIGRATION;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_FEED_MIGRATION;
-//import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_FEED_CONVERSION;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_BIG_COMPANY_MIGRATION;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACHMENT;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACHMENT_BACKGROUND;
+import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.*;
 
 public final class RabbitWorker
 {
@@ -52,7 +43,7 @@ public final class RabbitWorker
         if (EXCHANGE_TRACTOR.equalsIgnoreCase(argv[0]))
         {
             exchange = EXCHANGE_TRACTOR;
-            queues = new String[] { QUEUE_DESK_DATA_MIGRATION, QUEUE_DESK_ATTACHMENT };
+            queues = new String[] { QUEUE_DESK_EMAIL, QUEUE_DESK_DATA_MIGRATION, QUEUE_DESK_ATTACHMENT };
         }
         else if (EXCHANGE_FORMULA1.equalsIgnoreCase(argv[0]))
         {
@@ -127,6 +118,10 @@ public final class RabbitWorker
                     else if (envelope.getRoutingKey().equalsIgnoreCase(QUEUE_DESK_ATTACHMENT_BACKGROUND))
                     {
                         DeskWorker.migrateAttachments(message);
+                    }
+                    else if (envelope.getRoutingKey().equalsIgnoreCase(QUEUE_DESK_EMAIL))
+                    {
+                        DeskWorker.sendEmail(message);
                     }
                     else
                     {
