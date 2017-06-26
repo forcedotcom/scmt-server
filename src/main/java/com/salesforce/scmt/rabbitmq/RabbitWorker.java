@@ -26,7 +26,6 @@ import com.salesforce.scmt.worker.DeskWorker;
 import java.io.IOException;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.*;
 
-
 public final class RabbitWorker
 {
     /**
@@ -44,7 +43,7 @@ public final class RabbitWorker
         if (EXCHANGE_TRACTOR.equalsIgnoreCase(argv[0]))
         {
             exchange = EXCHANGE_TRACTOR;
-            queues = new String[] { QUEUE_DESK_DATA_MIGRATION, QUEUE_DESK_ATTACHMENT };
+            queues = new String[] { QUEUE_DESK_EMAIL, QUEUE_DESK_DATA_MIGRATION, QUEUE_DESK_ATTACHMENT };
         }
         else if (EXCHANGE_FORMULA1.equalsIgnoreCase(argv[0]))
         {

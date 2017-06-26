@@ -62,6 +62,9 @@ public final class Main
             // set the 'Access-Control-Allow-Origin' for CORS
             response.header("Access-Control-Allow-Origin", "*");
 
+            // set the 'X-XSS-Protection'
+            response.header("X-XSS-Protection", "1");
+
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
         	if(!"https".equalsIgnoreCase(request.headers("x-forwarded-proto"))){

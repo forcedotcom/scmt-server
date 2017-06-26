@@ -338,7 +338,8 @@ public class DeskService
                 "deskUrl", "consumerKey", "consumerSecret", "accessToken", "accessTokenSecret"});
 
         // publish the job to RabbitMQ
-        RabbitUtil.publishToQueue(QUEUE_DESK_EMAIL, EXCHANGE_FORMULA1, JsonUtil.toJson(postParams).getBytes());
+
+        RabbitUtil.publishToQueue(QUEUE_DESK_EMAIL, EXCHANGE_TRACTOR, JsonUtil.toJson(postParams).getBytes());
 
         // create a DeskService instance based on the data posted (e.g. tokens, url, session id, etc.)
         DeskService deskService = new DeskService(postParams.get("deskUrl"), postParams.get("consumerKey"),
