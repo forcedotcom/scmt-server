@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import com.desk.java.apiclient.model.*;
 import com.desk.java.apiclient.model.Interaction.InteractionType;
 import com.salesforce.scmt.model.DeployResponse;
+import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.AccountFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseCommentFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseFields;
@@ -51,7 +52,7 @@ public final class DeskJsonMapUtil
             // key is the field name
             for (String key : deskCFs.keySet())
             {
-                String sfCFkey = "Desk_" + key + "__c";
+                String sfCFkey = "Desk_" + key + SalesforceConstants.CF_SUFFIX;
                 CustomField cf = deskUtil.getDeskCustomField(key);
 
                 if (deskCFs.get(key) == null) continue;

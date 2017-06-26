@@ -41,14 +41,17 @@ public final class SalesforceConstants
 
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
+    public static final String PERMSET_NAME = "SCMT_Audit";
+    public static final String PERMSET_LABEL = "SCMT Audit";
+
     // declare the email regex pattern
     // https://help.salesforce.com/apex/HTViewSolution?id=000170904&language=en_US
 //    public static final Pattern EMAIL_PATTERN = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+");
     public static final Pattern EMAIL_PATTERN = Pattern.compile("([a-zA-Z0-9_\\-\\.]+)@((\\[a-z]{1,3}\\.[a-z]{1,3}\\.[a-z]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})");
 
 
-    private static final String CF_SUFFIX = "__c";
-    private static final String PKG_PREFIX = "${package.namespace}";
+    public static final String CF_SUFFIX = "__c";
+    public static final String PKG_PREFIX = "${package.namespace}";
 
     public static final String OBJ_USER = "User";
     public static final String OBJ_ACCOUNT = "Account";

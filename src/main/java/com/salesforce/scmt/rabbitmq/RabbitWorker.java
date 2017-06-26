@@ -48,7 +48,7 @@ public final class RabbitWorker
         else if (EXCHANGE_FORMULA1.equalsIgnoreCase(argv[0]))
         {
             exchange = EXCHANGE_FORMULA1;
-            queues = new String[] { QUEUE_DESK_FEED_MIGRATION, // QUEUE_DESK_FEED_CONVERSION,
+            queues = new String[] { QUEUE_DESK_FEED_MIGRATION, QUEUE_DESK_EMAIL, // QUEUE_DESK_FEED_CONVERSION,
                 QUEUE_DESK_BIG_COMPANY_MIGRATION, QUEUE_DESK_ATTACHMENT_BACKGROUND };
         }
         
