@@ -736,16 +736,16 @@ public final class DeskJsonMapUtil
     }
 
     public static String deskEmailToSalesforceProcessing(String deskEmail) {
-        if (deskEmail ==null || deskEmail.isEmpty()) {
+        if (deskEmail ==null) {
             return deskEmail;
         }
 
         if (deskEmail.matches("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\" ?<.*@.*>")) {
-            deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\"", "").trim();
+            deskEmail = deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\"", "").trim();
         }
 
         if (deskEmail.matches("\"[A-Za-z.,\\s\\-\\'0-9]*,[A-Za-z.,\\s\\-\\'0-9]*\"")) {
-            deskEmail.replaceAll("\"[A-Za-z.,\\s\\-\\'0-9]*,[A-Za-z.,\\s\\-\\'0-9]*\"", "").trim();
+            deskEmail = deskEmail.replaceAll("\"[A-Za-z.,\\s\\-\\'0-9]*,[A-Za-z.,\\s\\-\\'0-9]*\"", "").trim();
         }
 
         return deskEmail;
