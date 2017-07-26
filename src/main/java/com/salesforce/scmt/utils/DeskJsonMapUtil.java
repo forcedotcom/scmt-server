@@ -744,7 +744,7 @@ public final class DeskJsonMapUtil
             deskEmail = deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\"", "").trim();
         }
 
-        if (deskEmail.matches("\"[A-Za-z.,\\s\\-\\'0-9]*,[A-Za-z.,\\s\\-\\'0-9]*\"")) {
+        if (deskEmail.matches("\"[A-Za-z.,\\s\\-\\'0-9]*,[A-Za-z.,\\s\\-\\'0-9]*\" ?<.*@.*>")) {
             deskEmail = deskEmail.replaceAll("\"[A-Za-z.,\\s\\-\\'0-9]*,[A-Za-z.,\\s\\-\\'0-9]*\"", "").trim();
         }
 
