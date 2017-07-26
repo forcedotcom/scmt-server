@@ -730,7 +730,7 @@ public final class DeskJsonMapUtil
         mapObj.put(EmailMessageFields.Subject, interaction.getSubject());
 
         // The address of the email’s recipient. Salesforce won't allow "test@test.com" <test@test.com> format.
-        if (interaction.getTo().matches("\".*@.*\" ?<.*@.*>")) {
+        if (interaction.getTo() !=null && !interaction.getTo().isEmpty() && interaction.getTo().matches("\".*@.*\" ?<.*@.*>")) {
             mapObj.put(EmailMessageFields.ToAddress, interaction.getTo().replaceFirst("\".*@.*\" ?", ""));
         } else {
             mapObj.put(EmailMessageFields.ToAddress, interaction.getTo());
