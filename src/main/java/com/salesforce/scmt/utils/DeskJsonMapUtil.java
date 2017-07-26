@@ -740,12 +740,12 @@ public final class DeskJsonMapUtil
             return deskEmail;
         }
 
-        if (deskEmail.matches(".*\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\" ?<.*@.*>")) {
-            deskEmail = deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\"", "").trim();
+        if (deskEmail.matches(".*\"[A-Za-z.\\s\\-\\'0-9()_!;:]*@[A-Za-z.\\s\\-\\'0-9()_!;:]*\" ?<.*@.*>")) {
+            deskEmail = deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9()_!;:]*@[A-Za-z.\\s\\-\\'0-9()_!;:]*\"", "").trim();
         }
 
-        if (deskEmail.matches(".*\"[A-Za-z.,\\s\\-\\'0-9()]*,[A-Za-z.,\\s\\-\\'0-9()]*\" ?<.*@.*>")) {
-            deskEmail = deskEmail.replaceAll("\"[A-Za-z.,\\s\\-\\'0-9()]*,[A-Za-z.,\\s\\-\\'0-9()]*\"", "").trim();
+        if (deskEmail.matches(".*\"[A-Za-z.,\\s\\-\\'0-9()_!;:]*,[A-Za-z.,\\s\\-\\'0-9()_!;:]*\" ?<.*@.*>")) {
+            deskEmail = deskEmail.replaceAll("\"[A-Za-z.,\\s\\-\\'0-9()_!;:]*,[A-Za-z.,\\s\\-\\'0-9()_!;:]*\"", "").trim();
         }
 
         return deskEmail;
