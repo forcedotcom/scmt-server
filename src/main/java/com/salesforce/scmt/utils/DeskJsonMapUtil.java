@@ -736,6 +736,10 @@ public final class DeskJsonMapUtil
     }
 
     public static String deskEmailToSalesforceProcessing(String deskEmail) {
+        if (deskEmail ==null || deskEmail.isEmpty()) {
+            return deskEmail;
+        }
+
         if (deskEmail.matches("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\" ?<.*@.*>")) {
             deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9]*@[A-Za-z.\\s\\-\\'0-9]*\"", "").trim();
         }
