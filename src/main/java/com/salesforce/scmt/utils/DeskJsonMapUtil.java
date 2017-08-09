@@ -653,13 +653,13 @@ public final class DeskJsonMapUtil
         // The addresses that were sent a blind carbon copy of the email.
         if (interaction.getBcc() != null && !interaction.getBcc().isEmpty())
         {
-            mapObj.put(EmailMessageFields.BccAddress, interaction.getBcc());
+            mapObj.put(EmailMessageFields.BccAddress, deskEmailToSalesforceProcessing(interaction.getBcc()));
         }
 
         // The addresses that were sent a carbon copy of the email.
         if (interaction.getCc() != null && !interaction.getCc().isEmpty())
         {
-            mapObj.put(EmailMessageFields.CcAddress, interaction.getCc());
+            mapObj.put(EmailMessageFields.CcAddress, deskEmailToSalesforceProcessing(interaction.getCc()));
         }
 
         // The address that originated the email.
@@ -729,10 +729,26 @@ public final class DeskJsonMapUtil
         // The subject line of the email.
         mapObj.put(EmailMessageFields.Subject, interaction.getSubject());
 
-        // The address of the email’s recipient.
-        mapObj.put(EmailMessageFields.ToAddress, interaction.getTo());
+        // The address of the email’s recipient. Salesforce won't allow "test@test.com" <test@test.com> format.
+        mapObj.put(EmailMessageFields.ToAddress, deskEmailToSalesforceProcessing(interaction.getTo()));
 
         return mapObj;
+    }
+
+    public static String deskEmailToSalesforceProcessing(String deskEmail) {
+        if (deskEmail ==null) {
+            return deskEmail;
+        }
+
+        if (deskEmail.matches(".*\"[A-Za-z.\\s\\-\\'0-9()_!;:]*@[A-Za-z.\\s\\-\\'0-9()_!;:]*\" ?<.*@.*>")) {
+            deskEmail = deskEmail.replaceAll("\"[A-Za-z.\\s\\-\\'0-9()_!;:]*@[A-Za-z.\\s\\-\\'0-9()_!;:]*\"", "").trim();
+        }
+
+        if (deskEmail.matches(".*\"[A-Za-z.,\\s\\-\\'0-9()_!;:]*,[A-Za-z.,\\s\\-\\'0-9()_!;:]*\" ?<.*@.*>")) {
+            deskEmail = deskEmail.replaceAll("\"[A-Za-z.,\\s\\-\\'0-9()_!;:]*,[A-Za-z.,\\s\\-\\'0-9()_!;:]*\"", "").trim();
+        }
+
+        return deskEmail;
     }
 
     public static Map<String, Object> deskInteractionToSalesforceFeedItem(DeskUtil deskUtil, Interaction interaction, boolean isTweet,
