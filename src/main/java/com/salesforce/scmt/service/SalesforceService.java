@@ -83,6 +83,7 @@ public final class SalesforceService
     	// https://suncommon-/na37.salesforce.com/services/Soap/u/36.0/00DU0000000xxxx 
     	System.out.println("url "+url);
     	
+        //removed code that takes out scmt because of issues with custom domains with scmt in them
         _serverUrl = url.replaceFirst("\\/\\/.*c\\.", "\\/\\/").replaceFirst("visual\\.", "sales");        
     }
 
