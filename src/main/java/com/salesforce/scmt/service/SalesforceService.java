@@ -83,7 +83,7 @@ public final class SalesforceService
     	// https://suncommon-/na37.salesforce.com/services/Soap/u/36.0/00DU0000000xxxx 
     	System.out.println("url "+url);
     	
-        _serverUrl = url.replaceFirst("\\/\\/.*c\\.", "\\/\\/").replaceFirst("\\/.*?scmt\\.", "\\/\\/").replaceFirst("visual\\.", "sales");        
+        _serverUrl = url.replaceFirst("\\/\\/.*c\\.", "\\/\\/").replaceFirst("visual\\.", "sales");        
     }
 
     public String getServerUrl()
