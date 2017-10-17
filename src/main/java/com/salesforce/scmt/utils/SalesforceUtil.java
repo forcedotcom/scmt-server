@@ -169,6 +169,8 @@ public final class SalesforceUtil
         return _QueueName2Id;
 
     }
+
+    public static Map<String>
     
     /**
      * Convert a DateTime String into a Salesforce API compatible format

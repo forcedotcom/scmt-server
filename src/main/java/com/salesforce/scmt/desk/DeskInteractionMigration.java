@@ -75,7 +75,7 @@ public class DeskInteractionMigration<D extends Serializable> extends DeskBase<D
 	@Override
 	protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
 		// TODO Auto-generated method stub
-		
+		du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Interaction", dr);
 	}
 
 	@Override

@@ -54,6 +54,141 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
 		return a.getId();
 	}
 
+	public void migrate() throws Exception
+	{
+		Utils.log("Entered DeskArticleMigration::migrate()");
+
+		// initialize a flag which indicates if this is a delta migration
+		delta = (config.get("updated_at") != null && config.get("updated_at") != "null");
+		config.put("delta", String.valueOf(delta));
+
+		// get a list of all languages
+
+		Set languages = du.getDeskSiteLanguagesMap().keySet()
+
+		getKnowledgeLanguageSettings
+
+		// declare last record id
+		lastRecordId = (config.get("start_id") == null ? 1
+				: (config.get("start_id") == "null" ? 1 : Integer.valueOf(config.get("start_id"))));
+
+		// declare the updatedAt time
+		updatedAt = (config.get("updated_at") == null ? 1
+				: (config.get("updated_at") == "null" ? 1 : Integer.valueOf(config.get("updated_at"))));
+
+		// get the client settings
+		Map<String, Object> clientSettings = du.getDeskService().getClientSettings();
+
+		// create initial bulk job, each object has implementation
+		jobId = createJob(du);
+
+		du.updateMigrationStatus(DeskMigrationFields.StatusRunning, "", null, jobId);
+
+		//loop through each language
+		for { String language : languages } {
+		// loop through retrieving records
+		do {
+			try {
+				// reset the retry flag & increment request counter
+				bRetry = false;
+				requestCount++;
+
+
+				if (!delta) {
+					dResp = callDesk(du, language);
+				} else {
+					dResp = callDesk(du, language);
+				}
+
+				// check for success
+				if (dResp.getIsSuccess()) {
+					// log the Desk.com rate limiting headers
+					DeskUtil.logDeskRateHeaders(dResp.getHeaders());
+
+					// add the list of records to the return list
+					recList.addAll(((ApiResponse<D>) dResp.body).getEntriesAsList());
+
+					// check if we are on the last page
+					if (page >= DESK_MAX_PAGES) {
+						if (!delta) {
+							// save the last record id so I can get the next set of pages increment by 1 as the
+							// 'since_at' filter is using a >= operator NOTE: Desk.com API documentation says the id
+							// could change to alphanumeric at some point, at which we will no longer be able to
+							// increment the id in this manner.
+							lastRecordId = getId(recList.get(recList.size() - 1)) + 1;
+						} else {
+							// update the time filter
+							updatedAt = getUpdatedAt(recList.get(recList.size() - 1));//
+						}
+
+						// reset the page counter
+						page = 0;
+					}
+
+					// implemented in object, can be extended for different processes
+					clientSettings = objectSpecificProcessing(clientSettings, dResp);
+
+					// general processing logic to 10k, object specific implementation is called
+					objectBulkUploadProcessing(du, config);
+
+					// increment the page counter
+					page++;
+					userEmailAddress = (config.get("email_address") != null ? config.get("email_address") : "null");
+					if (!userEmailAddress.equals("") && !userEmailAddress.equals("null")) {
+//                        Utils.sendSuccessEmail(userEmailAddress);
+					}
+				} else {
+					// check for 'too many requests' response
+					if (dResp.errorCode == 429) {
+						// get the reset seconds and sleep for that many seconds
+						System.out.println("reset " + dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET));
+						Thread.sleep(Integer.parseInt(dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET)) * 1000);
+
+						// re-queue or retry
+						bRetry = true;
+					}
+					// java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
+					else if (dResp.code() == 500) {
+						// when we run imports through the API with threaded requests we'll occasionally get a 500
+						// response and have to retry the request (which succeeds on the retry).
+						bRetry = true;
+					} else if (dResp.code() == 504) {
+						// guard against 504 bad gateway
+						Thread.sleep(Integer.parseInt(dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET)) * 1000);
+						bRetry = true;
+					} else {
+						Utils.log(dResp.getHeaders().toString());
+						// throw new Exception(String.format("Error (%d): %s\n%s", dResp.code(), dResp.message(),
+						// dResp.errorBody().toString()));
+						du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "", dr);
+						throw new Exception(String.format("Error %s", dResp.getMessage()));
+					}
+				}
+			} catch (Exception e) {
+				// retry if we hit a socket timeout exception
+				retryCount++;
+				Utils.log("[EXCEPTION] Retry Attempt: " + retryCount);
+				if (retryCount > 5) {
+					dr.setResumePoint(lastRecordId);
+					//du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "Cases", dr);
+
+//                    Utils.sendEmail();
+					// we retried 5 times, let exception go
+					du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "", dr);
+					throw e;
+				} else {
+					bRetry = true;
+				}
+			}
+		}
+		// continue to loop while the request is successful and there are subsequent pages of results
+		while (!bRequeued && (bRetry || (dResp.getIsSuccess() && ((ApiResponse<D>) dResp.body).hasNextPage()
+				&& SalesforceConstants.RETRIEVE_ALL)));
+	}
+		// general processing for remaining objects over 10k or under10k, object specific is invoked.
+		objectBulkUploadComplete(du, config);
+	}
+
 	@Override
 	protected int getUpdatedAt(D d) {
 		Article a = (Article) d;
@@ -61,7 +196,7 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
 	}
 
 	@Override
-	protected DeskBaseResponse<ApiResponse<D>> callDesk(DeskUtil du) {
+	protected DeskBaseResponse<ApiResponse<D>> callDesk(DeskUtil du, String language) {
 		// get a service
         ArticleService service = du.getDeskClient().articles();
         Response<ApiResponse<Article>> resp = null;
@@ -70,11 +205,11 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
             if (!delta)
             {
                 // false == bigCompanies TODO
-                resp = service.getArticles("en", page, DESK_PAGE_SIZE_ARTICLE, true).execute();
+                resp = service.getArticles(language, page, DESK_PAGE_SIZE_ARTICLE, true).execute();
             }
             else
             {
-                resp = service.getArticles("en", page, DESK_PAGE_SIZE_ARTICLE, true).execute();
+                resp = service.getArticles(language, page, DESK_PAGE_SIZE_ARTICLE, true).execute();
             }
 
         }

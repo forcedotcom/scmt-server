@@ -282,6 +282,13 @@ public final class SalesforceService
         return (PermissionSet) mdInfo[0];
     }
 
+    public KnowledgeLanguageSettings getKnowledgeLanguageSettings throws Exception
+    {
+        createMetadataConnection();
+        ReadResult readResult = getMetadataConnection().readMetadata("KnowledgeSettings", "KnowledgeLanguageSettings");
+        Metadata[] mdInfo = readResult.getRecords();
+        return (KnowledgeLanguageSettings) mdInfo[0];
+    }
     /**
      * Add a list of Salesforce Metadata API custom fields to be created.
      * 
@@ -633,6 +640,26 @@ public final class SalesforceService
 
         // unclear if I can use this
         _bConn.closeJob(jobId);
+    }
+
+    public JobInfo getJobInfo(String jobID) throws AsyncApiException
+    {
+        createBulkConnection();
+        JobInfo result = _bConn.getJobStatus(jobID);
+        return result;
+    }
+
+    public Boolean checkBatchStatusComplete(String jobID) throws AsyncApiException
+    {
+        createBulkConnection();
+        BatchInfoList result = _bConn.getBatchInfoList(jobID);
+
+        for (BatchInfo b : result) {
+            if (b.getState() != "Completed"){
+                return false;
+            }
+        }
+        return true;
     }
 
     /*
