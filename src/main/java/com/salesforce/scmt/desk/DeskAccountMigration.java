@@ -130,6 +130,16 @@ public class DeskAccountMigration<D extends Serializable> extends DeskBase<D>
     @Override
     protected void objectSpecificBulkComplete(DeskUtil du) throws Exception
     {
+        boolean batchStatus = getSalesforceService().checkBatchStatusComplete(jobIds.get(soType), batchInfoList);
+
+        do {
+            TimeUnit.SECONDS.sleep(1);
+            batchStatus = getSalesforceService().checkBatchStatusComplete(jobIds.get(soType), batchInfoList);
+        } while (batchStatus == false);
+
+        JobInfo jobInfo = getSalesforceService().getJobInfo(jobIds.get(soType));
+
+        updateMigrationFailed(jobIds.get(soType));
     	du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Account", dr);
     }
 

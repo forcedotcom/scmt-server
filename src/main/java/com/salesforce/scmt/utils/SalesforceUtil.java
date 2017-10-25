@@ -170,8 +170,7 @@ public final class SalesforceUtil
 
     }
 
-    public static Map<String>
-    
+
     /**
      * Convert a DateTime String into a Salesforce API compatible format
      * Use the yyyy-MM-ddTHH:mm:ss.SSS+/-HHmm or yyyy-MM-ddTHH:mm:ss.SSSZ 

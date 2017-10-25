@@ -33,6 +33,9 @@ import com.salesforce.scmt.utils.SalesforceUtil;
 import com.salesforce.scmt.utils.Utils;
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
 import com.sforce.async.ConcurrencyMode;
 import com.sforce.async.ContentType;
 import com.sforce.async.JobInfo;
@@ -281,7 +284,7 @@ public final class SalesforceService
         Metadata[] mdInfo = readResult.getRecords();
         return (PermissionSet) mdInfo[0];
     }
-
+    /**
     public KnowledgeLanguageSettings getKnowledgeLanguageSettings throws Exception
     {
         createMetadataConnection();
@@ -612,7 +615,7 @@ public final class SalesforceService
         return job.getId();
     }
 
-    public void addBatchToJob(String jobId, List<Map<String, Object>> records)
+    public BatchInfo addBatchToJob(String jobId, List<Map<String, Object>> records)
         throws UnsupportedEncodingException, AsyncApiException
     {
         Utils.log("[BULK] Adding [" + records.size() + "] records to job [" + jobId + "].");
@@ -625,7 +628,7 @@ public final class SalesforceService
         job.setContentType(ContentType.JSON);
 
         // submit a batch to the job
-        _bConn.createBatchFromStream(job, jsonStream);
+        return _bConn.createBatchFromStream(job, jsonStream);
     }
 
     public void closeBulkJob(String jobId) throws AsyncApiException
@@ -649,13 +652,11 @@ public final class SalesforceService
         return result;
     }
 
-    public Boolean checkBatchStatusComplete(String jobID) throws AsyncApiException
+    public Boolean checkBatchStatusComplete(String jobID, List<BatchInfo> batchInfoList)
     {
-        createBulkConnection();
-        BatchInfoList result = _bConn.getBatchInfoList(jobID);
 
-        for (BatchInfo b : result) {
-            if (b.getState() != "Completed"){
+        for (BatchInfo b : batchInfoList) {
+            if (b.getState() != BatchStateEnum.Completed){
                 return false;
             }
         }
