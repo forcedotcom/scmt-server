@@ -110,10 +110,11 @@ public interface CustomerService {
      *
      * @param perPage the total cases per page
      * @param page the page requested
+     * @param since_id filters by the id
      * @return a customer response
      */
     @GET(CUSTOMERS_URI)
-    Call<ApiResponse<Customer>> getCustomers(@Query("per_page") int perPage, @Query("page") int page);
+    Call<ApiResponse<Customer>> getCustomers(@Query("since_id") Integer since_id, @Query("per_page") int perPage, @Query("page") int page);
     
     /**
      * Searches for customers by the updated_at date &amp; time
@@ -130,7 +131,7 @@ public interface CustomerService {
     Call<ApiResponse<Customer>> searchCustomersById(@Query("since_id") Integer since_id,
         @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField, 
         @Query("sort_direction") SortDirection sortDirection, @Query("fields") Fields fields);
-    
+
     @GET(CUSTOMERS_URI + "/search")
     Call<ApiResponse<Customer>> searchCustomersByUpdatedAt(@Query("since_updated_at") Integer since_updated_at,
         @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField, 
