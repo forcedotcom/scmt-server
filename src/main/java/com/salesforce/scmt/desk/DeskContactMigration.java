@@ -83,8 +83,8 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
             if (!delta)
             {
                 // false == bigCompanies TODO
-                resp = service.searchCustomersById(lastRecordId, DESK_PAGE_SIZE_CUSTOMER, page, "id", SortDirection.ASC,
-                    (false ? Fields.include("id", "_links") : null)).execute();
+                resp = service.getCustomers(lastRecordId, DESK_PAGE_SIZE_CUSTOMER, page, "id", SortDirection.ASC,
+                        (false ? Fields.include("id", "_links") : null)).execute();
             }
             else
             {

@@ -104,17 +104,18 @@ public interface CustomerService {
      */
     @GET(COMPANIES_URI + "/{id}/" + CUSTOMERS_URI)
     Call<ApiResponse<Customer>> getCustomersByCompany(@Path("id") int companyId, @Query("per_page") int perPage, @Query("page") int page);
-    
+
     /**
      * Retrieves all customers.
      *
      * @param perPage the total cases per page
      * @param page the page requested
+     * @param since_id filters by the id
      * @return a customer response
      */
     @GET(CUSTOMERS_URI)
-    Call<ApiResponse<Customer>> getCustomers(@Query("per_page") int perPage, @Query("page") int page);
-    
+    Call<ApiResponse<Customer>> getCustomers(@Query("since_id") Integer since_id, @Query("per_page") int perPage, @Query("page") int page);
+
     /**
      * Searches for customers by the updated_at date &amp; time
      *
