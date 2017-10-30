@@ -39,30 +39,30 @@ import com.sforce.async.OperationEnum;
 import retrofit.Response;
 
 public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
-	private static final int DESK_PAGE_SIZE_ARTICLE = 500;
-	
-	private int articleCounter = 0;
-	
-	public DeskArticleMigration(DeskUtil du, Map<String, String> config) {
-		super(du, config);
-		// TODO Auto-generated constructor stub
-	}
+    private static final int DESK_PAGE_SIZE_ARTICLE = 500;
 
-	@Override
-	protected int getId(D d) {
-		Article a = (Article) d;
-		return a.getId();
-	}
+    private int articleCounter = 0;
 
-	@Override
-	protected int getUpdatedAt(D d) {
-		Article a = (Article) d;
-		return Integer.valueOf(a.getUpdatedAt().toString());
-	}
+    public DeskArticleMigration(DeskUtil du, Map<String, String> config) {
+        super(du, config);
+        // TODO Auto-generated constructor stub
+    }
 
-	@Override
-	protected DeskBaseResponse<ApiResponse<D>> callDesk(DeskUtil du) {
-		// get a service
+    @Override
+    protected int getId(D d) {
+        Article a = (Article) d;
+        return a.getId();
+    }
+
+    @Override
+    protected int getUpdatedAt(D d) {
+        Article a = (Article) d;
+        return Integer.valueOf(a.getUpdatedAt().toString());
+    }
+
+    @Override
+    protected DeskBaseResponse<ApiResponse<D>> callDesk(DeskUtil du) {
+        // get a service
         ArticleService service = du.getDeskClient().articles();
         Response<ApiResponse<Article>> resp = null;
         try
@@ -91,53 +91,53 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
         d.setMessage(resp.message());
 
         return d;
-	}
+    }
 
-	@Override
-	protected String createJob(DeskUtil du) throws Exception {
-		return du.getSalesforceService().createBulkJob(SalesforceConstants.OBJ_ARTICLE, CaseFields.Id,
-	            OperationEnum.upsert);
-	}
+    @Override
+    protected String createJob(DeskUtil du) throws Exception {
+        return du.getSalesforceService().createBulkJob(SalesforceConstants.OBJ_ARTICLE, CaseFields.Id,
+                OperationEnum.upsert);
+    }
 
-	@Override
-	protected Map<String, Object> objectSpecificProcessing(Map<String, Object> clientSettings,
-			DeskBaseResponse<ApiResponse<D>> dResp) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Map<String, Object> objectSpecificProcessing(Map<String, Object> clientSettings,
+                                                           DeskBaseResponse<ApiResponse<D>> dResp) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected Map<String, String> objectSpecificBulkProcessing(Map<String, String> config) throws Exception {
-		// TODO Auto-generated method stub
-		return config;
-	}
+    @Override
+    protected Map<String, String> objectSpecificBulkProcessing(Map<String, String> config) throws Exception {
+        // TODO Auto-generated method stub
+        return config;
+    }
 
-	@Override
-	protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
-		du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Articles", dr);
-		
-	}
+    @Override
+    protected void objectSpecificBulkComplete(DeskUtil du) throws Exception {
+        du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Articles", dr);
 
-	@Override
-	protected void objectSpecificBulkCleanup(DeskUtil du) throws Exception {
-		
-		
-	}
+    }
 
-	@Override
-	protected List<Map<String, Object>> deskObjectToSalesforceObject(DeskUtil du, D d) throws Exception {
-		ArrayList<Map<String, Object>> a = new ArrayList<Map<String, Object>>();
+    @Override
+    protected void objectSpecificBulkCleanup(DeskUtil du) throws Exception {
+
+
+    }
+
+    @Override
+    protected List<Map<String, Object>> deskObjectToSalesforceObject(DeskUtil du, D d) throws Exception {
+        ArrayList<Map<String, Object>> a = new ArrayList<Map<String, Object>>();
         try
         {
-        	a.add(deskArticleToSalesforceJsonMap((Article) d, new DeployResponse(), articleCounter));
+            a.add(deskArticleToSalesforceJsonMap((Article) d, new DeployResponse(), articleCounter));
         }
         catch(Exception e)
-		{
-			dr.incrementErrorCount(1);
-			dr.addError(e.toString());
-		}
+        {
+            dr.incrementErrorCount(1);
+            dr.addError(e.toString());
+        }
         return a;
-		
-	}
+
+    }
 
 }

@@ -46,6 +46,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.concurrent.TimeUnit;
 
 import com.desk.java.apiclient.DeskClient;
 import com.desk.java.apiclient.model.ApiResponse;
@@ -97,6 +98,14 @@ import com.salesforce.scmt.utils.SalesforceConstants.FeedItemFields;
 import com.salesforce.scmt.utils.SalesforceConstants.GroupMemberFields;
 import com.salesforce.scmt.utils.SalesforceConstants.TopicFields;
 import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
+import com.sforce.async.BulkConnection;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
+import com.sforce.async.ConcurrencyMode;
+import com.sforce.async.ContentType;
+import com.sforce.async.JobInfo;
+import com.sforce.async.JobStateEnum;
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.OperationEnum;
 import com.sforce.soap.metadata.*;
@@ -1039,6 +1048,16 @@ public final class DeskUtil
 
         // close the bulk job
         getSalesforceService().closeBulkJob(jobId);
+        boolean batchStatus = getSalesforceService().checkBatchStatusComplete(jobId, batchInfoList);
+
+        do {
+            TimeUnit.SECONDS.sleep(1);
+            batchStatus = getSalesforceService().checkBatchStatusComplete(jobId, batchInfoList);
+        } while (batchStatus == false);
+
+        JobInfo jobInfo = getSalesforceService().getJobInfo(jobId;
+
+        updateMigrationFailed(jobId);
 
         updateMigrationStatus(DeskMigrationFields.StatusComplete, "Group Member", dr);
 
@@ -1428,7 +1447,9 @@ public final class DeskUtil
         }
         // continue to loop while the request is successful and there are subsequent pages of results
         while (bRetry || (resp.isSuccess() && !bRequeue && apiResp.hasNextPage() && SalesforceConstants.RETRIEVE_ALL));
-        
+
+        List<BatchInfo> batchInfoList = new ArrayList<BatchInfo>();
+
         // loop through the object types
         for (String soType : soTypes)
         {
@@ -1442,7 +1463,7 @@ public final class DeskUtil
                 int iMax = (recLists.get(soType).size() > batchMaxSize ? batchMaxSize : recLists.get(soType).size());
 
                 // create the records
-                getSalesforceService().addBatchToJob(jobIds.get(soType), recLists.get(soType).subList(0, iMax));
+                batchInfoList.add(getSalesforceService().addBatchToJob(jobIds.get(soType), recLists.get(soType).subList(0, iMax)));
 
                 // clear the records that were inserted
                 recLists.get(soType).subList(0, iMax).clear();
@@ -1460,8 +1481,18 @@ public final class DeskUtil
         }
         
         dr.addError(String.format("Final Interaction Page migrated [%d]", startId));
+        boolean batchStatus = getSalesforceService().checkBatchStatusComplete(jobIds.get(soType), batchInfoList);
+
+        do {
+            TimeUnit.SECONDS.sleep(1);
+            batchStatus = getSalesforceService().checkBatchStatusComplete(jobIds.get(soType), batchInfoList);
+        } while (batchStatus == false);
+
+        JobInfo jobInfo = getSalesforceService().getJobInfo(jobIds.get(soType));
+
+        updateMigrationFailed(jobIds.get(soType));
         updateMigrationStatus(DeskMigrationFields.StatusComplete, "Interactions", dr);
-        dr = new DeployResponse();
+        //dr = new DeployResponse();
         
         // return the deploy response
         return dr;
@@ -2331,7 +2362,8 @@ public final class DeskUtil
                     : Double.valueOf((String) prev.getField(DeskMigrationFields.RecordsMigrated)));
                 Double recordsFailed = (prev.getField(DeskMigrationFields.RecordsFailed) == null ? 0
                     : Double.valueOf((String) prev.getField(DeskMigrationFields.RecordsFailed)));
-    
+
+
                 // increment counters
                 deskMigration.setField(DeskMigrationFields.RecordsMigrated,
                     recordsMigrated.intValue() + dr.getSuccessCount());
@@ -2393,6 +2425,52 @@ public final class DeskUtil
             }
             
     
+            // upsert the migration status
+            getSalesforceService().upsertData(DeskMigrationFields.ID, Arrays.asList(deskMigration));
+        }
+        catch (UnexpectedErrorFault e)
+        {
+            Utils.log(String.format("[%s] %s", e.getExceptionCode().name(), e.getExceptionMessage()));
+        }
+        catch (AsyncApiException e)
+        {
+            Utils.log(String.format("[%s] %s", e.getExceptionCode().name(), e.getExceptionMessage()));
+        }
+        catch (Exception e)
+        {
+            Utils.log(String.format("[EXCEPTION] %s", e.getMessage()));
+        }
+    }
+
+    public void updateMigrationFailed(String jobId) {
+        try
+        {
+            SObject deskMigration = new SObject(SalesforceConstants.OBJ_DESK_MIGRATION);
+            deskMigration.setId(getDeskService().getMigrationId());
+
+                // retrieve the existing counts so I can increment them
+                String query = String.format("SELECT %s, %s, %s FROM %s WHERE %s = '%s'", DeskMigrationFields.RecordsFailed,
+                        DeskMigrationFields.RecordsMigrated, DeskMigrationFields.Log, SalesforceConstants.OBJ_DESK_MIGRATION,
+                        DeskMigrationFields.ID, getDeskService().getMigrationId());
+                List<SObject> results = getSalesforceService().query(query);
+
+                // check if an existing migration record was found
+                if (results == null || results.isEmpty())
+                {
+                    // we are in big trouble if we get here
+                    throw new InvalidParameterException(
+                            "Could not find existing Desk Migration record with Id: [" + getDeskService().getMigrationId() + "]!");
+                }
+
+                SObject prev = results.get(0);
+
+                Double recordsFailed = (prev.getField(DeskMigrationFields.RecordsFailed) == null ? 0
+                        : Double.valueOf((String) prev.getField(DeskMigrationFields.RecordsFailed)));
+
+                Double jobRecordsFailed = getSalesforceSerivce().getJobInfo(jobId).getNumberRecordsFailed();
+                // increment counters
+                deskMigration.setField(DeskMigrationFields.RecordsFailed, recordsFailed.intValue() + jobRecordsFailed);
+
             // upsert the migration status
             getSalesforceService().upsertData(DeskMigrationFields.ID, Arrays.asList(deskMigration));
         }
