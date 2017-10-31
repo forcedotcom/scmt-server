@@ -114,7 +114,8 @@ public interface CustomerService {
      * @return a customer response
      */
     @GET(CUSTOMERS_URI)
-    Call<ApiResponse<Customer>> getCustomers(@Query("since_id") Integer since_id, @Query("per_page") int perPage, @Query("page") int page);
+    Call<ApiResponse<Customer>> getCustomers(@Query("since_id") Integer since_id, @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField,
+                                             @Query("sort_direction") SortDirection sortDirection, @Query("fields") Fields fields);
 
     /**
      * Searches for customers by the updated_at date &amp; time
