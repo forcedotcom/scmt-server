@@ -86,3 +86,6 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+
+# Visual Studio Code workspace files
+*.code-workspace
