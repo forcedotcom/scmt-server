@@ -18,6 +18,7 @@ package com.salesforce.scmt.controller;
 import static spark.Spark.post;
 
 import com.salesforce.scmt.service.DeskService;
+import com.salesforce.scmt.service.KbService;
 import com.salesforce.scmt.utils.JsonTransformer;
 
 public class KbController
@@ -26,8 +27,8 @@ public class KbController
 
     public KbController()
     {
-        post(PREFIX_URI + "/imagesize", (req, res) -> { return null; /*KbService.imageSize(req, res);*/ }, new JsonTransformer());
-        post(PREFIX_URI + "/pushattachment", (req, res) -> { return null; /*KbService.pushAttachment(req, res);*/ }, new JsonTransformer());
-        post(PREFIX_URI + "/remotesite", (req, res) -> { return null; /*KbService.remoteSite(req, res);*/ }, new JsonTransformer());
+        post(PREFIX_URI + "/imagesize", (req, res) -> { return KbService.imageSize(req, res); }, new JsonTransformer());
+        post(PREFIX_URI + "/pushattachment", (req, res) -> { return KbService.pushAttachment(req, res); }, new JsonTransformer());
+        post(PREFIX_URI + "/remotesite", (req, res) -> { return KbService.remoteSite(req, res); }, new JsonTransformer());
     }
 }
