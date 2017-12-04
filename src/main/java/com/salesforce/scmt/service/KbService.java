@@ -23,11 +23,12 @@ package com.salesforce.scmt.service;
 // import static com.salesforce.scmt.utils.Utils.getPostParamsFromRequest;
 // import static java.lang.System.getenv;
 
+import java.lang.reflect.Type;
 // import java.io.IOException;
 // import java.security.InvalidParameterException;
 // import java.util.Arrays;
 // import java.util.HashMap;
-// import java.util.List;
+import java.util.List;
 // import java.util.Map;
 // import java.util.Set;
 // import java.util.TreeMap;
@@ -37,13 +38,17 @@ package com.salesforce.scmt.service;
 // import com.desk.java.apiclient.model.CustomField;
 // import com.desk.java.apiclient.model.Group;
 // import com.desk.java.apiclient.model.User;
+import com.desk.java.apiclient.model.Attachment;
 // import com.salesforce.scmt.model.DeployResponse;
-// import com.salesforce.scmt.utils.*;
+import com.salesforce.scmt.utils.*;
 // import com.squareup.okhttp.Interceptor;
 // import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 // import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
 
 // import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import spark.Request;
 import spark.Response;
@@ -56,7 +61,16 @@ public class KbService
 
     public static Object imageSize(Request req, Response res) throws Exception
     {
-        return null;
+        Type listType = new TypeToken<List<Attachment>>(){}.getType();
+        List<Attachment> attachments = new Gson().fromJson(req.body(), listType);
+
+        for (Attachment a : attachments) {
+            a.setContentType(DeskUtil.getMimeType(a.getUrl()));
+            a.setSize(DeskUtil.getFileLengthFromUrl(a.getUrl()));
+
+        }
+
+        return attachments;
     }
 
     public static Object pushAttachment(Request req, Response res) throws Exception
