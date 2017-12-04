@@ -26,6 +26,7 @@ import java.io.IOException;
 
 
 import static com.salesforce.scmt.utils.JsonUtil.toJson;
+import com.salesforce.scmt.utils.Utils;
 
 import com.salesforce.scmt.model.ErrorResponse;
 import com.salesforce.scmt.utils.Utils;
@@ -120,5 +121,6 @@ public final class Main
 
         // add the desk end-points
         new com.salesforce.scmt.controller.DeskController();
+        new com.salesforce.scmt.controller.KbController();
     }
 }
