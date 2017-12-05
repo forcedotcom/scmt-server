@@ -121,6 +121,7 @@ public final class Main
 
         // add the desk end-points
         new com.salesforce.scmt.controller.DeskController();
+        new com.salesforce.scmt.controller.MetaController();
         new com.salesforce.scmt.controller.KbController();
     }
 }
