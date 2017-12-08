@@ -30,7 +30,7 @@ public class Attachment implements Serializable {
     private String contentType;
     private int size;
     private String url;
-    private MessageLinks _links;
+    private AttachmentLinks _links;
 
     /**
      * default constructor
@@ -85,11 +85,11 @@ public class Attachment implements Serializable {
     }
     
     @NotNull
-    public MessageLinks getLinks() {
-        return _links == null ? _links = new MessageLinks() : _links;
+    public AttachmentLinks getLinks() {
+        return _links == null ? _links = new AttachmentLinks() : _links;
     }
 
-    public void setLinks(MessageLinks l) {
+    public void setLinks(AttachmentLinks l) {
         this._links = l;
     }
 
@@ -109,6 +109,15 @@ public class Attachment implements Serializable {
     public int getUserId()
     {
         return (getLinks().getUser() == null ? NO_ID : getLinks().getUser().getLinkId());
+    }
+
+    /**
+     * Gets the id of the article or {@link #NO_ID} if there is no article
+     * @return the id or {@link #NO_ID}
+     */
+    public int getArticleId()
+    {
+        return (getLinks().getArticle() == null ? NO_ID : getLinks().getArticle().getLinkId());
     }
 
 }

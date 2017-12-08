@@ -13,45 +13,60 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.salesforce.scmt.model;
+package com.desk.java.apiclient.model;
 
-import com.salesforce.scmt.utils.Utils;
+import com.google.gson.annotations.SerializedName;
 
-public class ErrorResponse
-{
-    private final String message;
-    private final String type;
-    private StackTraceElement[] trace;
+import org.jetbrains.annotations.Nullable;
 
-    public ErrorResponse(String type, String message, String... args)
-    {
-        this.type = type;
-        this.message = String.format(message, (Object[]) args);
+import java.io.Serializable;
+
+public class AttachmentLinks extends Links implements Serializable {
+
+    private static final long serialVersionUID = 2928173226911398456L;
+
+    @SerializedName("case")
+    private Link caseLink;
+    private Link article;
+    private Link user;
+    private Link message;
+    private Link reply;
+    private Link erasedBy;
+    private Link uploadedBy;
+
+    @Nullable
+    public Link getCaseLink() {
+        return caseLink;
     }
 
-    public ErrorResponse(Exception e)
-    {
-        this.type = e.getClass().toString();
-        this.message = e.getMessage();
-        String env = System.getenv("JAVA_ENV");
-        if (env != null && env.equals("development")) {
-            this.trace = e.getStackTrace();
-        }
-        Utils.logException(e);
+    @Nullable
+    public Link getArticle() {
+        return this.article;
     }
 
-    public String getType()
-    {
-        return this.type;
-    }
-
-    public String getMessage()
-    {
+    @Nullable
+    public Link getMessage() {
         return this.message;
     }
 
-    public StackTraceElement[] getStackTrace()
-    {
-        return this.trace;
+    @Nullable
+    public Link getReply() {
+        return this.reply;
     }
+
+    @Nullable
+    public Link getErasedBy() {
+        return this.erasedBy;
+    }
+
+    @Nullable
+    public Link getUploadedBy() {
+        return this.uploadedBy;
+    }
+
+    @Nullable
+    public Link getUser() {
+        return this.user;
+    }
+
 }

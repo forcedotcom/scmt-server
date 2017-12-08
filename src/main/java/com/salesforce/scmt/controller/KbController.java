@@ -13,45 +13,22 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.salesforce.scmt.model;
+package com.salesforce.scmt.controller;
 
-import com.salesforce.scmt.utils.Utils;
+import static spark.Spark.post;
 
-public class ErrorResponse
+import com.salesforce.scmt.service.DeskService;
+import com.salesforce.scmt.service.KbService;
+import com.salesforce.scmt.utils.JsonTransformer;
+
+public class KbController
 {
-    private final String message;
-    private final String type;
-    private StackTraceElement[] trace;
+    private static final String PREFIX_URI = "/kb";
 
-    public ErrorResponse(String type, String message, String... args)
+    public KbController()
     {
-        this.type = type;
-        this.message = String.format(message, (Object[]) args);
-    }
-
-    public ErrorResponse(Exception e)
-    {
-        this.type = e.getClass().toString();
-        this.message = e.getMessage();
-        String env = System.getenv("JAVA_ENV");
-        if (env != null && env.equals("development")) {
-            this.trace = e.getStackTrace();
-        }
-        Utils.logException(e);
-    }
-
-    public String getType()
-    {
-        return this.type;
-    }
-
-    public String getMessage()
-    {
-        return this.message;
-    }
-
-    public StackTraceElement[] getStackTrace()
-    {
-        return this.trace;
+        post(PREFIX_URI + "/imagesize", (req, res) -> { return KbService.imageSize(req, res); }, new JsonTransformer());
+        post(PREFIX_URI + "/pushattachment", (req, res) -> { return KbService.pushAttachment(req, res); }, new JsonTransformer());
+        post(PREFIX_URI + "/remotesite", (req, res) -> { return KbService.remoteSite(req, res); }, new JsonTransformer());
     }
 }

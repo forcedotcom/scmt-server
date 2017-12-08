@@ -30,6 +30,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
 import java.security.InvalidParameterException;
 import java.security.spec.InvalidParameterSpecException;
 import java.text.SimpleDateFormat;
@@ -105,6 +107,10 @@ import com.sforce.soap.partner.fault.ExceptionCode;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.soap.partner.sobject.SObject;
 import com.squareup.okhttp.Headers;
+
+import org.apache.tika.Tika;
+import org.apache.tika.detect.TypeDetector;
+import org.apache.commons.io.IOUtils;
 
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
@@ -1851,6 +1857,26 @@ public final class DeskUtil
 
         // return the list of records
         return dr;
+    }
+
+    public static String getMimeType(String url)
+    {
+        try {
+            return new Tika().detect(new URL(url));
+        }
+        catch (MalformedURLException ex) {}
+        catch (IOException ex) {}
+        return null;
+    }
+
+    public static int getFileLengthFromUrl(String url)
+    {
+        try {
+            return IOUtils.toByteArray(new URL(url).openStream()).length;
+        }
+        catch (MalformedURLException ex) {}
+        catch (IOException ex) {}
+        return 0;
     }
     
    
