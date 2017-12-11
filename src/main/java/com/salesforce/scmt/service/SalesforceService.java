@@ -27,6 +27,7 @@ import java.util.Map;
 
 import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.model.DeployResponse;
+import com.salesforce.scmt.model.RemoteSite;
 import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceUtil;
@@ -47,6 +48,9 @@ import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+
+import spark.Request;
+import spark.Response;
 
 public final class SalesforceService
 {
