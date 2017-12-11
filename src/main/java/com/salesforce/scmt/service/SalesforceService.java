@@ -52,6 +52,8 @@ import com.sforce.ws.ConnectorConfig;
 import spark.Request;
 import spark.Response;
 
+import com.google.gson.Gson;
+
 public final class SalesforceService
 {
     private MetadataConnection _mConn;
@@ -131,6 +133,28 @@ public final class SalesforceService
     public String getSessionId()
     {
         return _sessionId;
+    }
+
+    public void createRemoteSite(RemoteSite rs)
+      throws ConnectionException, DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+
+        RemoteSiteSetting rss = new RemoteSiteSetting();
+        rss.setFullName(rs.fullName);
+        rss.setUrl(rs.url);
+        rss.setDescription(rs.description);
+        rss.setIsActive(true);
+        rss.setDisableProtocolSecurity(false);
+
+        com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { rss });
+        
+        for (com.sforce.soap.metadata.SaveResult r : results) {
+            if (r.isSuccess()) {
+            System.out.println("Created component: " + r.getFullName());
+        } else {
+            throw new Exception("Errors found while creating " + r.getFullName());
+        }
+      }
     }
 
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
@@ -691,6 +715,17 @@ public final class SalesforceService
 
         // return the results
         return results;
+    }
+
+    public static String createRemoteSite(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+
+        RemoteSite rs = new Gson().fromJson(req.body(), RemoteSite.class);
+        SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+        sf.createRemoteSite(rs);
+
+        return "Success";
     }
 
     public void setAuditFieldsEnabled(Boolean valueOf)
