@@ -10,7 +10,7 @@ package com.salesforce.scmt.controller;
 
 import static spark.Spark.post;
 
-import com.salesforce.scmt.service.DeskService;
+import com.salesforce.scmt.service.SalesforceService;
 import com.salesforce.scmt.utils.JsonTransformer;
 
 public class MetaController
