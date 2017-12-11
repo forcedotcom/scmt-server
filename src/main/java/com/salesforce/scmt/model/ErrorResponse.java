@@ -17,40 +17,35 @@ package com.salesforce.scmt.model;
 
 import com.salesforce.scmt.utils.Utils;
 
-public class ErrorResponse
-{
-    private final String message;
-    private final String type;
-    private StackTraceElement[] trace;
+public class ErrorResponse {
+  private final String message;
+  private final String type;
+  private StackTraceElement[] trace;
 
-    public ErrorResponse(String type, String message, String... args)
-    {
-        this.type = type;
-        this.message = String.format(message, (Object[]) args);
-    }
+  public ErrorResponse(String type, String message, String... args) {
+    this.type = type;
+    this.message = String.format(message, (Object[]) args);
+  }
 
-    public ErrorResponse(Exception e)
-    {
-        this.type = e.getClass().toString();
-        this.message = e.getMessage();
-        if (System.getenv("JAVA_ENV").equals("development")) {
-            this.trace = e.getStackTrace();
-        }
-        Utils.logException(e);
+  public ErrorResponse(Exception e) {
+    this.type = e.getClass().toString();
+    this.message = e.getMessage();
+    String env = System.getenv("JAVA_ENV");
+    if (env != null && env.equals("development")) {
+      this.trace = e.getStackTrace();
     }
+    Utils.logException(e);
+  }
 
-    public String getType()
-    {
-        return this.type;
-    }
+  public String getType() {
+    return this.type;
+  }
 
-    public String getMessage()
-    {
-        return this.message;
-    }
+  public String getMessage() {
+    return this.message;
+  }
 
-    public StackTraceElement[] getStackTrace()
-    {
-        return this.trace;
-    }
+  public StackTraceElement[] getStackTrace() {
+    return this.trace;
+  }
 }
