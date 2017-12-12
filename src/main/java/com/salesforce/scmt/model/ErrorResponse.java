@@ -33,7 +33,8 @@ public class ErrorResponse
     {
         this.type = e.getClass().toString();
         this.message = e.getMessage();
-        if (System.getenv("JAVA_ENV").equals("development")) {
+        String env = System.getenv("JAVA_ENV");
+        if (env != null && env.equals("development")) {
             this.trace = e.getStackTrace();
         }
         Utils.logException(e);
