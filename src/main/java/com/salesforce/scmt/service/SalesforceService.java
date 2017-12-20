@@ -150,11 +150,11 @@ public final class SalesforceService
         
         for (com.sforce.soap.metadata.SaveResult r : results) {
             if (r.isSuccess()) {
-            System.out.println("Created component: " + r.getFullName());
-        } else {
-            throw new Exception("Errors found while creating " + r.getFullName());
+                System.out.println("Created component: " + r.getFullName());
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
         }
-      }
     }
 
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
@@ -721,10 +721,22 @@ public final class SalesforceService
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
 
-        RemoteSite rs = new Gson().fromJson(req.body(), RemoteSite.class);
-        SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
-        sf.createRemoteSite(rs);
-
+        try {
+            RemoteSite rs = new Gson().fromJson(req.body(), RemoteSite.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.createRemoteSite(rs);
+        } catch(com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        } catch(Exception e) {
+            if (e.getMessage().contains("Remote Site Name already exists")) {
+                res.status(200);
+                return "Already Created";
+            }
+        }
+        res.status(201);
         return "Success";
     }
 
