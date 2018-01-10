@@ -48,7 +48,7 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
 		// TODO Auto-generated constructor stub
 	}
 
-	private static final int DESK_PAGE_SIZE_CUSTOMER = 100;
+	private static final int DESK_PAGE_SIZE_CUSTOMER = 20;
 
     @Override
     protected int getId(D d)
