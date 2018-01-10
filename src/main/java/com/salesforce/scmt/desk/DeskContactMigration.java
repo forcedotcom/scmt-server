@@ -49,6 +49,7 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
 	}
 
 	private static final int DESK_PAGE_SIZE_CUSTOMER = 20;
+    //push
 
     @Override
     protected int getId(D d)
