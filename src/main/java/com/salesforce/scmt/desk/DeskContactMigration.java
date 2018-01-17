@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.internal.bind.util.ISO8601Utils;
+import java.text.ParsePosition;
+import java.text.ParseException;
+
 import com.desk.java.apiclient.model.ApiResponse;
 import com.desk.java.apiclient.model.Customer;
 import com.desk.java.apiclient.model.Fields;
@@ -64,8 +68,14 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
     @Override
     protected int getUpdatedAt(D d)
     {
-        Customer c = (Customer) d;
-        return Integer.valueOf(c.getUpdatedAt());
+        try {
+            Customer c = (Customer) d;
+            return (int) (ISO8601Utils.parse(c.getUpdatedAt(), new ParsePosition(0)).getTime() / 1000);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
     @Override
