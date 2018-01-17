@@ -44,8 +44,12 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
 {
 
     public DeskContactMigration(DeskUtil du, Map<String, String> config) {
-		super(du, config);
-		// TODO Auto-generated constructor stub
+        super(du, config);
+        
+        // WORKAROUND: Users with too many contacts lead to time outs. Let's default to a delta migration instead.
+        if (this.config.get("updated_at") == null || this.config.get("updated_at") == "null") {
+            this.config.put("updated_at", "1");
+        }
 	}
 
 	private static final int DESK_PAGE_SIZE_CUSTOMER = 100;
