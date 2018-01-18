@@ -2410,6 +2410,13 @@ public final class DeskUtil
         }
     }
 
+    public static void logAllHeaders(Headers headers) {
+        String env = System.getenv("JAVA_ENV");
+        if (env != null && !env.equals("production")) {
+            Utils.log(String.valueOf(headers.toMultimap()));
+        }
+    }
+
     public static void logDeskRateHeaders(Headers headers)
     {
         logDeskRateHeaders(
