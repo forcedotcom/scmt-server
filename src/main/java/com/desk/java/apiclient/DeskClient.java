@@ -438,13 +438,6 @@ public class DeskClient {
     private OkHttpClient createOkHttpClient() {
         OkHttpClient okHttpClient = new OkHttpClient();
 
-        String env = System.getenv("JAVA_ENV");
-        if (env != null && !env.equals("production")) {
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(Level.HEADERS);
-            okHttpClient.interceptors().add(logging);
-        }
-
         // if we have response cache let's use it!
         if (responseCache != null) {
             okHttpClient.setCache(responseCache);
