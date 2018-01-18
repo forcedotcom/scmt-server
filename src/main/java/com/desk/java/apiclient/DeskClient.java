@@ -29,6 +29,8 @@ import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.logging.HttpLoggingInterceptor;
+import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -435,6 +437,13 @@ public class DeskClient {
 
     private OkHttpClient createOkHttpClient() {
         OkHttpClient okHttpClient = new OkHttpClient();
+
+        String env = System.getenv("JAVA_ENV");
+        if (env != null && !env.equals("production")) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(Level.HEADERS);
+            okHttpClient.interceptors().add(logging);
+        }
 
         // if we have response cache let's use it!
         if (responseCache != null) {
