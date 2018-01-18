@@ -49,7 +49,6 @@ public interface CustomerService {
      * @param embed the objects to embed
      * @return a customer
      */
-    @Headers("X-DESK-API=assistly")
     @GET(CUSTOMERS_URI + "/{id}")
     Call<Customer> getCustomer(@Path("id") int customerId, @Query("embed") Embed embed);
 
