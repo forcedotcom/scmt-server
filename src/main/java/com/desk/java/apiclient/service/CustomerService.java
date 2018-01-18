@@ -29,6 +29,7 @@ import retrofit.http.PATCH;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.http.Headers;
 
 public interface CustomerService {
 
@@ -48,6 +49,7 @@ public interface CustomerService {
      * @param embed the objects to embed
      * @return a customer
      */
+    @Headers("X-DESK-API=assistly")
     @GET(CUSTOMERS_URI + "/{id}")
     Call<Customer> getCustomer(@Path("id") int customerId, @Query("embed") Embed embed);
 
