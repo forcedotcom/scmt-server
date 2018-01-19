@@ -52,7 +52,7 @@ public final class Main
          * the public directory name is not included in the URL.
          * A file /public/css/style.css is made available as http://{host}:{port}/css/style.css
          */
-        staticFileLocation("/src/main/public");
+        staticFileLocation("/public");
 
         // Before-filters are evaluated before each request, and can read the request and read/modify the response.
         before((request, response) -> {
@@ -81,7 +81,7 @@ public final class Main
         // After-filters are evaluated after each request, and can read the request and read/modify the response
         after((request, response) -> {
             // GZIP compress everything
-            response.header("Content-Encoding", "gzip");
+            //response.header("Content-Encoding", "gzip");
         });
 
         /**
