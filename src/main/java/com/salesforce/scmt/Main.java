@@ -72,7 +72,7 @@ public final class Main
 
             response.header("Pragma", "no-cache");
 
-            response.header("Cache-Control", "private");
+            response.header("Expires", "0");
 
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
@@ -86,6 +86,10 @@ public final class Main
 
         	}
         });
+
+        after((request, response) -> {
+            response.header("Cache-Control", "private");
+});
 
         /**
          * Register an exception handler when an 'IllegalArgumentException' is thrown.
