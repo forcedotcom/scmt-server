@@ -88,7 +88,7 @@ public final class Main
         });
 
         after((request, response) -> {
-            response.header("Cache-Control", "private");
+            response.header("Cache-Control", "must-revalidate,no-cache,no-store,private");
 });
 
         /**
