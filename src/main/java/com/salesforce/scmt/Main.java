@@ -72,6 +72,8 @@ public final class Main
 
             response.header("Pragma", "no-cache");
 
+            response.header("Cache-Control", "private");
+
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
         	if(!"https".equalsIgnoreCase(request.headers("x-forwarded-proto"))){
