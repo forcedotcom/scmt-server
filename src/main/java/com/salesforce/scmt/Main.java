@@ -77,13 +77,7 @@ public final class Main
 
         	}
         });
-
-        // After-filters are evaluated after each request, and can read the request and read/modify the response
-        after((request, response) -> {
-            // GZIP compress everything
-            //response.header("Content-Encoding", "gzip");
-        });
-
+        
         /**
          * Register an exception handler when an 'IllegalArgumentException' is thrown.
          */
