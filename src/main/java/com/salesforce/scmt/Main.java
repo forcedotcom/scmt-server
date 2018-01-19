@@ -65,6 +65,11 @@ public final class Main
             // set the 'X-XSS-Protection'
             response.header("X-XSS-Protection", "1");
 
+            //set X-Frame-Options to DENY
+            response.header("X-Frame-Options", "DENY");
+
+            response.header('X-Content-Type-Options', 'nosniff');
+
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
         	if(!"https".equalsIgnoreCase(request.headers("x-forwarded-proto"))){
@@ -77,7 +82,7 @@ public final class Main
 
         	}
         });
-        
+
         /**
          * Register an exception handler when an 'IllegalArgumentException' is thrown.
          */
