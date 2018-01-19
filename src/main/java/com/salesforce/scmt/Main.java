@@ -70,6 +70,8 @@ public final class Main
 
             response.header("X-Content-Type-Options", "nosniff");
 
+            response.header("Pragma", "no-cache");
+
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
         	if(!"https".equalsIgnoreCase(request.headers("x-forwarded-proto"))){
