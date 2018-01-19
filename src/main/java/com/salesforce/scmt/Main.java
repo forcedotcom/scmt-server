@@ -68,7 +68,7 @@ public final class Main
             //set X-Frame-Options to DENY
             response.header("X-Frame-Options", "DENY");
 
-            response.header('X-Content-Type-Options', 'nosniff');
+            response.header("X-Content-Type-Options", "nosniff");
 
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
