@@ -52,7 +52,7 @@ public final class Main
          * the public directory name is not included in the URL.
          * A file /public/css/style.css is made available as http://{host}:{port}/css/style.css
          */
-        staticFileLocation("/public");
+        staticFileLocation("/src/main/public");
 
         // Before-filters are evaluated before each request, and can read the request and read/modify the response.
         before((request, response) -> {
