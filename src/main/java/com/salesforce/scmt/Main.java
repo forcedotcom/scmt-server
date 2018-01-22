@@ -65,6 +65,15 @@ public final class Main
             // set the 'X-XSS-Protection'
             response.header("X-XSS-Protection", "1");
 
+            //set X-Frame-Options to DENY
+            response.header("X-Frame-Options", "DENY");
+
+            response.header("X-Content-Type-Options", "nosniff");
+
+            response.header("Pragma", "no-cache");
+
+            response.header("Expires", "0");
+
             // force to https
             System.out.println(request.headers("x-forwarded-proto"));
         	if(!"https".equalsIgnoreCase(request.headers("x-forwarded-proto"))){
@@ -78,11 +87,9 @@ public final class Main
         	}
         });
 
-        // After-filters are evaluated after each request, and can read the request and read/modify the response
         after((request, response) -> {
-            // GZIP compress everything
-            response.header("Content-Encoding", "gzip");
-        });
+            response.header("Cache-Control", "must-revalidate,no-cache,no-store,private");
+});
 
         /**
          * Register an exception handler when an 'IllegalArgumentException' is thrown.
