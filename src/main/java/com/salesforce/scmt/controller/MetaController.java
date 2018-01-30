@@ -20,6 +20,7 @@ public class MetaController
     public MetaController()
     {
         post(PREFIX_URI + "/remotesite", (req, res) -> { return SalesforceService.createRemoteSite(req, res); }, new JsonTransformer() );
+        post(PREFIX_URI + "/migrateTopics", (req, res) -> { return SalesforceService.createTopics(req, res); }, new JsonTransformer() );
         
     }
 }
