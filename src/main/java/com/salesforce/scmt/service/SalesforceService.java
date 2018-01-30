@@ -157,6 +157,29 @@ public final class SalesforceService
         }
     }
 
+    public void createDataCategoryGroup(DataCategoryGroup dg)
+      throws ConnectionException, DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+
+        DataCategoryGroup dcg = new DataCategoryGroup();
+        dcg.setFullName(dg.fullName);
+        dcg.setDataCategory(dg.url);
+        dcg.setDescription(dg.description);
+        dcg.setIsActive(true);
+        dcg.setLabel(dg.label);
+        dcg.setDataCategory(dg.DataCategory);
+
+        com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
+        
+        for (com.sforce.soap.metadata.SaveResult r : results) {
+            if (r.isSuccess()) {
+                System.out.println("Created component: " + r.getFullName());
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
+    }
+
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
     {
         ConnectorConfig config = new ConnectorConfig();
@@ -735,6 +758,29 @@ public final class SalesforceService
                 res.status(200);
                 return "Already Created";
             }
+        }
+        res.status(201);
+        return "Success";
+    }
+
+    public static String createDataCategoryGroup(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+
+        try {
+            DataCategoryGroup dcg = new Gson().fromJson(req.body(), DataCategoryGroup.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.createDataCategoryGroup(dcg);
+        } catch(com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        } catch(Exception e) {
+            // if (e.getMessage().contains("Remote Site Name already exists")) {
+            //     res.status(200);
+            //     return "Already Created";
+            // }
         }
         res.status(201);
         return "Success";
