@@ -182,7 +182,8 @@ public final class SalesforceService
         com.sforce.soap.metadata.Metadata[] mdInfo = existingResult.getRecords();
 
 
-        if (mdInfo.length > 0) {
+        for (com.sforce.soap.metadata.Metadata md : mdInfo) {
+            if (md != null) {
             com.sforce.soap.metadata.DeleteResult[]  deleteResults = getMetadataConnection().deleteMetadata("DataCategoryGroup", listFullNames1);
             for (com.sforce.soap.metadata.DeleteResult r : deleteResults) {
                 if (r.isSuccess()) {
@@ -190,8 +191,12 @@ public final class SalesforceService
                 } else {
                     throw new Exception(r.getErrors()[0].getMessage());
                 }
+            }
+            } else {
+                System.out.println("Empty metadata.");
+            }
         }
-        }
+
 
         com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
         
