@@ -175,7 +175,7 @@ public final class SalesforceService
         List<String> listFullNames = new ArrayList<String>();
         listFullNames.add(dg.fullName);
         listFullNames.toArray( listFullNames1 );
-
+        System.out.println(listFullNames1);
 
         com.sforce.soap.metadata.ReadResult existingResult = getMetadataConnection().readMetadata("DataCategoryGroup", listFullNames1);
         System.out.println(existingResult);
