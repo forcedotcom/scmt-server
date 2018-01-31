@@ -28,6 +28,8 @@ import java.util.Map;
 import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.model.RemoteSite;
+import com.salesforce.scmt.model.DataCategoryGroupJson;
+import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceUtil;
@@ -157,17 +159,18 @@ public final class SalesforceService
         }
     }
 
-    public void createDataCategoryGroup(DataCategoryGroup dg)
+    public void createDataCategoryGroup(DataCategoryGroupJson dg)
       throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
+        System.out.println("made it to create dcg");
 
         DataCategoryGroup dcg = new DataCategoryGroup();
         dcg.setFullName(dg.fullName);
-        dcg.setDataCategory(dg.url);
         dcg.setDescription(dg.description);
-        dcg.setIsActive(true);
+        dcg.setActive(true);
         dcg.setLabel(dg.label);
-        dcg.setDataCategory(dg.DataCategory);
+        DataCategory dc = createDataCategory(dg.dataCategory);
+        dcg.setDataCategory(dc);
 
         com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
         
@@ -178,6 +181,26 @@ public final class SalesforceService
                 throw new Exception(r.getErrors()[0].getMessage());
             }
         }
+    }
+
+    public static DataCategory createDataCategory(DataCategoryJson dg) {
+        System.out.println("made it to create dc");
+        DataCategory dc = new DataCategory();
+        dc.setName(dg.name);
+        dc.setLabel(dg.label);
+
+        DataCategory[] subList1 = new DataCategory[dg.subCategories.length];
+        List<DataCategory> subList = new ArrayList<DataCategory>();
+
+
+        for (DataCategoryJson dcj: dg.subCategories) {
+            subList.add(createDataCategory(dcj));
+        }
+
+        subList.toArray( subList1 );
+
+        dc.setDataCategory(subList1);
+        return dc;
     }
 
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
@@ -766,9 +789,10 @@ public final class SalesforceService
     public static String createDataCategoryGroup(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
+        System.out.println("made it to the base method");
 
         try {
-            DataCategoryGroup dcg = new Gson().fromJson(req.body(), DataCategoryGroup.class);
+            DataCategoryGroupJson dcg = new Gson().fromJson(req.body(), DataCategoryGroupJson.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
             sf.createDataCategoryGroup(dcg);
         } catch(com.sforce.ws.SoapFaultException e) {
@@ -781,6 +805,8 @@ public final class SalesforceService
             //     res.status(200);
             //     return "Already Created";
             // }
+            res.status(200);
+            return "failed" + e.getMessage();
         }
         res.status(201);
         return "Success";
