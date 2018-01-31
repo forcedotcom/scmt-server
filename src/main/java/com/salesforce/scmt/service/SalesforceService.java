@@ -172,7 +172,7 @@ public final class SalesforceService
         DataCategory dc = createDataCategory(dg.dataCategory);
         dcg.setDataCategory(dc);
 
-        com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
+        com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().upsertMetadata(new Metadata[] { dcg });
         
         for (com.sforce.soap.metadata.SaveResult r : results) {
             if (r.isSuccess()) {
