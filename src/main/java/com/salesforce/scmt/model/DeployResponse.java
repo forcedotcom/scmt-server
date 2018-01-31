@@ -27,7 +27,7 @@ public class DeployResponse {
 	private List<String> errorMessages;
 	private int successCount;
 	private int errorCount;
-	private Map<String, Set<Integer>> errorMessagesWithIds;
+	private Map<String, Set<Long>> errorMessagesWithIds;
 	private String resumePoint;
 	private Boolean delta;
 	
@@ -150,23 +150,23 @@ public class DeployResponse {
      * @param error - The error message (key)
      * @param id - The deskId to be added to set (value)
      */
-    public void addErrorWithId(String error, Integer id)
+    public void addErrorWithId(String error, Long id)
     {
     	// null check
         if (this.errorMessagesWithIds == null)
         {
             // initialize
-            this.errorMessagesWithIds = new HashMap<String, Set<Integer>>();
+            this.errorMessagesWithIds = new HashMap<String, Set<Long>>();
         }
         
     	if(this.errorMessagesWithIds.containsKey(error))
     	{
-    		Set<Integer> s = this.errorMessagesWithIds.get(error);
+    		Set<Long> s = this.errorMessagesWithIds.get(error);
     		s.add(id);
     		this.errorMessagesWithIds.put(error, s);
     	}
     	else{
-    		Set<Integer> s = new HashSet<Integer>();
+    		Set<Long> s = new HashSet<Long>();
     		s.add(id);
     		this.errorMessagesWithIds.put(error, s);
     	}

@@ -49,13 +49,13 @@ public class DeskUserMigration<D extends Serializable> extends DeskBase<D> {
 	}
 	
 	@Override
-	protected int getId(D d) {
+	protected long getId(D d) {
 		User u = (User)d;
 		return u.getId();
 	}
 
 	@Override
-	protected int getUpdatedAt(D d) {
+	protected long getUpdatedAt(D d) {
 		//User service does not support updated at
 		return 0;
 	}

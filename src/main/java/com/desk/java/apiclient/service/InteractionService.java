@@ -38,5 +38,5 @@ public interface InteractionService
      * @return an interaction api response
      */
     @GET(INTERACTION_URI + "")
-    Call<ApiResponse<Interaction>> getInteractions(@Query("per_page") int perPage, @Query("since_id") int since_id);
+    Call<ApiResponse<Interaction>> getInteractions(@Query("per_page") int perPage, @Query("since_id") long since_id);
 }

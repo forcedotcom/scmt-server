@@ -31,7 +31,7 @@ public class Brand implements Serializable
     private String name;
     private TopicLinks _links;
 
-    public int getId()
+    public long getId()
     {
         return this._links.getSelfId();
     }

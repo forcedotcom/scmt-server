@@ -132,13 +132,13 @@ public interface CaseService {
      * @return a case api response
      */
     @GET(CASES_URI + "/search")
-    Call<ApiResponse<Case>> searchCasesByUpdatedDate(@Query("since_updated_at") int since_updated_at,
+    Call<ApiResponse<Case>> searchCasesByUpdatedDate(@Query("since_updated_at") long since_updated_at,
         @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField,
         @Query("sort_direction") SortDirection sortDirection, @Query("embed") Embed embed,
         @Query("fields") Fields fields);
 
     @GET(CASES_URI + "/search")
-    Call<ApiResponse<Case>> searchCasesById(@Query("since_id") int since_id, @Query("per_page") int perPage,
+    Call<ApiResponse<Case>> searchCasesById(@Query("since_id") long since_id, @Query("per_page") int perPage,
         @Query("page") int page, @Query("sort_field") String sortField,
         @Query("sort_direction") SortDirection sortDirection, @Query("embed") Embed embed,
         @Query("fields") Fields fields);
@@ -153,7 +153,7 @@ public interface CaseService {
      * @return a case
      */
     @GET(CASES_URI + "/{id}")
-    Call<Case> getCaseById(@Path("id") int caseId, @Query("embed") Embed embed, @Query("fields") Fields fields);
+    Call<Case> getCaseById(@Path("id") long caseId, @Query("embed") Embed embed, @Query("fields") Fields fields);
 
     /**
      * Locks or unlocks a case

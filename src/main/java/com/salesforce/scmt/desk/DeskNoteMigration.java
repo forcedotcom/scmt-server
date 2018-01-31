@@ -50,20 +50,20 @@ public class DeskNoteMigration<D extends Serializable> extends DeskBase<D>
 	private static final int DESK_PAGE_SIZE_NOTE = 100;
 	private static final int DESK_NOTES_MAX_PAGE = 30000;
 	private boolean notesDelta = false;
-	private int notesPage;
+	private long notesPage;
 
     @Override
-    protected int getId(D d)
+    protected long getId(D d)
     {
         Note n = (Note) d;
         return n.getId();
     }
 
     @Override
-    protected int getUpdatedAt(D d)
+    protected long getUpdatedAt(D d)
     {
         Note n = (Note) d;
-        return Integer.valueOf(n.getUpdatedAt());
+        return Long.valueOf(n.getUpdatedAt());
     }
 
     @Override

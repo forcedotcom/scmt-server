@@ -36,13 +36,13 @@ public class DeskInteractionMigration<D extends Serializable> extends DeskBase<D
 	}
 
 	@Override
-	protected int getId(D d) {
+	protected long getId(D d) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	protected int getUpdatedAt(D d) {
+	protected long getUpdatedAt(D d) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

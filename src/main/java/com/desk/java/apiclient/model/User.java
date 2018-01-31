@@ -25,7 +25,7 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 752919141528370641L;
 
-    private int id;
+    private long id;
     private String name;
     private String publicName;
     private String email;
@@ -34,11 +34,11 @@ public class User implements Serializable {
     private UserLinks _links;
     private boolean deleted;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int i) {
+    public void setId(long i) {
         this.id = i;
     }
 
@@ -117,11 +117,6 @@ public class User implements Serializable {
 
         return id == that.id;
 
-    }
-
-    @Override
-    public int hashCode() {
-        return id;
     }
     
     public boolean getDeleted() {

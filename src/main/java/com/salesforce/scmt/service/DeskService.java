@@ -65,7 +65,7 @@ public class DeskService
     // these are used for caching
     public List<Group> _deskGroups;
     public List<User> _deskUsers;
-    public Map<Integer, String> _deskGroupId2Name;
+    public Map<Long, String> _deskGroupId2Name;
     
     public DeskService(Map<String, Object> config)
     {
@@ -135,12 +135,12 @@ public class DeskService
         _deskUsers = users;
     }
     
-    public Map<Integer, String> getDeskGroupId2Name()
+    public Map<Long, String> getDeskGroupId2Name()
     {
         return _deskGroupId2Name;
     }
     
-    public void setDeskGroupId2Name(Map<Integer, String> groupId2Name)
+    public void setDeskGroupId2Name(Map<Long, String> groupId2Name)
     {
         _deskGroupId2Name = groupId2Name;
     }
@@ -278,7 +278,7 @@ public class DeskService
 	        Map<String, Object> languages = deskUtil.getDeskSiteLanguagesMap();
 	        
 	        // get the groups
-	        Set<Integer> groupIds = deskUtil.getDeskGroupIds();
+	        Set<Long> groupIds = deskUtil.getDeskGroupIds();
 	        
 	        // get the custom fields
 	        List<CustomField> custom_fields = deskUtil.getDeskCustomFields();

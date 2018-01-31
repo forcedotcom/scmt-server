@@ -35,5 +35,5 @@ public interface NoteService
      * @return an interaction api response
      */
     @GET(NOTE_URI + "")
-    Call<ApiResponse<Note>> getNotes(@Query("page") int page, @Query("per_page") int perPage);
+    Call<ApiResponse<Note>> getNotes(@Query("page") long page, @Query("per_page") int perPage);
 }

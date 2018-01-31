@@ -27,11 +27,11 @@ public class Case implements Serializable {
     public static final int MIN_PRIORITY = 1;
     public static final int MAX_PRIORITY = 10;
 
-    public static final int NO_ID = 0;
+    public static final long NO_ID = 0;
 
     private static final long serialVersionUID = 8501351454459361905L;
 
-    private int id;
+    private long id;
     private String external_id;
     private String subject;
     private String priority;
@@ -41,7 +41,7 @@ public class Case implements Serializable {
     private String blurb;
     private CaseStatus status;
     private String[] labels;
-    private int[] labelIds;
+    private long[] labelIds;
     private LabelAction labelAction;
     private String language;
     private HashMap<String, String> customFields;
@@ -92,11 +92,11 @@ public class Case implements Serializable {
         return aCase;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int i) {
+    public void setId(long i) {
         this.id = i;
     }
     
@@ -225,11 +225,11 @@ public class Case implements Serializable {
     }
 
     @NotNull
-    public int[] getLabelIds() {
-        return labelIds == null ? new int[0] : labelIds;
+    public long[] getLabelIds() {
+        return labelIds == null ? new long[0] : labelIds;
     }
 
-    public void setLabelIds(int[] ids) {
+    public void setLabelIds(long[] ids) {
         this.labelIds = ids;
     }
 
@@ -422,7 +422,7 @@ public class Case implements Serializable {
      * Returns the user id of the assigned user
      * @return the user id if assigned, {@link #NO_ID} if unassigned
      */
-    public int getAssignedUserId() {
+    public long getAssignedUserId() {
         if (getAssignedUserLink() == null) {
             return NO_ID;
         }
@@ -462,7 +462,7 @@ public class Case implements Serializable {
      * Returns the user id of the assigned user
      * @return the user id if assigned, {@link #NO_ID} if unassigned
      */
-    public int getAssignedGroupId() {
+    public long getAssignedGroupId() {
         if (getAssignedGroupLink() == null) {
             return NO_ID;
         }
@@ -482,7 +482,7 @@ public class Case implements Serializable {
      * Gets the embedded customer id or {@link #NO_ID} if there is no embedded customer
      * @return the customer id or {@link #NO_ID}
      */
-    public int getCustomerId() {
+    public long getCustomerId() {
         if (getCustomerLink() == null) {
             return NO_ID;
         }
@@ -503,8 +503,8 @@ public class Case implements Serializable {
      * is no embedded customer or company for the embedded customer
      * @return the company id or {@link #NO_ID}
      */
-    public int getCustomerCompanyId() {
-        int id = NO_ID;
+    public long getCustomerCompanyId() {
+        long id = NO_ID;
         Customer customer = getCustomer();
         if (customer != null) {
             Link companyLink = customer.getCompanyLink();

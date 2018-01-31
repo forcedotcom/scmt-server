@@ -50,7 +50,7 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
 
 	private static final int DESK_PAGE_SIZE_CASE = 100; // API doc report this as 500, but the max size is really 100
 
-    private List<Integer> attachmentIdList = new ArrayList<>();
+    private List<Long> attachmentIdList = new ArrayList<>();
 
     @Override
     protected DeskBaseResponse<ApiResponse<D>> callDesk(DeskUtil du)
@@ -87,15 +87,15 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
     }
 
     @Override
-    protected int getId(D d)
+    protected long getId(D d)
     {
         return ((Case) d).getId();
     }
 
     @Override
-    protected int getUpdatedAt(D d)
+    protected long getUpdatedAt(D d)
     {
-        return (int) (((Case) d).getUpdatedAt().getTime() / 1000);
+        return (long) (((Case) d).getUpdatedAt().getTime() / 1000);
     }
 
     @SuppressWarnings("unchecked")

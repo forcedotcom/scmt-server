@@ -70,7 +70,7 @@ public interface TopicService {
      */
     @GET(TOPICS_URI + "/{topicId}/articles")
     Call<ApiResponse<Article>> getArticlesOfTopic(@Nullable @Header("Accept-Language") String language,
-        @Path("topicId") int topicId,
+        @Path("topicId") long topicId,
         @Nullable @Query("in_support_center") Boolean inSupportCenter);
 
     /**
@@ -80,7 +80,7 @@ public interface TopicService {
      * @return a brand api response
      */
     @GET(TOPICS_URI + "/{topicId}/brands")
-    Call<ApiResponse<Brand>> getBrandsOfTopic(@Path("topicId") int topicId);
+    Call<ApiResponse<Brand>> getBrandsOfTopic(@Path("topicId") long topicId);
 
     /**
      * Retrieve a list of all translations of a topic
@@ -89,5 +89,5 @@ public interface TopicService {
      * @return a topic api response
      */
     @GET(TOPICS_URI + "/{topicId}/translations")
-    Call<ApiResponse<Topic>> getTranslationsOfTopic(@Path("topicId") int topicId);
+    Call<ApiResponse<Topic>> getTranslationsOfTopic(@Path("topicId") long topicId);
 }

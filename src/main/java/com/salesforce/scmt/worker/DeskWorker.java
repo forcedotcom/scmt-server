@@ -117,7 +117,7 @@ public final class DeskWorker
             {
                 deskUtil.updateMigrationStatus(DeskMigrationFields.StatusRunning, "", dr);
             	// get set of desk groupIds
-            	Set<Integer> groupIds = deskUtil.getDeskGroupIdAndName().keySet();
+            	Set<Long> groupIds = deskUtil.getDeskGroupIdAndName().keySet();
             	
                 // get and create sfdc queue members from desk group members
             	dr.addDeployResponse(deskUtil.getDeskGroupMembers(groupIds, config));
