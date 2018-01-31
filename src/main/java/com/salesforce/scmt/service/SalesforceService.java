@@ -189,6 +189,7 @@ public final class SalesforceService
                 if (r.isSuccess()) {
                     System.out.println("Deleted existing component: " + r.getFullName());
                 } else {
+           
                     throw new Exception(r.getErrors()[0].getMessage());
                 }
             }
@@ -203,6 +204,28 @@ public final class SalesforceService
         for (com.sforce.soap.metadata.SaveResult r : results) {
             if (r.isSuccess()) {
                 System.out.println("Created component: " + r.getFullName());
+            } else if (r.getErrors()[0].getMessage().contains('A data category group with the same full name already exists in the system')){
+                pattern endNumber = pattern.compile('.*[^0-9]([0-9]+)');
+                pattern baseName = pattern.compile('(.*[^0-9])');
+
+                matcher fieldNumber = endNumber.matcher(name);
+                matcher rootName = baseName.matcher(name);
+
+                if (fieldNumber.matches()) {
+                    System.debug(fieldNumber.group(0));
+                }
+                if (rootName.matches()) {
+                    System.debug(rootName.group(0));
+                }
+
+                String newName;
+
+                if (fieldNumber.matches() && rootName.matches() && fieldNumber.group(1).length() > 0 ) {
+                    newName = rootName.group(1) + String.valueOf(Integer.valueof(fieldNumber.group(1))+ 1) + '__c';
+                } else if (rootName.matches()) {
+                    newName = rootName.group(1) + '_1'+ '__c';
+                }
+            }
             } else {
                 throw new Exception(r.getErrors()[0].getMessage());
             }
