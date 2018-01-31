@@ -171,10 +171,31 @@ public final class SalesforceService
         dcg.setLabel(dg.label);
         DataCategory dc = createDataCategory(dg.dataCategory);
         dcg.setDataCategory(dc);
+        String[] listFullNames1 = new String[1];
+        List<String> listFullNames = new ArrayList<String>();
+        listFullNames.add(dg.fullName);
+        listFullNames.toArray( listFullNames1 );
 
-        com.sforce.soap.metadata.UpsertResult[] results = getMetadataConnection().upsertMetadata(new Metadata[] { dcg });
+
+        com.sforce.soap.metadata.ReadResult existingResult = getMetadataConnection().readMetadata("DataCategoryGroup", listFullNames1);
+        System.out.println(existingResult);
+        com.sforce.soap.metadata.Metadata[] mdInfo = existingResult.getRecords();
+
+
+        if (mdInfo.length > 0) {
+            com.sforce.soap.metadata.DeleteResult[]  deleteResults = getMetadataConnection().deleteMetadata("DataCategoryGroup", listFullNames1);
+            for (com.sforce.soap.metadata.DeleteResult r : deleteResults) {
+                if (r.isSuccess()) {
+                    System.out.println("Deleted existing component: " + r.getFullName());
+                } else {
+                    throw new Exception(r.getErrors()[0].getMessage());
+                }
+        }
+        }
+
+        com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
         
-        for (com.sforce.soap.metadata.UpsertResult r : results) {
+        for (com.sforce.soap.metadata.SaveResult r : results) {
             if (r.isSuccess()) {
                 System.out.println("Created component: " + r.getFullName());
             } else {
