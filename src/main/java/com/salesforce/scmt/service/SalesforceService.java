@@ -162,8 +162,8 @@ public final class SalesforceService
     public void createDataCategoryGroup(DataCategoryGroupJson dg)
       throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
-        System.out.println("made it to create dcg");
 
+        //Instantiate the new group and set values
         DataCategoryGroup dcg = new DataCategoryGroup();
         dcg.setFullName(dg.fullName);
         dcg.setDescription(dg.description);
@@ -171,76 +171,49 @@ public final class SalesforceService
         dcg.setLabel(dg.label);
         DataCategory dc = createDataCategory(dg.dataCategory);
         dcg.setDataCategory(dc);
+
+        //Had to do some funky stuff to create an array of the fullname, but there should only be one
         String[] listFullNames1 = new String[1];
         List<String> listFullNames = new ArrayList<String>();
         listFullNames.add(dg.fullName);
         listFullNames.toArray( listFullNames1 );
-        System.out.println(listFullNames1);
 
+        //Get a list of existing datacategorygroups that match fullname, should only return no results or one result
         com.sforce.soap.metadata.ReadResult existingResult = getMetadataConnection().readMetadata("DataCategoryGroup", listFullNames1);
-        System.out.println(existingResult);
         com.sforce.soap.metadata.Metadata[] mdInfo = existingResult.getRecords();
 
-
+        //Loop through the results. If one is found, update that result, else create a new datacategory group
         for (com.sforce.soap.metadata.Metadata md : mdInfo) {
             if (md != null) {
-            com.sforce.soap.metadata.DeleteResult[]  deleteResults = getMetadataConnection().deleteMetadata("DataCategoryGroup", listFullNames1);
-            for (com.sforce.soap.metadata.DeleteResult r : deleteResults) {
-                if (r.isSuccess()) {
-                    System.out.println("Deleted existing component: " + r.getFullName());
-                } else {
-           
-                    throw new Exception(r.getErrors()[0].getMessage());
+                com.sforce.soap.metadata.SaveResult[]  updateResults = getMetadataConnection().updateMetadata(new Metadata[] { dcg });
+                for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+                    if (r.isSuccess()) {
+                        System.out.println("Updated existing component: " + r.getFullName());
+                    } else {
+                        throw new Exception(r.getErrors()[0].getMessage());
+                    }
                 }
-            }
             } else {
-                System.out.println("Empty metadata.");
-            }
-        }
-
-
-        com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
-        
-        for (com.sforce.soap.metadata.SaveResult r : results) {
-            if (r.isSuccess()) {
-                System.out.println("Created component: " + r.getFullName());
-            } else if (r.getErrors()[0].getMessage().contains('A data category group with the same full name already exists in the system')){
-                pattern endNumber = pattern.compile('.*[^0-9]([0-9]+)');
-                pattern baseName = pattern.compile('(.*[^0-9])');
-
-                matcher fieldNumber = endNumber.matcher(name);
-                matcher rootName = baseName.matcher(name);
-
-                if (fieldNumber.matches()) {
-                    System.debug(fieldNumber.group(0));
+                com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
+                for (com.sforce.soap.metadata.SaveResult r : results) {
+                    if (r.isSuccess()) {
+                        System.out.println("Created component: " + r.getFullName());
+                    } else {
+                        throw new Exception(r.getErrors()[0].getMessage());
+                    }
                 }
-                if (rootName.matches()) {
-                    System.debug(rootName.group(0));
-                }
-
-                String newName;
-
-                if (fieldNumber.matches() && rootName.matches() && fieldNumber.group(1).length() > 0 ) {
-                    newName = rootName.group(1) + String.valueOf(Integer.valueof(fieldNumber.group(1))+ 1) + '__c';
-                } else if (rootName.matches()) {
-                    newName = rootName.group(1) + '_1'+ '__c';
-                }
-            }
-            } else {
-                throw new Exception(r.getErrors()[0].getMessage());
             }
         }
     }
 
+    //Recursive method to create the data categories within the group
     public static DataCategory createDataCategory(DataCategoryJson dg) {
-        System.out.println("made it to create dc");
         DataCategory dc = new DataCategory();
         dc.setName(dg.name);
         dc.setLabel(dg.label);
 
         DataCategory[] subList1 = new DataCategory[dg.subCategories.length];
         List<DataCategory> subList = new ArrayList<DataCategory>();
-
 
         for (DataCategoryJson dcj: dg.subCategories) {
             subList.add(createDataCategory(dcj));
@@ -838,7 +811,6 @@ public final class SalesforceService
     public static String createDataCategoryGroup(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
-        System.out.println("made it to the base method");
 
         try {
             DataCategoryGroupJson dcg = new Gson().fromJson(req.body(), DataCategoryGroupJson.class);
@@ -850,12 +822,8 @@ public final class SalesforceService
                 return "Unauthorized";
             }
         } catch(Exception e) {
-            // if (e.getMessage().contains("Remote Site Name already exists")) {
-            //     res.status(200);
-            //     return "Already Created";
-            // }
             res.status(200);
-            return "failed" + e.getMessage();
+            return "Failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";
