@@ -209,7 +209,6 @@ public class DeskService
                     com.squareup.okhttp.Request request = original.newBuilder()                        
                         .method(original.method(), original.body())
                         .header(DESK_API_MIGRATION_HEADER, deskUrl)
-                        .header("X-DESK-API", "ruby")
                         .build();
 
                     return chain.proceed(request);

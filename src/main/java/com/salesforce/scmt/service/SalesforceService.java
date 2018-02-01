@@ -28,6 +28,8 @@ import java.util.Map;
 import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.model.RemoteSite;
+import com.salesforce.scmt.model.DataCategoryGroupJson;
+import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceUtil;
@@ -155,6 +157,72 @@ public final class SalesforceService
                 throw new Exception(r.getErrors()[0].getMessage());
             }
         }
+    }
+
+    public void createDataCategoryGroup(DataCategoryGroupJson dg)
+      throws ConnectionException, DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+
+        //Instantiate the new group and set values
+        DataCategoryGroup dcg = new DataCategoryGroup();
+        dcg.setFullName(dg.fullName);
+        dcg.setDescription(dg.description);
+        dcg.setActive(true);
+        dcg.setLabel(dg.label);
+        DataCategory dc = createDataCategory(dg.dataCategory);
+        dcg.setDataCategory(dc);
+
+        //Had to do some funky stuff to create an array of the fullname, but there should only be one
+        String[] listFullNames1 = new String[1];
+        List<String> listFullNames = new ArrayList<String>();
+        listFullNames.add(dg.fullName);
+        listFullNames.toArray( listFullNames1 );
+
+        //Get a list of existing datacategorygroups that match fullname, should only return no results or one result
+        com.sforce.soap.metadata.ReadResult existingResult = getMetadataConnection().readMetadata("DataCategoryGroup", listFullNames1);
+        com.sforce.soap.metadata.Metadata[] mdInfo = existingResult.getRecords();
+
+        //Loop through the results. If one is found, update that result, else create a new datacategory group
+        for (com.sforce.soap.metadata.Metadata md : mdInfo) {
+            if (md != null) {
+                com.sforce.soap.metadata.SaveResult[]  updateResults = getMetadataConnection().updateMetadata(new Metadata[] { dcg });
+                for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+                    if (r.isSuccess()) {
+                        System.out.println("Updated existing component: " + r.getFullName());
+                    } else {
+                        throw new Exception(r.getErrors()[0].getMessage());
+                    }
+                }
+            } else {
+                com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
+                for (com.sforce.soap.metadata.SaveResult r : results) {
+                    if (r.isSuccess()) {
+                        System.out.println("Created component: " + r.getFullName());
+                    } else {
+                        throw new Exception(r.getErrors()[0].getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    //Recursive method to create the data categories within the group
+    public static DataCategory createDataCategory(DataCategoryJson dg) {
+        DataCategory dc = new DataCategory();
+        dc.setName(dg.name);
+        dc.setLabel(dg.label);
+
+        DataCategory[] subList1 = new DataCategory[dg.subCategories.length];
+        List<DataCategory> subList = new ArrayList<DataCategory>();
+
+        for (DataCategoryJson dcj: dg.subCategories) {
+            subList.add(createDataCategory(dcj));
+        }
+
+        subList.toArray( subList1 );
+
+        dc.setDataCategory(subList1);
+        return dc;
     }
 
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
@@ -735,6 +803,27 @@ public final class SalesforceService
                 res.status(200);
                 return "Already Created";
             }
+        }
+        res.status(201);
+        return "Success";
+    }
+
+    public static String createDataCategoryGroup(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+
+        try {
+            DataCategoryGroupJson dcg = new Gson().fromJson(req.body(), DataCategoryGroupJson.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.createDataCategoryGroup(dcg);
+        } catch(com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        } catch(Exception e) {
+            res.status(200);
+            return "Failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";
