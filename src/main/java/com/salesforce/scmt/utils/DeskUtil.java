@@ -867,14 +867,14 @@ public final class DeskUtil
             sfQ.setFullName("Desk_" + queueStringList.get(0));
 
             // ensure the group name exists
-            if (!deskGroupId2Name.containsKey(Integer.valueOf(queueStringList.get(0))))
+            if (!deskGroupId2Name.containsKey(Long.valueOf(queueStringList.get(0))))
             {
                 Utils.log("[ERROR] Desk Group does not exist for Id: [" + queueStringList.get(0) + "]");
                 continue;
             }
 
             // get the desk group name
-            String groupName = deskGroupId2Name.get(Integer.valueOf(queueStringList.get(0)));
+            String groupName = deskGroupId2Name.get(Long.valueOf(queueStringList.get(0)));
 
             // set 'Name' (Label), max length is 40 characters
             sfQ.setName((groupName.length() > 40 ? groupName.substring(0, 40) : groupName));
