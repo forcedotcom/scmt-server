@@ -11,8 +11,8 @@ package com.salesforce.scmt.model;
 public class DataCategoryJson {
 	public String name;
 	public String label;
-    public DataCategoryJson[] subCategories;
-    public DataCategoryJson parent;
+	public DataCategoryJson[] subCategories;
+	public DataCategoryJson parent;
 
 
 	public DataCategoryJson() {

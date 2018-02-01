@@ -14,7 +14,7 @@ public class DataCategoryGroupJson {
 	public String fullName;
 	public String label;
 	public String description;
-    public DataCategoryJson dataCategory;
+	public DataCategoryJson dataCategory;
 
 
 	public DataCategoryGroupJson() {
