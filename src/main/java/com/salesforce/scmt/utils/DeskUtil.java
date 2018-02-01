@@ -911,7 +911,7 @@ public final class DeskUtil
         String unassignedQueue = getSalesforceService().getQueues().get(SalesforceConstants.QueueUnassigned);
 
         //map deskId to sfdcId
-        Map<Integer, String> deskIdToSfdcId = new HashMap<Integer, String>();
+        Map<Long, String> deskIdToSfdcId = new HashMap<Long, String>();
         for (SObject u : sfUsers)
         {
             if (u.getField(UserFields.Email).equals(config.get("user_email")))
@@ -919,7 +919,7 @@ public final class DeskUtil
 
             if (u.getField(UserFields.DeskId) != null) {
                 // better way to not lose precision? Values come back from sfdc as sci notation eg. 2.3091629E7
-                int deskId = new BigDecimal(String.valueOf(u.getField(UserFields.DeskId))).intValue();
+                long deskId = new BigDecimal(String.valueOf(u.getField(UserFields.DeskId))).longValue();
                 deskIdToSfdcId.put(deskId, (String) u.getField(UserFields.Id));
             }
         }
