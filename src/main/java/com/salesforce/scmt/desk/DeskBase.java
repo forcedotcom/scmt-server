@@ -52,11 +52,11 @@ public abstract class DeskBase<D extends Serializable>
     protected boolean delta;
     protected String userEmailAddress;
     protected int page = 1;
-    protected int lastRecordId = 1;
+    protected long lastRecordId = 1;
 
-    protected int minTime;
+    protected long minTime;
     protected int now;
-    protected Integer updatedAt;
+    protected Long updatedAt;
 
     protected String jobId = null;
 
@@ -85,11 +85,11 @@ public abstract class DeskBase<D extends Serializable>
 
         // declare last record id
         lastRecordId = (config.get("start_id") == null ? 1
-            : (config.get("start_id") == "null" ? 1 : Integer.valueOf(config.get("start_id"))));
+            : (config.get("start_id") == "null" ? 1 : Long.valueOf(config.get("start_id"))));
 
         // declare the updatedAt time
         updatedAt = (config.get("updated_at") == null ? 1
-            : (config.get("updated_at") == "null" ? 1 : Integer.valueOf(config.get("updated_at"))));
+            : (config.get("updated_at") == "null" ? 1 : Long.valueOf(config.get("updated_at"))));
 
         // get the client settings
         Map<String, Object> clientSettings = du.getDeskService().getClientSettings();
@@ -353,9 +353,9 @@ public abstract class DeskBase<D extends Serializable>
 
     protected boolean skipObject(D d) { return false; }
 
-    protected abstract int getId(D d);
+    protected abstract long getId(D d);
 
-    protected abstract int getUpdatedAt(D d);
+    protected abstract long getUpdatedAt(D d);
 
     protected abstract DeskBaseResponse<ApiResponse<D>> callDesk(DeskUtil du);
 

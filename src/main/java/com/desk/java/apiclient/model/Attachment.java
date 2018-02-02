@@ -24,7 +24,7 @@ public class Attachment implements Serializable {
     
     private static final long serialVersionUID = 2743899905456336126L;
 
-    public static final int NO_ID = 0;
+    public static final long NO_ID = 0;
     
     private String fileName;
     private String contentType;
@@ -97,7 +97,7 @@ public class Attachment implements Serializable {
      * Gets the id of the case or {@link #NO_ID} if there is no case
      * @return the id or {@link #NO_ID}
      */
-    public int getCaseId()
+    public long getCaseId()
     {
         return (getLinks().getCaseLink() == null ? NO_ID : getLinks().getCaseLink().getLinkId());
     }
@@ -106,7 +106,7 @@ public class Attachment implements Serializable {
      * Gets the id of the agent or {@link #NO_ID} if there is no agent
      * @return the id or {@link #NO_ID}
      */
-    public int getUserId()
+    public long getUserId()
     {
         return (getLinks().getUser() == null ? NO_ID : getLinks().getUser().getLinkId());
     }

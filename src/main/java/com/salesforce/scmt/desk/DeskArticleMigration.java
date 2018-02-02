@@ -49,15 +49,15 @@ public class DeskArticleMigration<D extends Serializable> extends DeskBase<D> {
 	}
 
 	@Override
-	protected int getId(D d) {
+	protected long getId(D d) {
 		Article a = (Article) d;
 		return a.getId();
 	}
 
 	@Override
-	protected int getUpdatedAt(D d) {
+	protected long getUpdatedAt(D d) {
 		Article a = (Article) d;
-		return Integer.valueOf(a.getUpdatedAt().toString());
+		return Long.valueOf(a.getUpdatedAt().toString());
 	}
 
 	@Override

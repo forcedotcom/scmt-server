@@ -115,7 +115,7 @@ public interface CustomerService {
      * @return a customer response
      */
     @GET(CUSTOMERS_URI)
-    Call<ApiResponse<Customer>> getCustomers(@Query("since_id") Integer since_id, @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField,
+    Call<ApiResponse<Customer>> getCustomers(@Query("since_id") Long since_id, @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField,
                                              @Query("sort_direction") SortDirection sortDirection, @Query("fields") Fields fields);
 
     /**
@@ -130,12 +130,12 @@ public interface CustomerService {
      * @return a customer api response
      */
     @GET(CUSTOMERS_URI + "/search")
-    Call<ApiResponse<Customer>> searchCustomersById(@Query("since_id") Integer since_id,
+    Call<ApiResponse<Customer>> searchCustomersById(@Query("since_id") Long since_id,
         @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField, 
         @Query("sort_direction") SortDirection sortDirection, @Query("fields") Fields fields);
     
     @GET(CUSTOMERS_URI + "/search")
-    Call<ApiResponse<Customer>> searchCustomersByUpdatedAt(@Query("since_updated_at") Integer since_updated_at,
+    Call<ApiResponse<Customer>> searchCustomersByUpdatedAt(@Query("since_updated_at") Long since_updated_at,
         @Query("per_page") int perPage, @Query("page") int page, @Query("sort_field") String sortField, 
         @Query("sort_direction") SortDirection sortDirection, @Query("fields") Fields fields);
 }
