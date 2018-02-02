@@ -179,7 +179,7 @@ public final class SalesforceConstants
         public static final String StatusWorking = "Working";
         public static final String StatusPending = "Pending";
         public static final String StatusResolved = "Resolved";
-        public statis final String StatusOpen = "Open";
+        public static final String StatusOpen = "Open";
 
         public static final String Origin = "Origin";
         public static final String OriginEmail = "Email";
