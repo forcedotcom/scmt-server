@@ -171,7 +171,7 @@ public final class DeskJsonMapUtil
         // Map status values from Desk.com to Salesforce
         mapObj.put(CaseFields.Status, (deskCase.getStatus() == CaseStatus.NEW ? CaseFields.StatusNew :
             (deskCase.getStatus() == CaseStatus.CLOSED ? CaseFields.StatusClosed :
-            (deskCase.getStatus() == CaseStatus.OPEN ? CaseFields.StatusWorking :
+            (deskCase.getStatus() == CaseStatus.OPEN ? CaseFields.StatusOpen :
             (deskCase.getStatus() == CaseStatus.PENDING ? CaseFields.StatusPending : CaseFields.StatusResolved)))));
 
         // map Desk.com case type to Salesforce case origin
