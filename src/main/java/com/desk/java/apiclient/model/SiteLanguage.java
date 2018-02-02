@@ -113,8 +113,4 @@ public class SiteLanguage implements Serializable{
         return id == that.id;
     }
 
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 }

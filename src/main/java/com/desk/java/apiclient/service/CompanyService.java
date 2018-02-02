@@ -36,7 +36,7 @@ public interface CompanyService {
      * @return a company
      */
     @GET(COMPANY_URI + "/{id}")
-    Call<Company> getCompany(@Path("id") int companyId);
+    Call<Company> getCompany(@Path("id") long companyId);
 
     /**
      * Search for companies using the search parameter 'q' to specify search terms.

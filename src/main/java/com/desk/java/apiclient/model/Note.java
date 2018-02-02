@@ -23,9 +23,9 @@ public class Note implements Serializable
 {
     private static final long serialVersionUID = -1281357273641660176L;
 
-    public static final int NO_ID = 0;
+    public static final long NO_ID = 0;
     
-    private int id;
+    private long id;
     private String body;
     private String created_at;
     private String updated_at;
@@ -36,7 +36,7 @@ public class Note implements Serializable
      * Retrieve the integer identifier for this object.
      * @return Integer identifier for this object.
      */
-    public int getId()
+    public long getId()
     {
         return id;
     }
@@ -136,7 +136,7 @@ public class Note implements Serializable
      * Retrieve the id of the case this note is associated to.
      * @return the id of the case this note is associated to
      */
-    public int getCaseId()
+    public long getCaseId()
     {
         return (getLinks().getCaseLink() == null ? 0 : getLinks().getCaseLink().getLinkId());
     }

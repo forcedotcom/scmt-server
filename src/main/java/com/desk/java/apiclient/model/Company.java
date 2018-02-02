@@ -25,7 +25,7 @@ public class Company implements Serializable {
 
     private static final long serialVersionUID = 7792122326436126562L;
 
-    private int id;
+    private long id;
     private String name;
     private String[] domains;
     private CompanyLinks _links;
@@ -70,7 +70,7 @@ public class Company implements Serializable {
         this.customFields = cf;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

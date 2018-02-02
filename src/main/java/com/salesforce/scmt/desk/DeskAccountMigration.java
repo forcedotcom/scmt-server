@@ -49,17 +49,17 @@ public class DeskAccountMigration<D extends Serializable> extends DeskBase<D>
 	private static final int DESK_PAGE_SIZE_COMPANY = 500;
 
     @Override
-    protected int getId(D d)
+    protected long getId(D d)
     {
         Company a = (Company) d;
         return a.getId();
     }
 
     @Override
-    protected int getUpdatedAt(D d)
+    protected long getUpdatedAt(D d)
     {
         Company a = (Company) d;
-        return Integer.valueOf(a.getUpdatedAt());
+        return Long.valueOf(a.getUpdatedAt());
     }
 
     @Override

@@ -31,7 +31,7 @@ public class Interaction implements Serializable
     public static final int NO_ID = 0;
     
     // common fields
-    private int id;
+    private long id;
     private Date created_at;
     private Date updated_at;
     private Date sent_at;
@@ -86,7 +86,7 @@ public class Interaction implements Serializable
      * Retrieve the integer identifier for this object.
      * @return Integer identifier for this object.
      */
-    public int getId()
+    public long getId()
     {
         return id;
     }
@@ -244,7 +244,7 @@ public class Interaction implements Serializable
      * Retrieve the id of the case this interaction is associated to.
      * @return the id of the case this interaction is associated to
      */
-    public int getCaseId()
+    public long getCaseId()
     {
         return (getLinks().getCaseLink() == null ? 0 : getLinks().getCaseLink().getLinkId());
     }
@@ -253,7 +253,7 @@ public class Interaction implements Serializable
      * Retrieve the id of the agent who sent this interaction.
      * @return the id of the agent who sent this interaction
      */
-    public int getSentById()
+    public long getSentById()
     {
         return (getLinks().getSentBy() == null ? 0 : getLinks().getSentBy().getLinkId());
     }
@@ -262,7 +262,7 @@ public class Interaction implements Serializable
      * Retrieve the id of the agent who entered this interaction.
      * @return the id of the agent who entered this interaction
      */
-    public int getEnteredById()
+    public long getEnteredById()
     {
         return (getLinks().getEnteredBy() == null ? 0 : getLinks().getEnteredBy().getLinkId());
     }
@@ -271,7 +271,7 @@ public class Interaction implements Serializable
      * Retrieve the id of the agent who sent the chat message.
      * @return the id of the agent who sent the chat message
      */
-    public int getCreatedById()
+    public long getCreatedById()
     {
         return (getLinks().getCreatedBy() == null ? 0 : getLinks().getCreatedBy().getLinkId());
     }

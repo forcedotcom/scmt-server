@@ -30,7 +30,7 @@ public class Customer implements Serializable {
 
     private static final long serialVersionUID = 6378489591680023162L;
 
-    private int id;
+    private long id;
     private String firstName;
     private String lastName;
     private String avatar;
@@ -65,7 +65,7 @@ public class Customer implements Serializable {
         return customer;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

@@ -29,9 +29,9 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 7987793767800204017L;
 
-    public static final int NO_ID = 0;
+    public static final long NO_ID = 0;
 
-    private int id;
+    private long id;
     private String subject;
     private String body;
     private MessageDirection direction;
@@ -55,11 +55,11 @@ public class Message implements Serializable {
     private MessageEmbedded _embedded;
     private MessageLinks _links;
 
-    public int getId() {
+    public long getId() {
         return this.id;
     }
 
-    public void setId(int i) {
+    public void setId(long i) {
         this.id = i;
     }
 
@@ -302,7 +302,7 @@ public class Message implements Serializable {
         return getLinks().getSelf();
     }
 
-    public int getSelfLinkId() {
+    public long getSelfLinkId() {
         return getLinks().getSelfId();
     }
 
@@ -335,7 +335,7 @@ public class Message implements Serializable {
      * Gets the id of the outbound mailbox or {@link #NO_ID} if there is no outbound mailbox
      * @return the id or {@link #NO_ID}
      */
-    public int getOutboundMailboxId() {
+    public long getOutboundMailboxId() {
         if (getOutboundMailboxLink() == null) {
             return NO_ID;
         }
@@ -351,7 +351,7 @@ public class Message implements Serializable {
      * Gets the id of the case or {@link #NO_ID} if there is no case
      * @return the id or {@link #NO_ID}
      */
-    public int getCaseId() {
+    public long getCaseId() {
         if (getCaseLink() == null) {
             return NO_ID;
         }
@@ -362,7 +362,7 @@ public class Message implements Serializable {
      * Gets the id of the agent or {@link #NO_ID} if there is no agent
      * @return the id or {@link #NO_ID}
      */
-    public int getUserId()
+    public long getUserId()
     {
         return (getUserLink() == null ? NO_ID : getUserLink().getLinkId());
     }
@@ -371,7 +371,7 @@ public class Message implements Serializable {
      * Gets the id of the customer or {@link #NO_ID} if there is no customer
      * @return the id or {@link #NO_ID}
      */
-    public int getCustomerId()
+    public long getCustomerId()
     {
         return (getCustomerLink() == null ? NO_ID : getCustomerLink().getLinkId());
     }
@@ -394,11 +394,6 @@ public class Message implements Serializable {
 
     public boolean isReply() {
         return getSelfLinkUrl().contains(CaseService.REPLIES_URI);
-    }
-
-    @Override
-    public int hashCode() {
-        return id;
     }
 
     public enum MessageType {REPLY, NOTE, DRAFT, MESSAGE}

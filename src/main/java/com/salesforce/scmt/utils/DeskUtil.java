@@ -464,7 +464,7 @@ public final class DeskUtil
         return _deskCustomFields;
     }
 
-    public Map<Integer, String> getDeskGroupIdAndName() throws Exception
+    public Map<Long, String> getDeskGroupIdAndName() throws Exception
     {            	
         if (getDeskService().getDeskGroupId2Name() == null || getDeskService().getDeskGroupId2Name().isEmpty())
         {
@@ -610,13 +610,13 @@ public final class DeskUtil
         return groupNames;
     }
 
-    public Set<Integer> getDeskGroupIds() throws Exception
+    public Set<Long> getDeskGroupIds() throws Exception
     {
         // get the groups
         List<Group> groups = getDeskGroups();
 
         // convert groups to list of group ids
-        Set<Integer> groupIds = new TreeSet<>();
+        Set<Long> groupIds = new TreeSet<>();
 
         // loop through the groups
         for (Group group : groups)
@@ -631,7 +631,7 @@ public final class DeskUtil
     /**
      * Get the SFDC Id for a queue when passing the Desk Id for a group
      */
-    public String getQueueId(int deskGroupId) throws Exception
+    public String getQueueId(long deskGroupId) throws Exception
     {
         String queueId = null;
 
@@ -845,7 +845,7 @@ public final class DeskUtil
         qso.setSobjectType("Case");        
         
         getDeskGroupIdAndName();
-        Map<Integer, String> deskGroupId2Name = getDeskService().getDeskGroupId2Name();        
+        Map<Long, String> deskGroupId2Name = getDeskService().getDeskGroupId2Name();        
         // loop through the list of strings which represents a queue
         for (List<String> queueStringList : jsonObj)
         {
@@ -867,14 +867,14 @@ public final class DeskUtil
             sfQ.setFullName("Desk_" + queueStringList.get(0));
 
             // ensure the group name exists
-            if (!deskGroupId2Name.containsKey(Integer.valueOf(queueStringList.get(0))))
+            if (!deskGroupId2Name.containsKey(Long.valueOf(queueStringList.get(0))))
             {
                 Utils.log("[ERROR] Desk Group does not exist for Id: [" + queueStringList.get(0) + "]");
                 continue;
             }
 
             // get the desk group name
-            String groupName = deskGroupId2Name.get(Integer.valueOf(queueStringList.get(0)));
+            String groupName = deskGroupId2Name.get(Long.valueOf(queueStringList.get(0)));
 
             // set 'Name' (Label), max length is 40 characters
             sfQ.setName((groupName.length() > 40 ? groupName.substring(0, 40) : groupName));
@@ -887,7 +887,7 @@ public final class DeskUtil
         return getSalesforceService().deploy();
     }
 
-    public DeployResponse getDeskGroupMembers(Set<Integer> groupIds, Map<String, String> config) throws Exception
+    public DeployResponse getDeskGroupMembers(Set<Long> groupIds, Map<String, String> config) throws Exception
     {
         // declare the response objects at this scope so I can check them in the do/while loop
         Response<ApiResponse<User>> resp = null;
@@ -911,7 +911,7 @@ public final class DeskUtil
         String unassignedQueue = getSalesforceService().getQueues().get(SalesforceConstants.QueueUnassigned);
 
         //map deskId to sfdcId
-        Map<Integer, String> deskIdToSfdcId = new HashMap<Integer, String>();
+        Map<Long, String> deskIdToSfdcId = new HashMap<Long, String>();
         for (SObject u : sfUsers)
         {
             if (u.getField(UserFields.Email).equals(config.get("user_email")))
@@ -919,7 +919,7 @@ public final class DeskUtil
 
             if (u.getField(UserFields.DeskId) != null) {
                 // better way to not lose precision? Values come back from sfdc as sci notation eg. 2.3091629E7
-                int deskId = new BigDecimal(String.valueOf(u.getField(UserFields.DeskId))).intValue();
+                long deskId = new BigDecimal(String.valueOf(u.getField(UserFields.DeskId))).longValue();
                 deskIdToSfdcId.put(deskId, (String) u.getField(UserFields.Id));
             }
         }
@@ -936,7 +936,7 @@ public final class DeskUtil
 
         updateMigrationStatus(DeskMigrationFields.StatusRunning, "", dr, jobId);
 
-        for (Integer groupId : groupIds)
+        for (Long groupId : groupIds)
         {
             // declare the retry flag
             boolean bRetry = false;
@@ -1468,7 +1468,7 @@ public final class DeskUtil
     }
 
 
-    public byte[] getDeskAttachment(int caseId, String attachmentUrl)
+    public byte[] getDeskAttachment(long caseId, String attachmentUrl)
         throws OAuthCommunicationException, OAuthExpectationFailedException, OAuthMessageSignerException, IOException,
         InvalidParameterSpecException, NumberFormatException, InterruptedException
     {

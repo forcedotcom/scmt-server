@@ -531,7 +531,7 @@ public final class DeskJsonMapUtil
         Map<String, Object> jsonMap = null;
 
         // define a map for holding chat interactions for a case
-        Map<Integer, List<Interaction>> chatInteractionsByCase = new HashMap<>();
+        Map<Long, List<Interaction>> chatInteractionsByCase = new HashMap<>();
 
         // loop through the interactions and convert them
         for (Interaction interaction : interactions)
@@ -616,7 +616,7 @@ public final class DeskJsonMapUtil
         if (!chatInteractionsByCase.isEmpty())
         {
             // loop through the cases
-            for (Integer caseId : chatInteractionsByCase.keySet())
+            for (Long caseId : chatInteractionsByCase.keySet())
             {
                 // convert and add to the map
                 jsonMaps.get(SalesforceConstants.OBJ_CASE_COMMENT).addAll(
@@ -815,8 +815,8 @@ public final class DeskJsonMapUtil
         // fields that are summarized across the interaction records
         Date startTime = null;
         Date endTime = null;
-        Integer caseId = null;
-        Integer userId = null;
+        Long caseId = null;
+        Long userId = null;
 
         // loop through the chat messages so I can build a single chat transcript body
         for (Interaction interaction : interactions)
@@ -904,7 +904,7 @@ public final class DeskJsonMapUtil
         return mapObjs;
     }
 
-    private static Map<String, Object> getChatComment(DeskUtil deskUtil, Date startTime, Date endTime, Integer caseId, Integer userId)
+    private static Map<String, Object> getChatComment(DeskUtil deskUtil, Date startTime, Date endTime, Long caseId, Long userId)
     {
         // create the map
         Map<String, Object> mapObj = new HashMap<>();
@@ -1076,29 +1076,29 @@ public final class DeskJsonMapUtil
         return mapObjs;
     }
 
-    private static Map<String, Object> getLookupMap(String field, int id)
+    private static Map<String, Object> getLookupMap(String field, long id)
     {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(field, id);
         return map;
     }
 
-    private static Map<String, Object> getAccountMap(int deskCompanyId)
+    private static Map<String, Object> getAccountMap(long deskCompanyId)
     {
         return getLookupMap(AccountFields.DeskId, deskCompanyId);
     }
 
-    private static Map<String, Object> getContactMap(int deskCustomerId)
+    private static Map<String, Object> getContactMap(long deskCustomerId)
     {
         return getLookupMap(ContactFields.DeskId, deskCustomerId);
     }
 
-    private static Map<String, Object> getCaseMap(int deskCaseId)
+    private static Map<String, Object> getCaseMap(long deskCaseId)
     {
         return getLookupMap(CaseFields.DeskId, deskCaseId);
     }
 
-    private static Map<String, Object> getUserMap(int deskUserId, boolean polymorphic)
+    private static Map<String, Object> getUserMap(long deskUserId, boolean polymorphic)
     {
         Map<String, Object> userMap = getLookupMap(UserFields.DeskId, deskUserId);
 

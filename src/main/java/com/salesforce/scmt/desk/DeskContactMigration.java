@@ -49,28 +49,23 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
 
     public DeskContactMigration(DeskUtil du, Map<String, String> config) {
         super(du, config);
-        
-        // WORKAROUND: Users with too many contacts lead to time outs. Let's default to a delta migration instead.
-        if (this.config.get("updated_at") == null || this.config.get("updated_at") == "null") {
-            this.config.put("updated_at", "1");
-        }
 	}
 
 	private static final int DESK_PAGE_SIZE_CUSTOMER = 100;
 
     @Override
-    protected int getId(D d)
+    protected long getId(D d)
     {
         Customer c = (Customer) d;
         return c.getId();
     }
 
     @Override
-    protected int getUpdatedAt(D d)
+    protected long getUpdatedAt(D d)
     {
         try {
             Customer c = (Customer) d;
-            return (int) (ISO8601Utils.parse(c.getUpdatedAt(), new ParsePosition(0)).getTime() / 1000);
+            return (long) (ISO8601Utils.parse(c.getUpdatedAt(), new ParsePosition(0)).getTime() / 1000);
         } catch (ParseException e) {
             e.printStackTrace();
         }
