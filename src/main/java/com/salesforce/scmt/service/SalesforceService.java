@@ -657,7 +657,7 @@ public final class SalesforceService {
 
     public Integer getFailedRecords(String jobId) throws AsyncApiException {
         Utils.log("[BULK] Get Job Details: [" + jobId + "]");
-        JobInfo ji = _bConn.getJobStatus(jobId);
+        JobInfo ji = _bConn.getJobStatus(jobId, ContentType.JSON);
         return ji.getNumberRecordsFailed();
     }
 
