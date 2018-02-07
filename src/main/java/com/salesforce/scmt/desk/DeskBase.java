@@ -29,8 +29,7 @@ import com.salesforce.scmt.utils.Utils;
 
 import retrofit.Response;
 
-public abstract class DeskBase<D extends Serializable>
-{
+public abstract class DeskBase<D extends Serializable> {
     /**
      * Desk will only allow you to retrieve 500 pages. When you request the the 501 page it responds with: {"message":
      * "page parameter must be less than or equal to 500"} So added this constant so we can watch for when we are on
@@ -62,21 +61,19 @@ public abstract class DeskBase<D extends Serializable>
 
     // flag which indicates if the job is being re-queued (to better handle the daily Heroku dyno restarts)
     private boolean bRequeued = false;
-    
+
     protected DeskUtil du;
     protected Map<String, String> config;
-    
-    public DeskBase(DeskUtil du, Map<String, String> config)
-    {
-    	this.du = du;
-    	this.config = config;
+
+    public DeskBase(DeskUtil du, Map<String, String> config) {
+        this.du = du;
+        this.config = config;
     }
 
     /*
      * Entry Point from DeskWorker, Starts migration.
      */
-    public void migrate() throws Exception
-    {
+    public void migrate() throws Exception {
         Utils.log("Entered DeskBase::migrate()");
 
         // initialize a flag which indicates if this is a delta migration
@@ -85,11 +82,11 @@ public abstract class DeskBase<D extends Serializable>
 
         // declare last record id
         lastRecordId = (config.get("start_id") == null ? 1
-            : (config.get("start_id") == "null" ? 1 : Integer.valueOf(config.get("start_id"))));
+                : (config.get("start_id") == "null" ? 1 : Integer.valueOf(config.get("start_id"))));
 
         // declare the updatedAt time
         updatedAt = (config.get("updated_at") == null ? 1
-            : (config.get("updated_at") == "null" ? 1 : Integer.valueOf(config.get("updated_at"))));
+                : (config.get("updated_at") == "null" ? 1 : Integer.valueOf(config.get("updated_at"))));
 
         // get the client settings
         Map<String, Object> clientSettings = du.getDeskService().getClientSettings();
@@ -100,27 +97,20 @@ public abstract class DeskBase<D extends Serializable>
         du.updateMigrationStatus(DeskMigrationFields.StatusRunning, "", null, jobId);
 
         // loop through retrieving records
-        do
-        {
-            try
-            {
+        do {
+            try {
                 // reset the retry flag & increment request counter
                 bRetry = false;
                 requestCount++;
 
-
-                if (!delta)
-                {
+                if (!delta) {
                     dResp = callDesk(du);
-                }
-                else
-                {
+                } else {
                     dResp = callDesk(du);
                 }
 
                 // check for success
-                if (dResp.getIsSuccess())
-                {                	
+                if (dResp.getIsSuccess()) {
                     // log the Desk.com rate limiting headers
                     DeskUtil.logDeskRateHeaders(dResp.getHeaders());
 
@@ -128,18 +118,14 @@ public abstract class DeskBase<D extends Serializable>
                     recList.addAll(((ApiResponse<D>) dResp.body).getEntriesAsList());
 
                     // check if we are on the last page
-                    if (page >= DESK_MAX_PAGES)
-                    {
-                        if (!delta)
-                        {
+                    if (page >= DESK_MAX_PAGES) {
+                        if (!delta) {
                             // save the last record id so I can get the next set of pages increment by 1 as the
                             // 'since_at' filter is using a >= operator NOTE: Desk.com API documentation says the id
                             // could change to alphanumeric at some point, at which we will no longer be able to
                             // increment the id in this manner.
                             lastRecordId = getId(recList.get(recList.size() - 1)) + 1;
-                        }
-                        else
-                        {
+                        } else {
                             // update the time filter
                             updatedAt = getUpdatedAt(recList.get(recList.size() - 1));//
                         }
@@ -155,39 +141,31 @@ public abstract class DeskBase<D extends Serializable>
                     objectBulkUploadProcessing(du, config);
 
                     // increment the page counter
-                    page++;  
+                    page++;
                     userEmailAddress = (config.get("email_address") != null ? config.get("email_address") : "null");
-                    if(!userEmailAddress.equals("") && !userEmailAddress.equals("null")){
-//                        Utils.sendSuccessEmail(userEmailAddress);
+                    if (!userEmailAddress.equals("") && !userEmailAddress.equals("null")) {
+                        //                        Utils.sendSuccessEmail(userEmailAddress);
                     }
-                }
-                else
-                {
+                } else {
                     // check for 'too many requests' response                	
-                    if (dResp.errorCode == 429)
-                    {                    	
+                    if (dResp.errorCode == 429) {
                         // get the reset seconds and sleep for that many seconds
-                    	System.out.println("reset "+dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET));
+                        System.out.println("reset " + dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET));
                         Thread.sleep(Integer.parseInt(dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET)) * 1000);
 
                         // re-queue or retry
                         bRetry = true;
                     }
                     // java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
-                    else if (dResp.code() == 500)
-                    {
+                    else if (dResp.code() == 500) {
                         // when we run imports through the API with threaded requests we'll occasionally get a 500
                         // response and have to retry the request (which succeeds on the retry).
                         bRetry = true;
-                    }
-                    else if (dResp.code() == 504)
-                    {
-                    	// guard against 504 bad gateway
-                    	Thread.sleep(Integer.parseInt(dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET)) * 1000);
+                    } else if (dResp.code() == 504) {
+                        // guard against 504 bad gateway
+                        Thread.sleep(Integer.parseInt(dResp.getHeaders().get(DeskUtil.DESK_HEADER_LIMIT_RESET)) * 1000);
                         bRetry = true;
-                    }
-                    else
-                    {
+                    } else {
                         Utils.log(dResp.getHeaders().toString());
                         // throw new Exception(String.format("Error (%d): %s\n%s", dResp.code(), dResp.message(),
                         // dResp.errorBody().toString()));
@@ -195,64 +173,56 @@ public abstract class DeskBase<D extends Serializable>
                         throw new Exception(String.format("Error %s", dResp.getMessage()));
                     }
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 // retry if we hit a socket timeout exception
                 retryCount++;
                 Utils.log("[EXCEPTION] Retry Attempt: " + retryCount);
-                if (retryCount > 5)
-                {
+                if (retryCount > 5) {
                     dr.setResumePoint(lastRecordId);
                     //du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "Cases", dr);
-                    
-//                    Utils.sendEmail();
+
+                    //                    Utils.sendEmail();
                     // we retried 5 times, let exception go
                     du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "", dr);
                     throw e;
-                }
-                else
-                {
+                } else {
                     bRetry = true;
                 }
             }
         }
         // continue to loop while the request is successful and there are subsequent pages of results
         while (!bRequeued && (bRetry || (dResp.getIsSuccess() && ((ApiResponse<D>) dResp.body).hasNextPage()
-            && SalesforceConstants.RETRIEVE_ALL)));
+                && SalesforceConstants.RETRIEVE_ALL)));
 
         // general processing for remaining objects over 10k or under10k, object specific is invoked.
         objectBulkUploadComplete(du, config);
     }
 
-    private DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du)
-    {
+    private DeployResponse transformObject(String jobId, List<D> deskObjects, DeskUtil du) {
         DeployResponse dr = new DeployResponse();
 
-        try
-        {
+        try {
             Utils.log("Bulk Upload");
             List<Map<String, Object>> sfRecs = new ArrayList<>();
             int counter = 0;
 
-            for (D d : deskObjects)
-            {
+            for (D d : deskObjects) {
                 // skip object
-                if (skipObject(d)) continue;
+                if (skipObject(d))
+                    continue;
 
                 // convert the desk case to the Map for conversion to JSON
                 // sfRecs.add(d);
-            	List<Map<String, Object>> obj = deskObjectToSalesforceObject(du, d);
+                List<Map<String, Object>> obj = deskObjectToSalesforceObject(du, d);
                 sfRecs.addAll(obj);
-                
+
                 // increment the counter 
                 counter = counter + obj.size();
 
                 // submit a bulk job every 10k records
-                if ((counter % SalesforceConstants.BULK_MAX_SIZE) == 0)
-                {                	
+                if ((counter % SalesforceConstants.BULK_MAX_SIZE) == 0) {
                     du.getSalesforceService().addBatchToJob(jobId, sfRecs);
-                    
+
                     //update dr success count
                     dr.incrementSuccessCount(sfRecs.size());
                     // clear the lists
@@ -263,17 +233,14 @@ public abstract class DeskBase<D extends Serializable>
             }
 
             // check if there are records that still need to be bulk upserted
-            if (!sfRecs.isEmpty())
-            {
+            if (!sfRecs.isEmpty()) {
                 du.getSalesforceService().addBatchToJob(jobId, sfRecs);
-                
+
                 // update dr success count
-                dr.incrementSuccessCount(sfRecs.size());                
+                dr.incrementSuccessCount(sfRecs.size());
             }
-        }
-        catch (Exception e)
-        {
-        	
+        } catch (Exception e) {
+
             Utils.logException(e);
         }
 
@@ -281,27 +248,24 @@ public abstract class DeskBase<D extends Serializable>
 
     }
 
-    private void objectBulkUploadProcessing(DeskUtil du, Map<String, String> config) throws Exception
-    {
-    	
+    private void objectBulkUploadProcessing(DeskUtil du, Map<String, String> config) throws Exception {
+
         // every 10k records, pass to createCases() to bulk upsert them
-        if (recList.size() >= SalesforceConstants.BULK_MAX_SIZE && !SalesforceConstants.READ_ONLY)
-        {
+        if (recList.size() >= SalesforceConstants.BULK_MAX_SIZE && !SalesforceConstants.READ_ONLY) {
             // check for valid job, job closes after 5k batches or 24 hours,
             // whichever comes first
-            if (du.getSalesforceService().createNewJob(this.jobId))
-            {
+            if (du.getSalesforceService().createNewJob(this.jobId)) {
 
                 // object specificBulk processing
                 config = objectSpecificBulkProcessing(config);
-                
+
                 //close current job
                 du.getSalesforceService().closeBulkJob(this.jobId);
 
                 // flip the flag indicating we have re-queued this message, and
                 // we can exit this run...
                 bRequeued = true;
-                                
+
             }
 
             // create the cases, transformObject calls object specific method
@@ -313,18 +277,14 @@ public abstract class DeskBase<D extends Serializable>
 
     }
 
-    private void objectBulkUploadComplete(DeskUtil du, Map<String, String> config) throws Exception
-    {
+    private void objectBulkUploadComplete(DeskUtil du, Map<String, String> config) throws Exception {
         // process any records over the 10k chunk, or all if total is less than 10k.
 
-        
-        if (!recList.isEmpty() && !SalesforceConstants.READ_ONLY)
-        {
+        if (!recList.isEmpty() && !SalesforceConstants.READ_ONLY) {
             System.out.println("JobID" + this.jobId);
             // check for valid job, job closes after 5k batches or 24 hours,
             // whichever comes first
-            if (du.getSalesforceService().createNewJob(this.jobId))
-            {
+            if (du.getSalesforceService().createNewJob(this.jobId)) {
 
                 // close the current job
                 du.getSalesforceService().closeBulkJob(this.jobId);
@@ -334,24 +294,29 @@ public abstract class DeskBase<D extends Serializable>
             }
 
             System.out.println("Upserting : " + recList.size());
-            
+
             dr.addDeployResponse(transformObject(this.jobId, recList, du));
             recList.clear();
 
             // close the bulk job
             du.getSalesforceService().closeBulkJob(jobId);
-            
-         // object specific completion code, eg. cases sends attachment ids
+
+            // check for failed records and update migration record
+            Integer failedRecords = du.getSalesforceService().getFailedRecords(jobId);
+
+            // object specific completion code, eg. cases sends attachment ids
             dr.setResumePoint(lastRecordId);
-//            du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "Cases", dr);
-            
-//            Utils.sendEmail();
+            //            du.updateMigrationStatus(DeskMigrationFields.StatusFailed, "Cases", dr);
+
+            //            Utils.sendEmail();
             objectSpecificBulkComplete(du);
-            
+
         }
     }
 
-    protected boolean skipObject(D d) { return false; }
+    protected boolean skipObject(D d) {
+        return false;
+    }
 
     protected abstract int getId(D d);
 
@@ -362,7 +327,7 @@ public abstract class DeskBase<D extends Serializable>
     protected abstract String createJob(DeskUtil du) throws Exception;
 
     protected abstract Map<String, Object> objectSpecificProcessing(Map<String, Object> clientSettings,
-        DeskBaseResponse<ApiResponse<D>> dResp) throws Exception;
+            DeskBaseResponse<ApiResponse<D>> dResp) throws Exception;
 
     protected abstract Map<String, String> objectSpecificBulkProcessing(Map<String, String> config) throws Exception;
 

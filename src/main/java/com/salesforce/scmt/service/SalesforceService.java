@@ -56,8 +56,7 @@ import spark.Response;
 
 import com.google.gson.Gson;
 
-public final class SalesforceService
-{
+public final class SalesforceService {
     private MetadataConnection _mConn;
     private PartnerConnection _pConn;
     private BulkConnection _bConn;
@@ -69,76 +68,66 @@ public final class SalesforceService
     private static String SALESFORCE_TRACE_PARTNER = "SALESFORCE_TRACE_PARTNER";
     private static String SALESFORCE_TRACE_BULK = "SALESFORCE_TRACE_BULK";
 
-    private boolean _auditFieldsEnabled = false;	
+    private boolean _auditFieldsEnabled = false;
 
     /**
      * Private constructor for utility class. TODO: Consider making this not so 'static-y'
      */
-    public SalesforceService(String serverUrl, String sessionId)
-    {
+    public SalesforceService(String serverUrl, String sessionId) {
         this.setServerUrl(serverUrl);
         this.setSessionId(sessionId);
     }
 
-    public void setServerUrl(String url)
-    {
+    public void setServerUrl(String url) {
         // API needs an endpoint URL like this:
         // https://na30.salesforce.com/services/Soap/u/35.0/00D36000000H5z4
         // But the '$Api.Partner_Server_URL_350' I am using in VF returns a value like this:
         // https://c.na30.visual.force.com/services/Soap/u/35.0/00D36000000H5z4
         // When the "My Domain" feature is enabled, the URL looks like this:
         // https://datepickertest--sfdevpro1--c.cs45.visual.force.com/services/Soap/u/36.0/00D8A0000008py4
-    	// https://suncommon-/na37.salesforce.com/services/Soap/u/36.0/00DU0000000xxxx 
-    	System.out.println("url "+url);
-    	
+        // https://suncommon-/na37.salesforce.com/services/Soap/u/36.0/00DU0000000xxxx 
+        System.out.println("url " + url);
+
         //removed code that takes out scmt because of issues with custom domains with scmt in them
-        _serverUrl = url.replaceFirst("\\/\\/.*c\\.", "\\/\\/").replaceFirst("visual\\.", "sales");        
+        _serverUrl = url.replaceFirst("\\/\\/.*c\\.", "\\/\\/").replaceFirst("visual\\.", "sales");
     }
 
-    public String getServerUrl()
-    {
+    public String getServerUrl() {
         return _serverUrl;
     }
 
-    public void setQueues() throws Exception
-    {
-    	_queues = SalesforceUtil.getQueueName2Id(this);
+    public void setQueues() throws Exception {
+        _queues = SalesforceUtil.getQueueName2Id(this);
     }
-    
-    public Map<String, String> getQueues() throws Exception
-    {
-    	if(_queues == null)
-    	{
-    		setQueues();
-    	}
-    	return _queues;
+
+    public Map<String, String> getQueues() throws Exception {
+        if (_queues == null) {
+            setQueues();
+        }
+        return _queues;
     }
-    
-    public String getMetadataUrl()
-    {
+
+    public String getMetadataUrl() {
         // Metadata API needs an endpoint URL like this:
         // https://na30.salesforce.com/services/Soap/m/35.0/00D36000000H5z4
         return _serverUrl.replaceFirst("\\/u\\/", "\\/m\\/");
     }
 
-    public String getBulkEndpoint()
-    {
+    public String getBulkEndpoint() {
         // Change serverURL to bulk api
         return _serverUrl.substring(0, _serverUrl.indexOf("Soap/")) + "async/36.0";
     }
 
-    public void setSessionId(String sessionId)
-    {
+    public void setSessionId(String sessionId) {
         _sessionId = sessionId;
     }
 
-    public String getSessionId()
-    {
+    public String getSessionId() {
         return _sessionId;
     }
 
     public void createRemoteSite(RemoteSite rs)
-      throws ConnectionException, DeployException, AsyncApiException, Exception {
+            throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
 
         RemoteSiteSetting rss = new RemoteSiteSetting();
@@ -149,7 +138,7 @@ public final class SalesforceService
         rss.setDisableProtocolSecurity(false);
 
         com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { rss });
-        
+
         for (com.sforce.soap.metadata.SaveResult r : results) {
             if (r.isSuccess()) {
                 System.out.println("Created component: " + r.getFullName());
@@ -160,7 +149,7 @@ public final class SalesforceService
     }
 
     public void createDataCategoryGroup(DataCategoryGroupJson dg)
-      throws ConnectionException, DeployException, AsyncApiException, Exception {
+            throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
 
         //Instantiate the new group and set values
@@ -176,16 +165,18 @@ public final class SalesforceService
         String[] listFullNames1 = new String[1];
         List<String> listFullNames = new ArrayList<String>();
         listFullNames.add(dg.fullName);
-        listFullNames.toArray( listFullNames1 );
+        listFullNames.toArray(listFullNames1);
 
         //Get a list of existing datacategorygroups that match fullname, should only return no results or one result
-        com.sforce.soap.metadata.ReadResult existingResult = getMetadataConnection().readMetadata("DataCategoryGroup", listFullNames1);
+        com.sforce.soap.metadata.ReadResult existingResult = getMetadataConnection().readMetadata("DataCategoryGroup",
+                listFullNames1);
         com.sforce.soap.metadata.Metadata[] mdInfo = existingResult.getRecords();
 
         //Loop through the results. If one is found, update that result, else create a new datacategory group
         for (com.sforce.soap.metadata.Metadata md : mdInfo) {
             if (md != null) {
-                com.sforce.soap.metadata.SaveResult[]  updateResults = getMetadataConnection().updateMetadata(new Metadata[] { dcg });
+                com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection()
+                        .updateMetadata(new Metadata[] { dcg });
                 for (com.sforce.soap.metadata.SaveResult r : updateResults) {
                     if (r.isSuccess()) {
                         System.out.println("Updated existing component: " + r.getFullName());
@@ -194,7 +185,8 @@ public final class SalesforceService
                     }
                 }
             } else {
-                com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { dcg });
+                com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection()
+                        .createMetadata(new Metadata[] { dcg });
                 for (com.sforce.soap.metadata.SaveResult r : results) {
                     if (r.isSuccess()) {
                         System.out.println("Created component: " + r.getFullName());
@@ -215,18 +207,17 @@ public final class SalesforceService
         DataCategory[] subList1 = new DataCategory[dg.subCategories.length];
         List<DataCategory> subList = new ArrayList<DataCategory>();
 
-        for (DataCategoryJson dcj: dg.subCategories) {
+        for (DataCategoryJson dcj : dg.subCategories) {
             subList.add(createDataCategory(dcj));
         }
 
-        subList.toArray( subList1 );
+        subList.toArray(subList1);
 
         dc.setDataCategory(subList1);
         return dc;
     }
 
-    private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
-    {
+    private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId) {
         ConnectorConfig config = new ConnectorConfig();
         config.setServiceEndpoint(serverUrl);
         config.setSessionId(sessionId);
@@ -234,43 +225,34 @@ public final class SalesforceService
         return config;
     }
 
-    private MetadataConnection getMetadataConnection()
-    {
+    private MetadataConnection getMetadataConnection() {
         return _mConn;
     }
 
-    private void setMetadataConnection(MetadataConnection mConn)
-    {
+    private void setMetadataConnection(MetadataConnection mConn) {
         this._mConn = mConn;
     }
 
-    private BulkConnection getBulkConnection()
-    {
+    private BulkConnection getBulkConnection() {
         return _bConn;
     }
 
-    private void setBulkConnection(BulkConnection bConn)
-    {
+    private void setBulkConnection(BulkConnection bConn) {
         this._bConn = bConn;
     }
 
-    private PartnerConnection getPartnerConnection()
-    {
+    private PartnerConnection getPartnerConnection() {
         return _pConn;
     }
 
-    private void setPartnerConnection(PartnerConnection pConn)
-    {
+    private void setPartnerConnection(PartnerConnection pConn) {
         this._pConn = pConn;
     }
 
-    private void createMetadataConnection()
-        throws ConnectionException, AsyncApiException
-    {
+    private void createMetadataConnection() throws ConnectionException, AsyncApiException {
         Utils.log("SalesforceService::createMetadataConnection() entered");
         // check if connection has already been created
-        if (getMetadataConnection() != null)
-        {
+        if (getMetadataConnection() != null) {
             // connection already created
             return;
         }
@@ -279,8 +261,7 @@ public final class SalesforceService
         config.setServiceEndpoint(getMetadataUrl());
 
         // check if tracing is enabled
-        if (getenv(SALESFORCE_TRACE_METADATA) != null && getenv(SALESFORCE_TRACE_METADATA).equalsIgnoreCase("1"))
-        {
+        if (getenv(SALESFORCE_TRACE_METADATA) != null && getenv(SALESFORCE_TRACE_METADATA).equalsIgnoreCase("1")) {
             // set this to true to see HTTP requests and responses on stdout
             config.setTraceMessage(true);
             config.setPrettyPrintXml(true);
@@ -295,32 +276,27 @@ public final class SalesforceService
         getMetadataConnection().setAllOrNoneHeader(false);
 
         // print the endpoint
-        Utils.log(
-            "\n\tSession ID:            " + getSessionId() +
-            "\n\tEndpoint:              " + getServerUrl() +
-            "\n\tConnection Session ID: " + _mConn.getConfig().getSessionId() +
-            "\n\tAuth Endpoint:         " + _mConn.getConfig().getAuthEndpoint());
+        Utils.log("\n\tSession ID:            " + getSessionId() + "\n\tEndpoint:              " + getServerUrl()
+                + "\n\tConnection Session ID: " + _mConn.getConfig().getSessionId() + "\n\tAuth Endpoint:         "
+                + _mConn.getConfig().getAuthEndpoint());
     }
 
-    private void createPartnerConnection() throws ConnectionException
-    {
+    private void createPartnerConnection() throws ConnectionException {
         // check if connection has already been created
-        if (getPartnerConnection() != null)
-        {
+        if (getPartnerConnection() != null) {
             // connection already created
             return;
         }
 
         // print the info we will use to build the connection
-        Utils.log("SalesforceService::createPartnerConnection() entered" + "\n\tSession ID:       "
-            + getSessionId() + "\n\tPartner Endpoint: " + getServerUrl());
+        Utils.log("SalesforceService::createPartnerConnection() entered" + "\n\tSession ID:       " + getSessionId()
+                + "\n\tPartner Endpoint: " + getServerUrl());
 
         // create partner connector configuration
         ConnectorConfig partnerConfig = getConnectorConfig(getServerUrl(), getSessionId());
 
         // check if tracing is enabled
-        if (getenv(SALESFORCE_TRACE_PARTNER) != null && getenv(SALESFORCE_TRACE_PARTNER).equalsIgnoreCase("1"))
-        {
+        if (getenv(SALESFORCE_TRACE_PARTNER) != null && getenv(SALESFORCE_TRACE_PARTNER).equalsIgnoreCase("1")) {
             // set this to true to see HTTP requests and responses on stdout
             partnerConfig.setTraceMessage(true);
             partnerConfig.setPrettyPrintXml(true);
@@ -338,18 +314,16 @@ public final class SalesforceService
         getPartnerConnection().setAllowFieldTruncationHeader(true);
     }
 
-    private void createBulkConnection() throws AsyncApiException
-    {
+    private void createBulkConnection() throws AsyncApiException {
         // check if connection has already been created
-        if (getBulkConnection() != null)
-        {
+        if (getBulkConnection() != null) {
             // connection already created
             return;
         }
 
         // print the info we will use to build the connection
         Utils.log("SalesforceService::createBulkConnection() entered" + "\n\tSession ID:    " + getSessionId()
-            + "\n\tBulk Endpoint: " + getBulkEndpoint());
+                + "\n\tBulk Endpoint: " + getBulkEndpoint());
 
         // create partner connector configuration
         ConnectorConfig bulkConfig = getConnectorConfig(getServerUrl(), getSessionId());
@@ -358,8 +332,7 @@ public final class SalesforceService
         bulkConfig.setCompression(true);
 
         // check if tracing is enabled
-        if (getenv(SALESFORCE_TRACE_BULK) != null && getenv(SALESFORCE_TRACE_BULK).equalsIgnoreCase("1"))
-        {
+        if (getenv(SALESFORCE_TRACE_BULK) != null && getenv(SALESFORCE_TRACE_BULK).equalsIgnoreCase("1")) {
             // set this to true to see HTTP requests and responses on stdout
             bulkConfig.setTraceMessage(true);
             bulkConfig.setPrettyPrintXml(true);
@@ -371,8 +344,7 @@ public final class SalesforceService
         setBulkConnection(new BulkConnection(bulkConfig));
     }
 
-    public PermissionSet getPermissionSet(String name) throws Exception
-    {
+    public PermissionSet getPermissionSet(String name) throws Exception {
         createMetadataConnection();
         ReadResult readResult = getMetadataConnection().readMetadata("PermissionSet", new String[] { name });
         Metadata[] mdInfo = readResult.getRecords();
@@ -385,11 +357,9 @@ public final class SalesforceService
      * @param customFields
      *            The list of custom fields to be created.
      */
-    public void addCustomFields(List<Metadata> customFields)
-    {
+    public void addCustomFields(List<Metadata> customFields) {
         // check if the metadata list needs to be initialized
-        if (_metadata == null)
-        {
+        if (_metadata == null) {
             _metadata = new ArrayList<Metadata>();
         }
         // add the passed list of metadata to the internal list
@@ -402,11 +372,9 @@ public final class SalesforceService
      * @param queues
      *            The list of queues to be created.
      */
-    public void addQueues(List<Queue> queues)
-    {
+    public void addQueues(List<Queue> queues) {
         // check if the custom fields list needs to be initialized
-        if (_metadata == null)
-        {
+        if (_metadata == null) {
             _metadata = new ArrayList<Metadata>();
         }
 
@@ -435,11 +403,9 @@ public final class SalesforceService
      * @param queues
      *            The list of data categories to be created.
      */
-    public void addCategories(List<DataCategoryGroup> categories)
-    {
+    public void addCategories(List<DataCategoryGroup> categories) {
         // check if the custom fields list needs to be initialized
-        if (_metadata == null)
-        {
+        if (_metadata == null) {
             _metadata = new ArrayList<Metadata>();
         }
 
@@ -447,15 +413,12 @@ public final class SalesforceService
         _metadata.addAll(categories);
     }
 
-    public DeployResponse deploy()
-        throws ConnectionException, DeployException, AsyncApiException
-    {
+    public DeployResponse deploy() throws ConnectionException, DeployException, AsyncApiException {
         // declare the return variable
         DeployResponse dr = new DeployResponse();
 
         // check if the metadata queue is empty
-        if (_metadata != null && !_metadata.isEmpty())
-        {
+        if (_metadata != null && !_metadata.isEmpty()) {
             // ensure a metadata connection has been initialized
             createMetadataConnection();
 
@@ -463,17 +426,15 @@ public final class SalesforceService
             List<Metadata> batch = new ArrayList<>();
 
             // loop through the items and every 10 items call create
-            for (Metadata m : _metadata)
-            {
+            for (Metadata m : _metadata) {
                 // add the item
                 batch.add(m);
 
                 // check if we have reached 10 items
-                if (batch.size() == 10)
-                {
+                if (batch.size() == 10) {
                     // call the 'createMetadata' API
                     dr = handleMetadataResponse(dr,
-                        getMetadataConnection().upsertMetadata(batch.toArray(new Metadata[] {})));
+                            getMetadataConnection().upsertMetadata(batch.toArray(new Metadata[] {})));
 
                     // clear the batch
                     batch.clear();
@@ -481,12 +442,11 @@ public final class SalesforceService
             }
 
             // check there was a remainder of metadata
-            if (!batch.isEmpty())
-            {
+            if (!batch.isEmpty()) {
                 // call the 'createMetadata' API
 
                 dr = handleMetadataResponse(dr,
-                    getMetadataConnection().upsertMetadata(batch.toArray(new Metadata[] {})));
+                        getMetadataConnection().upsertMetadata(batch.toArray(new Metadata[] {})));
 
                 // clear the batch
                 batch.clear();
@@ -495,8 +455,7 @@ public final class SalesforceService
 
         // clear out the metadata items
         // TODO: (just successful items?)
-        if (_metadata != null)
-        {
+        if (_metadata != null) {
             _metadata.clear();
         }
 
@@ -504,20 +463,14 @@ public final class SalesforceService
     }
 
     private static DeployResponse handleMetadataResponse(DeployResponse dr,
-        com.sforce.soap.metadata.UpsertResult[] results) throws DeployException
-    {
-        for (com.sforce.soap.metadata.UpsertResult result : results)
-        {
-            if (result.isSuccess())
-            {
+            com.sforce.soap.metadata.UpsertResult[] results) throws DeployException {
+        for (com.sforce.soap.metadata.UpsertResult result : results) {
+            if (result.isSuccess()) {
                 dr.incrementSuccessCount();
-            }
-            else
-            {
-                for (com.sforce.soap.metadata.Error e : result.getErrors())
-                {
+            } else {
+                for (com.sforce.soap.metadata.Error e : result.getErrors()) {
                     dr.addError(String.format("Status Code: [%s]\nMessage: [%s]\nFields: [%s]\n",
-                        e.getStatusCode().name(), e.getMessage(), String.join(", ", e.getFields())));
+                            e.getStatusCode().name(), e.getMessage(), String.join(", ", e.getFields())));
                     dr.incrementErrorCount();
                 }
             }
@@ -526,62 +479,49 @@ public final class SalesforceService
         return dr;
     }
 
-    private static DeployResponse handleInsertResponse(DeployResponse dr, SaveResult[] results) throws DeployException
-    {
+    private static DeployResponse handleInsertResponse(DeployResponse dr, SaveResult[] results) throws DeployException {
         boolean foundErrors = false;
-        for (SaveResult sr : results)
-        {
-            if (sr.getSuccess())
-            {
+        for (SaveResult sr : results) {
+            if (sr.getSuccess()) {
                 // Utils.log("'insert' was successful! [" + ur.getId() + "]");
                 dr.incrementSuccessCount();
-            }
-            else
-            {
-                for (com.sforce.soap.partner.Error e : sr.getErrors())
-                {
+            } else {
+                for (com.sforce.soap.partner.Error e : sr.getErrors()) {
                     dr.addError(String.format("Status Code: [%s]\nMessage: [%s]\n%s\n", e.getStatusCode().name(),
-                        e.getMessage(), (e.getFields() == null || e.getFields().length == 0 ? ""
-                            : String.format("Fields: [%s]", String.join(", ", e.getFields())))));
+                            e.getMessage(), (e.getFields() == null || e.getFields().length == 0 ? ""
+                                    : String.format("Fields: [%s]", String.join(", ", e.getFields())))));
                     dr.incrementErrorCount();
                 }
                 foundErrors = true;
             }
         }
 
-        if (foundErrors)
-        {
+        if (foundErrors) {
             Utils.log("'insert' resulted in errors! See log.");
         }
 
         return dr;
     }
 
-    private static DeployResponse handleUpsertResponse(DeployResponse dr, UpsertResult[] results) throws DeployException
-    {
+    private static DeployResponse handleUpsertResponse(DeployResponse dr, UpsertResult[] results)
+            throws DeployException {
         boolean foundErrors = false;
-        for (UpsertResult ur : results)
-        {
-            if (ur.getSuccess())
-            {
+        for (UpsertResult ur : results) {
+            if (ur.getSuccess()) {
                 // Utils.log("'upsert' was successful! [" + ur.getId() + "]");
                 dr.incrementSuccessCount();
-            }
-            else
-            {
-                for (com.sforce.soap.partner.Error e : ur.getErrors())
-                {
+            } else {
+                for (com.sforce.soap.partner.Error e : ur.getErrors()) {
                     dr.addError(String.format("Status Code: [%s]\nMessage: [%s]\n%s\n", e.getStatusCode().name(),
-                        e.getMessage(), (e.getFields() == null || e.getFields().length == 0 ? ""
-                            : String.format("Fields: [%s]", String.join(", ", e.getFields())))));
+                            e.getMessage(), (e.getFields() == null || e.getFields().length == 0 ? ""
+                                    : String.format("Fields: [%s]", String.join(", ", e.getFields())))));
                     dr.incrementErrorCount();
                 }
                 foundErrors = true;
             }
         }
 
-        if (foundErrors)
-        {
+        if (foundErrors) {
             Utils.log("'upsert' resulted in errors! See log.");
         }
 
@@ -589,31 +529,25 @@ public final class SalesforceService
     }
 
     public DeployResponse insertData(List<SObject> sobjects)
-        throws ConnectionException, DeployException, AsyncApiException
-    {
+            throws ConnectionException, DeployException, AsyncApiException {
         return insertData(sobjects, false, null);
     }
 
-    public DeployResponse insertData(List<SObject> sobjects, boolean allOrNone,
-        List<SaveResult> saveResults) throws ConnectionException, DeployException, AsyncApiException
-    {
+    public DeployResponse insertData(List<SObject> sobjects, boolean allOrNone, List<SaveResult> saveResults)
+            throws ConnectionException, DeployException, AsyncApiException {
         DeployResponse dr = new DeployResponse();
 
         // ensure the partner connection has been initialized
         createPartnerConnection();
 
         // check if the SObject queue is empty
-        if (sobjects == null || sobjects.isEmpty())
-        {
+        if (sobjects == null || sobjects.isEmpty()) {
             Utils.log("An empty list of SObject was passed to insertData()!");
-        }
-        else
-        {
+        } else {
             Utils.log(String.format("Inserting %d records.", sobjects.size()));
 
             // check if we want AllOrNone header
-            if (allOrNone)
-            {
+            if (allOrNone) {
                 _pConn.setAllOrNoneHeader(true);
             }
 
@@ -621,19 +555,16 @@ public final class SalesforceService
             com.sforce.soap.partner.SaveResult[] SRs = _pConn.create(sobjects.toArray(new SObject[] {}));
 
             // reset AllOrNone header
-            if (allOrNone)
-            {
+            if (allOrNone) {
                 _pConn.setAllOrNoneHeader(false);
             }
 
             // check if we want to return the save results
-            if (saveResults != null)
-            {
+            if (saveResults != null) {
                 // loop through the save results and add them to the list
                 // I can't just assign SRs to saveResults because it changes the
                 // memory address of saveResult and doesn't return the data.
-                for (SaveResult sr : SRs)
-                {
+                for (SaveResult sr : SRs) {
                     saveResults.add(sr);
                 }
             }
@@ -645,25 +576,20 @@ public final class SalesforceService
     }
 
     public DeployResponse upsertData(String IdField, List<SObject> sobjects)
-        throws ConnectionException, DeployException, AsyncApiException
-    {
+            throws ConnectionException, DeployException, AsyncApiException {
         DeployResponse dr = new DeployResponse();
 
         // ensure the partner connection has been initialized
         createPartnerConnection();
 
         // check if the SObject queue is empty
-        if (sobjects == null || sobjects.isEmpty())
-        {
+        if (sobjects == null || sobjects.isEmpty()) {
             Utils.log("An empty list of SObject was passed to upsertData()!");
-        }
-        else
-        {
+        } else {
             Utils.log(String.format("Upserting %d records with Id field [%s].", +sobjects.size(), IdField));
 
             // upsert the records
-            com.sforce.soap.partner.UpsertResult[] URs = _pConn.upsert(IdField,
-                sobjects.toArray(new SObject[] {}));
+            com.sforce.soap.partner.UpsertResult[] URs = _pConn.upsert(IdField, sobjects.toArray(new SObject[] {}));
 
             // process the results and log errors
             dr = SalesforceService.handleUpsertResponse(dr, URs);
@@ -674,11 +600,9 @@ public final class SalesforceService
     // Bulk API example code:
     // https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_code_walkthrough.htm
 
-    public String createBulkJob(String sobjectType, String upsertField,
-        OperationEnum op) throws AsyncApiException
-    {
+    public String createBulkJob(String sobjectType, String upsertField, OperationEnum op) throws AsyncApiException {
         Utils.log("[BULK] Creating Bulk Job:" + "\n\tObject:       [" + sobjectType + "]" + "\n\tUnique Field: ["
-            + upsertField + "]" + "\n\tOperation:    [" + op + "]");
+                + upsertField + "]" + "\n\tOperation:    [" + op + "]");
 
         // create a connection
         createBulkConnection();
@@ -690,8 +614,7 @@ public final class SalesforceService
         job.setConcurrencyMode(ConcurrencyMode.Serial);
         // JSON available in Spring '16
         job.setContentType(ContentType.JSON);
-        if (upsertField != null)
-        {
+        if (upsertField != null) {
             job.setExternalIdFieldName(upsertField);
         }
 
@@ -703,8 +626,7 @@ public final class SalesforceService
     }
 
     public void addBatchToJob(String jobId, List<Map<String, Object>> records)
-        throws UnsupportedEncodingException, AsyncApiException
-    {
+            throws UnsupportedEncodingException, AsyncApiException {
         Utils.log("[BULK] Adding [" + records.size() + "] records to job [" + jobId + "].");
 
         // convert the records into a byte stream
@@ -718,25 +640,63 @@ public final class SalesforceService
         _bConn.createBatchFromStream(job, jsonStream);
     }
 
-    public void closeBulkJob(String jobId) throws AsyncApiException
-    {
+    public void closeBulkJob(String jobId) throws AsyncApiException {
         Utils.log("[BULK] Closing Bulk Job: [" + jobId + "]");
 
+        /*
         JobInfo job = new JobInfo();
         job.setId(jobId);
         job.setState(JobStateEnum.Closed);
         job.setContentType(ContentType.JSON);
+        */
         // _bConn.updateJob(job, ContentType.JSON);
 
         // unclear if I can use this
         _bConn.closeJob(jobId);
     }
 
+    public Integer getFailedRecords(String jobId) throws AsyncApiException {
+        Utils.log("[BULK] Get Job Details: [" + jobId + "]");
+        JobInfo ji = _bConn.getJobStatus(jobId);
+        return ji.getNumberRecordsFailed();
+    }
+
+    /**
+     * Gets the results of the operation and checks for errors.
+    
+    private void checkResults(BulkConnection connection, JobInfo job,
+          List<BatchInfo> batchInfoList)
+        throws AsyncApiException, IOException {
+    // batchInfoList was populated when batches were created and submitted
+    for (BatchInfo b : batchInfoList) {
+        CSVReader rdr =
+          new CSVReader(connection.getBatchResultStream(job.getId(), b.getId()));
+        List<String> resultHeader = rdr.nextRecord();
+        int resultCols = resultHeader.size();
+    
+        List<String> row;
+        while ((row = rdr.nextRecord()) != null) {
+            Map<String, String> resultInfo = new HashMap<String, String>();
+            for (int i = 0; i < resultCols; i++) {
+                resultInfo.put(resultHeader.get(i), row.get(i));
+            }
+            boolean success = Boolean.valueOf(resultInfo.get("Success"));
+            boolean created = Boolean.valueOf(resultInfo.get("Created"));
+            String id = resultInfo.get("Id");
+            String error = resultInfo.get("Error");
+            if (success && created) {
+                System.out.println("Created row with id " + id);
+            } else if (!success) {
+                System.out.println("Failed with error: " + error);
+            }
+        }
+    }
+    }
+     */
     /*
      * Check to see if a valid job exists in Salesforce Valid job is less than 12 hours old
      */
-    public boolean createNewJob(String jobId) throws AsyncApiException
-    {
+    public boolean createNewJob(String jobId) throws AsyncApiException {
         JobInfo job = _bConn.getJobStatus(jobId, ContentType.JSON);
         Utils.log("[BULK] Getting Bulk Job Status: [" + jobId + "]");
         Calendar cal = job.getCreatedDate();
@@ -745,15 +705,11 @@ public final class SalesforceService
         return ((System.currentTimeMillis() - cal.getTime().getTime()) > SalesforceConstants.JOB_LIFE);
     }
 
-    public List<SObject> query(String query)
-        throws ConnectionException, UnexpectedErrorFault
-    {
+    public List<SObject> query(String query) throws ConnectionException, UnexpectedErrorFault {
         return query(query, true);
     }
 
-    public List<SObject> query(String query, boolean queryMore)
-        throws ConnectionException, UnexpectedErrorFault
-    {
+    public List<SObject> query(String query, boolean queryMore) throws ConnectionException, UnexpectedErrorFault {
         Utils.log("[QUERY] " + query);
         // create connection
         createPartnerConnection();
@@ -768,8 +724,7 @@ public final class SalesforceService
         results = Arrays.asList(qr.getRecords());
 
         // check if the query is done
-        while (queryMore && !qr.isDone())
-        {
+        while (queryMore && !qr.isDone()) {
             Utils.log("[QUERY] Calling 'queryMore()' to retrieve more results...");
 
             // call 'queryMore' to retrieve more results
@@ -793,12 +748,12 @@ public final class SalesforceService
             RemoteSite rs = new Gson().fromJson(req.body(), RemoteSite.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
             sf.createRemoteSite(rs);
-        } catch(com.sforce.ws.SoapFaultException e) {
+        } catch (com.sforce.ws.SoapFaultException e) {
             if (e.getMessage().contains("INVALID_SESSION_ID")) {
                 res.status(401);
                 return "Unauthorized";
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             if (e.getMessage().contains("Remote Site Name already exists")) {
                 res.status(200);
                 return "Already Created";
@@ -816,12 +771,12 @@ public final class SalesforceService
             DataCategoryGroupJson dcg = new Gson().fromJson(req.body(), DataCategoryGroupJson.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
             sf.createDataCategoryGroup(dcg);
-        } catch(com.sforce.ws.SoapFaultException e) {
+        } catch (com.sforce.ws.SoapFaultException e) {
             if (e.getMessage().contains("INVALID_SESSION_ID")) {
                 res.status(401);
                 return "Unauthorized";
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             res.status(200);
             return "Failed: " + e.getMessage();
         }
@@ -829,13 +784,11 @@ public final class SalesforceService
         return "Success";
     }
 
-    public void setAuditFieldsEnabled(Boolean valueOf)
-    {
+    public void setAuditFieldsEnabled(Boolean valueOf) {
         this._auditFieldsEnabled = valueOf;
     }
 
-    public Boolean getAuditFieldsEnabled()
-    {
+    public Boolean getAuditFieldsEnabled() {
         return _auditFieldsEnabled;
     }
 }
