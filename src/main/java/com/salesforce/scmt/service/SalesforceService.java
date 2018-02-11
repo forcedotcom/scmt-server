@@ -159,14 +159,12 @@ public final class SalesforceService
         }
     }
 
-    public void updateFieldPermissions(List<String> fieldNames) 
-      throws ConnectionException, DeployException, AsyncApiException, Exception {
+    public void updateFieldPermissions(List<String> fieldNames)
+            throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
 
-        //com.sforce.soap.metadata
         ProfileFieldLevelSecurity[] subList1 = new ProfileFieldLevelSecurity[fieldNames.size()];
         List<ProfileFieldLevelSecurity> subList = new ArrayList<ProfileFieldLevelSecurity>();
-
 
         for (String field : fieldNames) {
             ProfileFieldLevelSecurity pFLS = new ProfileFieldLevelSecurity();
@@ -176,53 +174,22 @@ public final class SalesforceService
 
             subList.add(pFLS);
         }
+        subList.toArray(subList1);
+        com.sforce.soap.metadata.Profile adminProfile = new com.sforce.soap.metadata.Profile();
+        adminProfile.setFullName("Admin");
 
-        subList.toArray( subList1 );
+        adminProfile.setFieldPermissions(subList1);
+        com.sforce.soap.metadata.Metadata adminProfileMetadata = (com.sforce.soap.metadata.Metadata) adminProfile;
 
-
-
-
-
-        //         if (String.IsNullOrWhiteSpace(_instanceUrl) || String.IsNullOrWhiteSpace(_accessToken))
-        // {
-        //     Authenticate();
-        // }
-
-        // var permissionList = fieldfullNames.Select(field => new ProfileFieldLevelSecurity
-        //     {
-        //         field = field,
-        //         editable = true,
-        //         readable = true,
-        //         readableSpecified = true
-        //     }).ToArray();
-
-        // Logger.Info("Updating Profile Metadata...");
-        // var updateRequest = new updateMetadataRequest(
-        //     new SessionHeader() { sessionId = _accessToken },
-        //     new CallOptions(),
-        //     profilefullNames.Select(profileName => new Profile
-        //     {
-        //         fullName = profileName,
-        //         fieldPermissions = permissionList
-        //     }).Cast<Metadata.Metadata>().ToArray());
-
-        // RequestObjectCache.Add(updateRequest);
-        // var updateResponse = MetadataService.updateMetadata(updateRequest);
-        // var updateSuccessful = true;
-
-        // foreach (var result in updateResponse.result.Where(result => !result.success))
-        // {
-        //     Logger.Error("Metadata Update Failed");
-        //     if (result.errors != null)
-        //     {
-        //         foreach (var errorMsg in result.errors)
-        //         {
-        //             Logger.Error("Error in Update Metadata (Code: {0} Message: {1})", errorMsg.statusCode,
-        //                 errorMsg.message);
-        //         }
-        //     }
-        //     updateSuccessful = false;
-        // }
+        com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection()
+                .updateMetadata(new Metadata[] { adminProfileMetadata });
+        for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+            if (r.isSuccess()) {
+                System.out.println("Updated profile FLS");
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
     }
 
     public void createDataCategoryGroup(DataCategoryGroupJson dg)
@@ -877,11 +844,9 @@ public final class SalesforceService
     public static String updateFieldPermissions(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
-         List<String> ls = new ArrayList<String>();
-
 
         try {
-            List<String> pl = new Gson().fromJson(req.body(), new ArrayList<String>(){}.class);
+            List<String> pl = new Gson().fromJson(req.body(), ArrayList.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
             sf.updateFieldPermissions(pl);
         } catch(com.sforce.ws.SoapFaultException e) {
@@ -890,10 +855,8 @@ public final class SalesforceService
                 return "Unauthorized";
             }
         } catch(Exception e) {
-            if (e.getMessage().contains("Remote Site Name already exists")) {
-                res.status(200);
-                return "Already Created";
-            }
+                res.status(400);
+                return "Profile FLS upadate failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";
