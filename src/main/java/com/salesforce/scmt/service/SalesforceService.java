@@ -758,7 +758,7 @@ public final class SalesforceService
 
     public JobInfo awaitCompletion(String jobId) throws AsyncApiException {
         createBulkConnection();
-        BatchInfoList batchList = getBulkConnection().getBatchInfoList(jobId);
+        BatchInfoList batchList = getBulkConnection().getBatchInfoList(jobId, ContentType.JSON);
 
         long sleepTime = 0L;
         Set<String> incomplete = new HashSet<String>();
