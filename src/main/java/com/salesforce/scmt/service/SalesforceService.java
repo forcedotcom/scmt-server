@@ -786,14 +786,12 @@ public final class SalesforceService
         return getBulkConnection().getJobStatus(jobId, ContentType.JSON);
     }
 
-    public void updateMigration(String migrationId, int total, int migrated, int failed)
+    public void updateMigration(String migrationId, int failed)
         throws ConnectionException, DeployException, AsyncApiException {
         createPartnerConnection();
 
         SObject migration = new SObject(SalesforceConstants.OBJ_DESK_MIGRATION);
         migration.setId(migrationId);
-        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsTotal, total);
-        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsMigrated, migrated);
         migration.setField(SalesforceConstants.DeskMigrationFields.RecordsFailed, failed);
         
         DeployResponse dr = upsertData(SalesforceConstants.DeskMigrationFields.ID, Collections.singletonList(migration));
