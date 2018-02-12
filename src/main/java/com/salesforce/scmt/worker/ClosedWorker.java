@@ -58,9 +58,10 @@ public class ClosedWorker implements Runnable {
     public void run() {
         sf = new SalesforceService(this.serverUrl, this.sessionId);
         try {
-            JobInfo job  = sf.awaitCompletion(jobId);
-            int failed   = job.getNumberRecordsFailed();
-            sf.updateMigration(this.migrationId, failed);
+            JobInfo job   = sf.awaitCompletion(jobId);
+            int failed    = job.getNumberRecordsFailed();
+            int processed = job.getNumberRecordsProcessed();
+            sf.updateMigration(this.migrationId, failed, processed);
         } catch (AsyncApiException|ConnectionException|DeployException e) {
             Utils.logException(e);
         }
