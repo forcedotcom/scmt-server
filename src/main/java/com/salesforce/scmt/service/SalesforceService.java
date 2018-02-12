@@ -22,26 +22,42 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.gson.Gson;
+import com.salesforce.scmt.model.DataCategoryGroupJson;
+import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.model.RemoteSite;
-import com.salesforce.scmt.model.DataCategoryGroupJson;
-import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceUtil;
 import com.salesforce.scmt.utils.Utils;
+import com.salesforce.scmt.worker.ClosedWorker;
 import com.sforce.async.AsyncApiException;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
 import com.sforce.async.BulkConnection;
 import com.sforce.async.ConcurrencyMode;
 import com.sforce.async.ContentType;
 import com.sforce.async.JobInfo;
 import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
-import com.sforce.soap.metadata.*;
+import com.sforce.soap.metadata.DataCategory;
+import com.sforce.soap.metadata.DataCategoryGroup;
+import com.sforce.soap.metadata.Metadata;
+import com.sforce.soap.metadata.MetadataConnection;
+import com.sforce.soap.metadata.PermissionSet;
+import com.sforce.soap.metadata.Queue;
+import com.sforce.soap.metadata.QueueSobject;
+import com.sforce.soap.metadata.ReadResult;
+import com.sforce.soap.metadata.RemoteSiteSetting;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
@@ -53,8 +69,6 @@ import com.sforce.ws.ConnectorConfig;
 
 import spark.Request;
 import spark.Response;
-
-import com.google.gson.Gson;
 
 public final class SalesforceService
 {
@@ -718,7 +732,7 @@ public final class SalesforceService
         _bConn.createBatchFromStream(job, jsonStream);
     }
 
-    public void closeBulkJob(String jobId) throws AsyncApiException
+    public void closeBulkJob(String jobId, String migrationId) throws AsyncApiException
     {
         Utils.log("[BULK] Closing Bulk Job: [" + jobId + "]");
 
@@ -730,6 +744,59 @@ public final class SalesforceService
 
         // unclear if I can use this
         _bConn.closeJob(jobId);
+        createClosedWorker(jobId, migrationId);
+    }
+
+    /**
+     * 
+     */
+    public void createClosedWorker(String jobId, String migrationId)
+    {
+        Thread t = new Thread(new ClosedWorker(jobId, migrationId, getServerUrl(), getSessionId()));
+        t.start();
+    }
+
+    public JobInfo awaitCompletion(String jobId) throws AsyncApiException {
+        createBulkConnection();
+        BatchInfoList batchList = getBulkConnection().getBatchInfoList(jobId);
+
+        long sleepTime = 0L;
+        Set<String> incomplete = new HashSet<String>();
+
+        for (BatchInfo bi : batchList.getBatchInfo()) {
+            incomplete.add(bi.getId());
+        }
+
+        while (!incomplete.isEmpty()) {
+            try {
+                Thread.sleep(sleepTime);
+            } catch(InterruptedException e) {}
+            Utils.log("Awaiting results ... [" + incomplete.size() + "]");
+            sleepTime = 10000L;
+            BatchInfo[] statusList = getBulkConnection().getBatchInfoList(jobId).getBatchInfo();
+            for (BatchInfo b : statusList) {
+                if (b.getState() == BatchStateEnum.Completed || b.getState() == BatchStateEnum.Failed) {
+                    if (incomplete.remove(b.getId())) {
+                        Utils.log("BATCH STATUS: " + b);
+                    }
+                }
+            }
+        }
+
+        return getBulkConnection().getJobStatus(jobId);
+    }
+
+    public void updateMigration(String migrationId, int total, int migrated, int failed)
+        throws ConnectionException, DeployException, AsyncApiException {
+        createPartnerConnection();
+
+        SObject migration = new SObject(SalesforceConstants.OBJ_DESK_MIGRATION);
+        migration.setId(migrationId);
+        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsTotal, total);
+        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsMigrated, migrated);
+        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsFailed, failed);
+        
+        DeployResponse dr = upsertData(SalesforceConstants.DeskMigrationFields.ID, Collections.singletonList(migration));
     }
 
     /*

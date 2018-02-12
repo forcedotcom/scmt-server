@@ -296,7 +296,7 @@ public abstract class DeskBase<D extends Serializable>
                 config = objectSpecificBulkProcessing(config);
                 
                 //close current job
-                du.getSalesforceService().closeBulkJob(this.jobId);
+                du.getSalesforceService().closeBulkJob(this.jobId, du.getDeskService().getMigrationId());
 
                 // flip the flag indicating we have re-queued this message, and
                 // we can exit this run...
@@ -327,7 +327,7 @@ public abstract class DeskBase<D extends Serializable>
             {
 
                 // close the current job
-                du.getSalesforceService().closeBulkJob(this.jobId);
+                du.getSalesforceService().closeBulkJob(this.jobId, du.getDeskService().getMigrationId());
 
                 // object specific cleanup create new job
                 objectSpecificBulkCleanup(du);
@@ -339,7 +339,7 @@ public abstract class DeskBase<D extends Serializable>
             recList.clear();
 
             // close the bulk job
-            du.getSalesforceService().closeBulkJob(jobId);
+            du.getSalesforceService().closeBulkJob(jobId, du.getDeskService().getMigrationId());
             
          // object specific completion code, eg. cases sends attachment ids
             dr.setResumePoint(lastRecordId);

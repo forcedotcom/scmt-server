@@ -195,7 +195,7 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
         int lastTimestamp = (int) ((delta ? record.getUpdatedAt().getTime() : record.getCreatedAt().getTime()) / 1000);
 
         // close the bulk job
-        du.getSalesforceService().closeBulkJob(jobId);
+        du.getSalesforceService().closeBulkJob(jobId, du.getDeskService().getMigrationId());
 
         // log the upper timestamp boundary
         dr.addError(String.format("Migrated all records created/updated before: [%d]", lastTimestamp));        

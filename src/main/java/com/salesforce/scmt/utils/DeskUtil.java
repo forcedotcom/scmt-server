@@ -1038,7 +1038,7 @@ public final class DeskUtil
         }
 
         // close the bulk job
-        getSalesforceService().closeBulkJob(jobId);
+        getSalesforceService().closeBulkJob(jobId, getDeskService().getMigrationId());
 
         updateMigrationStatus(DeskMigrationFields.StatusComplete, "Group Member", dr);
 
@@ -1449,7 +1449,7 @@ public final class DeskUtil
             }
 
             // close the current job
-            getSalesforceService().closeBulkJob(jobIds.get(soType));
+            getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
         }
 
         // update migration status
@@ -1847,7 +1847,7 @@ public final class DeskUtil
         }
 
         // close the bulk job
-        getSalesforceService().closeBulkJob(jobId);
+        getSalesforceService().closeBulkJob(jobId, getDeskService().getMigrationId());
 
         // return the list of records
         return dr;
