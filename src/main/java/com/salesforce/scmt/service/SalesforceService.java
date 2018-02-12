@@ -773,7 +773,7 @@ public final class SalesforceService
             } catch(InterruptedException e) {}
             Utils.log("Awaiting results ... [" + incomplete.size() + "]");
             sleepTime = 10000L;
-            BatchInfo[] statusList = getBulkConnection().getBatchInfoList(jobId).getBatchInfo();
+            BatchInfo[] statusList = getBulkConnection().getBatchInfoList(jobId, ContentType.JSON).getBatchInfo();
             for (BatchInfo b : statusList) {
                 if (b.getState() == BatchStateEnum.Completed || b.getState() == BatchStateEnum.Failed) {
                     if (incomplete.remove(b.getId())) {
