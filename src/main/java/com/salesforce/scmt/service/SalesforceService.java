@@ -829,6 +829,27 @@ public final class SalesforceService
         return "Success";
     }
 
+    public static String createAura(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+
+        try {
+            DataCategoryGroupJson dcg = new Gson().fromJson(req.body(), DataCategoryGroupJson.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.createDataCategoryGroup(dcg);
+        } catch (com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        } catch (Exception e) {
+            res.status(200);
+            return "Failed: " + e.getMessage();
+        }
+        res.status(201);
+        return "Success";
+    }
+
     public void setAuditFieldsEnabled(Boolean valueOf)
     {
         this._auditFieldsEnabled = valueOf;
