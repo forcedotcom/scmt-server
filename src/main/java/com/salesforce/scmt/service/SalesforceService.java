@@ -854,9 +854,6 @@ public final class SalesforceService
                 res.status(401);
                 return "Unauthorized";
             }
-        } catch(Exception e) {
-                res.status(400);
-                return "Profile FLS upadate failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";
