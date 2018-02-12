@@ -20,21 +20,15 @@ import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskNoteToSalesforceJson
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import com.desk.java.apiclient.model.ApiResponse;
-import com.desk.java.apiclient.model.Customer;
-import com.desk.java.apiclient.model.Fields;
 import com.desk.java.apiclient.model.Note;
-import com.desk.java.apiclient.model.SortDirection;
-import com.desk.java.apiclient.service.CustomerService;
 import com.desk.java.apiclient.service.NoteService;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
-import com.salesforce.scmt.utils.SalesforceConstants.CaseFields;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.salesforce.scmt.utils.Utils;
 import com.sforce.async.OperationEnum;

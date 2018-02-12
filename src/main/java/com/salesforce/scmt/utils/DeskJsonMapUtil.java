@@ -32,7 +32,6 @@ import com.salesforce.scmt.utils.SalesforceConstants.EmailMessageFields;
 import com.salesforce.scmt.utils.SalesforceConstants.FeedItemFields;
 import com.salesforce.scmt.utils.SalesforceConstants.TopicFields;
 import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
-import com.sforce.soap.partner.sobject.SObject;
 
 public final class DeskJsonMapUtil
 {

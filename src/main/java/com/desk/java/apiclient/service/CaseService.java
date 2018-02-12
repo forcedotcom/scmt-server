@@ -15,7 +15,6 @@
 
 package com.desk.java.apiclient.service;
 
-import com.desk.java.apiclient.DeskClientBuilder;
 import com.desk.java.apiclient.model.ApiResponse;
 import com.desk.java.apiclient.model.Attachment;
 import com.desk.java.apiclient.model.Case;
