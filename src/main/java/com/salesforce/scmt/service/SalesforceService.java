@@ -159,6 +159,25 @@ public final class SalesforceService
         }
     }
 
+    public void updateCustomLabel(String[] ls)
+        throws ConnectionException, DeployException, AsyncApiException, Exception {
+          createMetadataConnection();
+          
+          CustomLabel cl = new CustomLabel();
+          cl.setFullName(ls[0]);
+          cl.setValue(ls[1]);
+
+          com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection().updateMetadata(new Metadata[] { cl });
+          for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+            if (r.isSuccess()) {
+                System.out.println("Updated existing component: " + r.getFullName());
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
+
+    }
+
     public void createDataCategoryGroup(DataCategoryGroupJson dg)
       throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
