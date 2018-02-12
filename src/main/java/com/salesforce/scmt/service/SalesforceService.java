@@ -783,7 +783,7 @@ public final class SalesforceService
             }
         }
 
-        return getBulkConnection().getJobStatus(jobId);
+        return getBulkConnection().getJobStatus(jobId, ContentType.JSON);
     }
 
     public void updateMigration(String migrationId, int total, int migrated, int failed)
