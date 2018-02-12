@@ -796,6 +796,7 @@ public final class SalesforceService
         migration.setField(SalesforceConstants.DeskMigrationFields.RecordsTotal, processed);
         migration.setField(SalesforceConstants.DeskMigrationFields.RecordsMigrated, processed - failed);
         
+        @SuppressWarnings("unused")
         DeployResponse dr = upsertData(SalesforceConstants.DeskMigrationFields.ID, Collections.singletonList(migration));
     }
 

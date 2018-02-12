@@ -225,20 +225,20 @@ public final class DeskUtil
      * So added this constant so we can watch for when we are on 500th page we can grab the last id and reset the page
      * counter.
      */
-    private static final int DESK_MAX_PAGES = 500;
+    public static final int DESK_MAX_PAGES = 500;
 
-    private static final int DESK_PAGE_SIZE_CF = 1000;
-    private static final int DESK_PAGE_SIZE_GROUP = 1000;
-    private static final int DESK_PAGE_SIZE_USER = 1000;
-    private static final int DESK_PAGE_SIZE_CUSTOMER = 100;
-    private static final int DESK_PAGE_SIZE_COMPANY = 500;
-    private static final int DESK_PAGE_SIZE_LABEL = 1000;
-    private static final int DESK_PAGE_SIZE_CASE = 100; // API doc report this as 500, but the max size is really 100
-    private static final int DESK_PAGE_SIZE_NOTE = 100;
-    private static final int DESK_PAGE_SIZE_INTERACTION = 100;
-    private static final int DESK_PAGE_SIZE_ARTICLE = 500;
-    private static final int DESK_PAGE_SIZE_FEED = 50;
-    private static final int DESK_COMPANY_ID_MAX = 50;
+    public static final int DESK_PAGE_SIZE_CF = 1000;
+    public static final int DESK_PAGE_SIZE_GROUP = 1000;
+    public static final int DESK_PAGE_SIZE_USER = 1000;
+    public static final int DESK_PAGE_SIZE_CUSTOMER = 100;
+    public static final int DESK_PAGE_SIZE_COMPANY = 500;
+    public static final int DESK_PAGE_SIZE_LABEL = 1000;
+    public static final int DESK_PAGE_SIZE_CASE = 100; // API doc report this as 500, but the max size is really 100
+    public static final int DESK_PAGE_SIZE_NOTE = 100;
+    public static final int DESK_PAGE_SIZE_INTERACTION = 100;
+    public static final int DESK_PAGE_SIZE_ARTICLE = 500;
+    public static final int DESK_PAGE_SIZE_FEED = 50;
+    public static final int DESK_COMPANY_ID_MAX = 50;
 
     private DeskService _deskService;
 

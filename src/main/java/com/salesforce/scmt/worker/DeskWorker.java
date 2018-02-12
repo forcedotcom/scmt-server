@@ -20,7 +20,6 @@ import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACH
 import static java.lang.System.getenv;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,6 @@ public final class DeskWorker
         {
         	System.out.println("config" + config.get("server_url"));
         	System.out.println("config" + config.get("deskUrl"));
-            Map<String, Object> objMap = new HashMap<>(config);
             DeskUtil deskUtil = new DeskUtil(new DeskService((String)config.get("deskUrl"),
             		(String)config.get("consumerKey"), (String)config.get("consumerSecret"),
             		(String)config.get("accessToken"), (String)config.get("accessTokenSecret"),
@@ -222,8 +220,6 @@ public final class DeskWorker
             // deserialize the data
             @SuppressWarnings("unchecked")
             Map<String, Object> config = (Map<String, Object>) JsonUtil.fromJson(json, Map.class);
-
-            DeskUtil deskUtil = new DeskUtil(new DeskService(config));
             
             @SuppressWarnings("unchecked")
             // casting to Integer produced entries like '5.0', so explicitly parse to Integer
