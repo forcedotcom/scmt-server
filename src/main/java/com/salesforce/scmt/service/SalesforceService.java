@@ -173,6 +173,39 @@ public final class SalesforceService
         }
     }
 
+    public void updateFieldPermissions(List<String> fieldNames)
+            throws ConnectionException, DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+
+        ProfileFieldLevelSecurity[] subList1 = new ProfileFieldLevelSecurity[fieldNames.size()];
+        List<ProfileFieldLevelSecurity> subList = new ArrayList<ProfileFieldLevelSecurity>();
+
+        for (String field : fieldNames) {
+            ProfileFieldLevelSecurity pFLS = new ProfileFieldLevelSecurity();
+            pFLS.setField(field);
+            pFLS.setEditable(true);
+            pFLS.setReadable(true);
+
+            subList.add(pFLS);
+        }
+        subList.toArray(subList1);
+        com.sforce.soap.metadata.Profile adminProfile = new com.sforce.soap.metadata.Profile();
+        adminProfile.setFullName("Admin");
+
+        adminProfile.setFieldPermissions(subList1);
+        com.sforce.soap.metadata.Metadata adminProfileMetadata = (com.sforce.soap.metadata.Metadata) adminProfile;
+
+        com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection()
+                .updateMetadata(new Metadata[] { adminProfileMetadata });
+        for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+            if (r.isSuccess()) {
+                System.out.println("Updated profile FLS");
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
+    }
+
     public void createDataCategoryGroup(DataCategoryGroupJson dg)
       throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
@@ -876,6 +909,24 @@ public final class SalesforceService
         return "Success";
     }
 
+    public static String updateFieldPermissions(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+
+        try {
+            List<String> pl = new Gson().fromJson(req.body(), ArrayList.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.updateFieldPermissions(pl);
+        } catch(com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        }
+        res.status(201);
+        return "Success";
+    }
+
     public static String createDataCategoryGroup(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
@@ -889,9 +940,6 @@ public final class SalesforceService
                 res.status(401);
                 return "Unauthorized";
             }
-        } catch(Exception e) {
-            res.status(200);
-            return "Failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";
