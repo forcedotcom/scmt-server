@@ -872,9 +872,6 @@ public final class SalesforceService
                 res.status(401);
                 return "Unauthorized";
             }
-        } catch(Exception e) {
-            res.status(200);
-            return "Failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";
