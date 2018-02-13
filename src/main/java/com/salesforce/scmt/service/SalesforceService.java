@@ -224,7 +224,29 @@ public final class SalesforceService
         dc.setDataCategory(subList1);
         return dc;
     }
+// {"fullname": "TestName",
+//  ""}
+    public void createAura(Map<String,String> input)       
+        throws ConnectionException, DeployException, AsyncApiException, Exception {
+            createMetadataConnection();
 
+            AuraDefinitionBundle bundle = new AuraDefinitionBundle();
+            AuraBundleType abt = AuraBundleType.valueOf("Component");
+            bundle.setType(abt);
+            bundle.setDescription("Created by SCMT Server");
+            bundle.setFullName("test");
+
+
+            com.sforce.soap.metadata.SaveResult[] results = getMetadataConnection().createMetadata(new Metadata[] { bundle });
+
+        for (com.sforce.soap.metadata.SaveResult r : results) {
+            if (r.isSuccess()) {
+                System.out.println("Created component: " + r.getFullName());
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
+    }
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
     {
         ConnectorConfig config = new ConnectorConfig();
@@ -834,9 +856,9 @@ public final class SalesforceService
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
 
         try {
-            DataCategoryGroupJson dcg = new Gson().fromJson(req.body(), DataCategoryGroupJson.class);
+            Map<String,String> adb = new Gson().fromJson(req.body(), Map.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
-            sf.createDataCategoryGroup(dcg);
+            sf.createAura(adb);
         } catch (com.sforce.ws.SoapFaultException e) {
             if (e.getMessage().contains("INVALID_SESSION_ID")) {
                 res.status(401);
