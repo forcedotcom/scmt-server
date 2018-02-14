@@ -29,7 +29,6 @@ import java.text.ParseException;
 
 import com.desk.java.apiclient.model.ApiResponse;
 import com.desk.java.apiclient.model.Customer;
-import com.desk.java.apiclient.model.Fields;
 import com.desk.java.apiclient.model.SortDirection;
 import com.desk.java.apiclient.service.CustomerService;
 import com.salesforce.scmt.model.DeployResponse;
@@ -92,13 +91,12 @@ public class DeskContactMigration<D extends Serializable> extends DeskBase<D>
             if (!delta)
             {
                 // false == bigCompanies TODO
-                resp = service.getCustomers(lastRecordId, DESK_PAGE_SIZE_CUSTOMER, page, "id", SortDirection.ASC,
-                        (false ? Fields.include("id", "_links") : null)).execute();
+                resp = service.getCustomers(lastRecordId, DESK_PAGE_SIZE_CUSTOMER, page, "id", SortDirection.ASC, null).execute();
             }
             else
             {
                 resp = service.searchCustomersByUpdatedAt(updatedAt, DESK_PAGE_SIZE_CUSTOMER, page, "updated_at",
-                    SortDirection.ASC, (false ? Fields.include("updated_at", "_links") : null)).execute();
+                    SortDirection.ASC, null).execute();
             }
 
         }

@@ -25,9 +25,6 @@ import java.util.Map;
 
 import com.desk.java.apiclient.model.ApiResponse;
 import com.desk.java.apiclient.model.Article;
-import com.desk.java.apiclient.model.Customer;
-import com.desk.java.apiclient.model.Fields;
-import com.desk.java.apiclient.model.SortDirection;
 import com.desk.java.apiclient.service.ArticleService;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.utils.DeskUtil;

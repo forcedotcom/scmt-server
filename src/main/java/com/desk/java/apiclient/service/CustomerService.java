@@ -29,7 +29,6 @@ import retrofit.http.PATCH;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
-import retrofit.http.Headers;
 
 public interface CustomerService {
 
