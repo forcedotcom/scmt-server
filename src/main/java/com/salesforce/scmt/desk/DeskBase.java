@@ -67,7 +67,18 @@ public abstract class DeskBase<D extends Serializable>
      */
     public void migrate() throws Exception
     {
+
         Utils.log("Entered DeskBase::migrate()");
+
+        // Set the custom label to 1, indicating bypass process builders. For Desk Trial Org.
+        try {
+            String[] label = new String[2];
+            label[0] = "BypassProcessBuilder";
+            label[1] = "1";
+            du.getSalesforceService().updateCustomLabel(label);
+        } catch (Exception e) {
+            Utils.logException(e);
+        }
 
         // initialize a flag which indicates if this is a delta migration
         delta = (config.get("updated_at") != null && config.get("updated_at") != "null");
