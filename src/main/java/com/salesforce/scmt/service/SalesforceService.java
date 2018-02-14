@@ -182,6 +182,7 @@ public final class SalesforceService
           CustomLabel cl = new CustomLabel();
           cl.setFullName(ls[0]);
           cl.setValue(ls[1]);
+          cl.setLanguage("English");
 
           com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection().updateMetadata(new Metadata[] { cl });
           for (com.sforce.soap.metadata.SaveResult r : updateResults) {
