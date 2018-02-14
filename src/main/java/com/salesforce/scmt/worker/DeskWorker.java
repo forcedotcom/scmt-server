@@ -19,33 +19,26 @@ import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_FORMULA1
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACHMENT_BACKGROUND;
 import static java.lang.System.getenv;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.desk.java.apiclient.model.Article;
 import com.salesforce.scmt.desk.DeskAccountMigration;
 import com.salesforce.scmt.desk.DeskArticleMigration;
-import com.salesforce.scmt.desk.DeskBase;
 import com.salesforce.scmt.desk.DeskCaseMigration;
 import com.salesforce.scmt.desk.DeskContactMigration;
 import com.salesforce.scmt.desk.DeskNoteMigration;
 import com.salesforce.scmt.desk.DeskUserMigration;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.service.DeskService;
-//import com.salesforce.scmt.service.DeskService;
-import com.salesforce.scmt.service.SalesforceService;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.RabbitUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMessageFields;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
-import com.salesforce.scmt.utils.SalesforceConstants.UserFields;
 import com.salesforce.scmt.utils.Utils;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.soap.partner.sobject.SObject;
@@ -75,7 +68,6 @@ public final class DeskWorker
         {
         	System.out.println("config" + config.get("server_url"));
         	System.out.println("config" + config.get("deskUrl"));
-            Map<String, Object> objMap = new HashMap<>(config);
             DeskUtil deskUtil = new DeskUtil(new DeskService((String)config.get("deskUrl"),
             		(String)config.get("consumerKey"), (String)config.get("consumerSecret"),
             		(String)config.get("accessToken"), (String)config.get("accessTokenSecret"),
@@ -228,8 +220,6 @@ public final class DeskWorker
             // deserialize the data
             @SuppressWarnings("unchecked")
             Map<String, Object> config = (Map<String, Object>) JsonUtil.fromJson(json, Map.class);
-
-            DeskUtil deskUtil = new DeskUtil(new DeskService(config));
             
             @SuppressWarnings("unchecked")
             // casting to Integer produced entries like '5.0', so explicitly parse to Integer

@@ -22,26 +22,44 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.gson.Gson;
+import com.salesforce.scmt.model.DataCategoryGroupJson;
+import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.model.RemoteSite;
-import com.salesforce.scmt.model.DataCategoryGroupJson;
-import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.utils.JsonUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceUtil;
 import com.salesforce.scmt.utils.Utils;
+import com.salesforce.scmt.worker.ClosedWorker;
 import com.sforce.async.AsyncApiException;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
 import com.sforce.async.BulkConnection;
 import com.sforce.async.ConcurrencyMode;
 import com.sforce.async.ContentType;
 import com.sforce.async.JobInfo;
 import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
-import com.sforce.soap.metadata.*;
+import com.sforce.soap.metadata.DataCategory;
+import com.sforce.soap.metadata.DataCategoryGroup;
+import com.sforce.soap.metadata.Metadata;
+import com.sforce.soap.metadata.MetadataConnection;
+import com.sforce.soap.metadata.PermissionSet;
+import com.sforce.soap.metadata.ProfileFieldLevelSecurity;
+import com.sforce.soap.metadata.Queue;
+import com.sforce.soap.metadata.QueueSobject;
+import com.sforce.soap.metadata.ReadResult;
+import com.sforce.soap.metadata.RemoteSiteSetting;
+import com.sforce.soap.metadata.CustomLabel;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
@@ -53,8 +71,6 @@ import com.sforce.ws.ConnectorConfig;
 
 import spark.Request;
 import spark.Response;
-
-import com.google.gson.Gson;
 
 public final class SalesforceService
 {
@@ -171,6 +187,42 @@ public final class SalesforceService
           for (com.sforce.soap.metadata.SaveResult r : updateResults) {
             if (r.isSuccess()) {
                 System.out.println("Updated existing component: " + r.getFullName());
+                System.out.println("Updated profile FLS");
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
+
+    }
+
+                
+    public void updateFieldPermissions(List<String> fieldNames)
+            throws ConnectionException, DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+
+        ProfileFieldLevelSecurity[] subList1 = new ProfileFieldLevelSecurity[fieldNames.size()];
+        List<ProfileFieldLevelSecurity> subList = new ArrayList<ProfileFieldLevelSecurity>();
+
+        for (String field : fieldNames) {
+            ProfileFieldLevelSecurity pFLS = new ProfileFieldLevelSecurity();
+            pFLS.setField(field);
+            pFLS.setEditable(true);
+            pFLS.setReadable(true);
+
+            subList.add(pFLS);
+        }
+        subList.toArray(subList1);
+        com.sforce.soap.metadata.Profile adminProfile = new com.sforce.soap.metadata.Profile();
+        adminProfile.setFullName("Admin");
+
+        adminProfile.setFieldPermissions(subList1);
+        com.sforce.soap.metadata.Metadata adminProfileMetadata = (com.sforce.soap.metadata.Metadata) adminProfile;
+
+        com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection()
+                .updateMetadata(new Metadata[] { adminProfileMetadata });
+        for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+            if (r.isSuccess()) {
+                System.out.println("Updated profile FLS");
             } else {
                 throw new Exception(r.getErrors()[0].getMessage());
             }
@@ -737,7 +789,7 @@ public final class SalesforceService
         _bConn.createBatchFromStream(job, jsonStream);
     }
 
-    public void closeBulkJob(String jobId) throws AsyncApiException
+    public void closeBulkJob(String jobId, String migrationId) throws AsyncApiException
     {
         Utils.log("[BULK] Closing Bulk Job: [" + jobId + "]");
 
@@ -749,6 +801,60 @@ public final class SalesforceService
 
         // unclear if I can use this
         _bConn.closeJob(jobId);
+        createClosedWorker(jobId, migrationId);
+    }
+
+    /**
+     * 
+     */
+    public void createClosedWorker(String jobId, String migrationId)
+    {
+        Thread t = new Thread(new ClosedWorker(jobId, migrationId, getServerUrl(), getSessionId()));
+        t.start();
+    }
+
+    public JobInfo awaitCompletion(String jobId) throws AsyncApiException {
+        createBulkConnection();
+        BatchInfoList batchList = getBulkConnection().getBatchInfoList(jobId, ContentType.JSON);
+
+        long sleepTime = 0L;
+        Set<String> incomplete = new HashSet<String>();
+
+        for (BatchInfo bi : batchList.getBatchInfo()) {
+            incomplete.add(bi.getId());
+        }
+
+        while (!incomplete.isEmpty()) {
+            try {
+                Thread.sleep(sleepTime);
+            } catch(InterruptedException e) {}
+            Utils.log("Awaiting results ... [" + incomplete.size() + "]");
+            sleepTime = 10000L;
+            BatchInfo[] statusList = getBulkConnection().getBatchInfoList(jobId, ContentType.JSON).getBatchInfo();
+            for (BatchInfo b : statusList) {
+                if (b.getState() == BatchStateEnum.Completed || b.getState() == BatchStateEnum.Failed) {
+                    if (incomplete.remove(b.getId())) {
+                        Utils.log("BATCH STATUS: " + b);
+                    }
+                }
+            }
+        }
+
+        return getBulkConnection().getJobStatus(jobId, ContentType.JSON);
+    }
+
+    public void updateMigration(String migrationId, int failed, int processed)
+        throws ConnectionException, DeployException, AsyncApiException {
+        createPartnerConnection();
+
+        SObject migration = new SObject(SalesforceConstants.OBJ_DESK_MIGRATION);
+        migration.setId(migrationId);
+        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsFailed, failed);
+        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsTotal, processed);
+        migration.setField(SalesforceConstants.DeskMigrationFields.RecordsMigrated, processed - failed);
+        
+        @SuppressWarnings("unused")
+        DeployResponse dr = upsertData(SalesforceConstants.DeskMigrationFields.ID, Collections.singletonList(migration));
     }
 
     /*
@@ -827,6 +933,24 @@ public final class SalesforceService
         return "Success";
     }
 
+    public static String updateFieldPermissions(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+
+        try {
+            List<String> pl = new Gson().fromJson(req.body(), ArrayList.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.updateFieldPermissions(pl);
+        } catch(com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        }
+        res.status(201);
+        return "Success";
+    }
+
     public static String createDataCategoryGroup(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
@@ -840,9 +964,6 @@ public final class SalesforceService
                 res.status(401);
                 return "Unauthorized";
             }
-        } catch(Exception e) {
-            res.status(200);
-            return "Failed: " + e.getMessage();
         }
         res.status(201);
         return "Success";

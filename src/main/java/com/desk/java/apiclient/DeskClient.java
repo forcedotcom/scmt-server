@@ -29,8 +29,6 @@ import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.logging.HttpLoggingInterceptor;
-import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
 
 import org.jetbrains.annotations.NotNull;
 

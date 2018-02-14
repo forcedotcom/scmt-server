@@ -27,19 +27,9 @@ import com.salesforce.scmt.utils.SalesforceConstants;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.salesforce.scmt.utils.Utils;
 
-import retrofit.Response;
-
 public abstract class DeskBase<D extends Serializable>
 {
-    /**
-     * Desk will only allow you to retrieve 500 pages. When you request the the 501 page it responds with: {"message":
-     * "page parameter must be less than or equal to 500"} So added this constant so we can watch for when we are on
-     * 500th page we can grab the last id and reset the page counter.
-     */
-    private static final int DESK_MAX_PAGES = 500;
-
     protected List<D> recList = new ArrayList<>();
-    private Response<ApiResponse<D>> resp = null;
     private DeskBaseResponse<ApiResponse<D>> dResp = new DeskBaseResponse<>();
 
     // deploy response
@@ -128,7 +118,7 @@ public abstract class DeskBase<D extends Serializable>
                     recList.addAll(((ApiResponse<D>) dResp.body).getEntriesAsList());
 
                     // check if we are on the last page
-                    if (page >= DESK_MAX_PAGES)
+                    if (page >= DeskUtil.DESK_MAX_PAGES)
                     {
                         if (!delta)
                         {
@@ -296,7 +286,7 @@ public abstract class DeskBase<D extends Serializable>
                 config = objectSpecificBulkProcessing(config);
                 
                 //close current job
-                du.getSalesforceService().closeBulkJob(this.jobId);
+                du.getSalesforceService().closeBulkJob(this.jobId, du.getDeskService().getMigrationId());
 
                 // flip the flag indicating we have re-queued this message, and
                 // we can exit this run...
@@ -327,7 +317,7 @@ public abstract class DeskBase<D extends Serializable>
             {
 
                 // close the current job
-                du.getSalesforceService().closeBulkJob(this.jobId);
+                du.getSalesforceService().closeBulkJob(this.jobId, du.getDeskService().getMigrationId());
 
                 // object specific cleanup create new job
                 objectSpecificBulkCleanup(du);
@@ -339,7 +329,7 @@ public abstract class DeskBase<D extends Serializable>
             recList.clear();
 
             // close the bulk job
-            du.getSalesforceService().closeBulkJob(jobId);
+            du.getSalesforceService().closeBulkJob(jobId, du.getDeskService().getMigrationId());
             
          // object specific completion code, eg. cases sends attachment ids
             dr.setResumePoint(lastRecordId);

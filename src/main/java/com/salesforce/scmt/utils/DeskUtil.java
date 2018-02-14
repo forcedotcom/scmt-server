@@ -15,13 +15,8 @@
 
 package com.salesforce.scmt.utils;
 
-import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskCaseToSalesforceJsonMap;
-import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskCompanyToSalesforceJsonMap;
-import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskCustomerToSalesforceJsonMap;
 import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskInteractionToSalesforceJsonMaps;
 import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskLabelToSalesforceTopicJsonMap;
-import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskNoteToSalesforceJsonMap;
-import static com.salesforce.scmt.utils.DeskJsonMapUtil.deskUserToSalesforceJsonMap;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,34 +44,22 @@ import java.util.regex.Pattern;
 
 import com.desk.java.apiclient.DeskClient;
 import com.desk.java.apiclient.model.ApiResponse;
-import com.desk.java.apiclient.model.Article;
 import com.desk.java.apiclient.model.Attachment;
-import com.desk.java.apiclient.model.Case;
-import com.desk.java.apiclient.model.Company;
 import com.desk.java.apiclient.model.CustomField;
 import com.desk.java.apiclient.model.CustomFieldDataType;
 import com.desk.java.apiclient.model.CustomFieldType;
-import com.desk.java.apiclient.model.Customer;
-import com.desk.java.apiclient.model.Fields;
 import com.desk.java.apiclient.model.Group;
 import com.desk.java.apiclient.model.Interaction;
 import com.desk.java.apiclient.model.Interaction.InteractionType;
 import com.desk.java.apiclient.model.Label;
-import com.desk.java.apiclient.model.Message;
-import com.desk.java.apiclient.model.Note;
 import com.desk.java.apiclient.model.SiteLanguage;
 import com.desk.java.apiclient.model.SiteSetting;
-import com.desk.java.apiclient.model.SortDirection;
 import com.desk.java.apiclient.model.User;
-import com.desk.java.apiclient.service.ArticleService;
 import com.desk.java.apiclient.service.CaseService;
-import com.desk.java.apiclient.service.CompanyService;
 import com.desk.java.apiclient.service.CustomFieldsService;
-import com.desk.java.apiclient.service.CustomerService;
 import com.desk.java.apiclient.service.GroupService;
 import com.desk.java.apiclient.service.InteractionService;
 import com.desk.java.apiclient.service.LabelService;
-import com.desk.java.apiclient.service.NoteService;
 import com.desk.java.apiclient.service.SiteService;
 import com.desk.java.apiclient.service.UserService;
 import com.desk.java.apiclient.util.StringUtils;
@@ -85,11 +68,9 @@ import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.rabbitmq.RabbitConfiguration;
 import com.salesforce.scmt.service.DeskService;
 import com.salesforce.scmt.service.SalesforceService;
-import com.salesforce.scmt.utils.SalesforceConstants.AccountFields;
 import com.salesforce.scmt.utils.SalesforceConstants.AttachmentFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseCommentFields;
 import com.salesforce.scmt.utils.SalesforceConstants.CaseFields;
-import com.salesforce.scmt.utils.SalesforceConstants.ContactFields;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMessageFields;
 import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.salesforce.scmt.utils.SalesforceConstants.EmailMessageFields;
@@ -244,20 +225,20 @@ public final class DeskUtil
      * So added this constant so we can watch for when we are on 500th page we can grab the last id and reset the page
      * counter.
      */
-    private static final int DESK_MAX_PAGES = 500;
+    public static final int DESK_MAX_PAGES = 500;
 
-    private static final int DESK_PAGE_SIZE_CF = 1000;
-    private static final int DESK_PAGE_SIZE_GROUP = 1000;
-    private static final int DESK_PAGE_SIZE_USER = 1000;
-    private static final int DESK_PAGE_SIZE_CUSTOMER = 100;
-    private static final int DESK_PAGE_SIZE_COMPANY = 500;
-    private static final int DESK_PAGE_SIZE_LABEL = 1000;
-    private static final int DESK_PAGE_SIZE_CASE = 100; // API doc report this as 500, but the max size is really 100
-    private static final int DESK_PAGE_SIZE_NOTE = 100;
-    private static final int DESK_PAGE_SIZE_INTERACTION = 100;
-    private static final int DESK_PAGE_SIZE_ARTICLE = 500;
-    private static final int DESK_PAGE_SIZE_FEED = 50;
-    private static final int DESK_COMPANY_ID_MAX = 50;
+    public static final int DESK_PAGE_SIZE_CF = 1000;
+    public static final int DESK_PAGE_SIZE_GROUP = 1000;
+    public static final int DESK_PAGE_SIZE_USER = 1000;
+    public static final int DESK_PAGE_SIZE_CUSTOMER = 100;
+    public static final int DESK_PAGE_SIZE_COMPANY = 500;
+    public static final int DESK_PAGE_SIZE_LABEL = 1000;
+    public static final int DESK_PAGE_SIZE_CASE = 100; // API doc report this as 500, but the max size is really 100
+    public static final int DESK_PAGE_SIZE_NOTE = 100;
+    public static final int DESK_PAGE_SIZE_INTERACTION = 100;
+    public static final int DESK_PAGE_SIZE_ARTICLE = 500;
+    public static final int DESK_PAGE_SIZE_FEED = 50;
+    public static final int DESK_COMPANY_ID_MAX = 50;
 
     private DeskService _deskService;
 
@@ -1038,7 +1019,7 @@ public final class DeskUtil
         }
 
         // close the bulk job
-        getSalesforceService().closeBulkJob(jobId);
+        getSalesforceService().closeBulkJob(jobId, getDeskService().getMigrationId());
 
         updateMigrationStatus(DeskMigrationFields.StatusComplete, "Group Member", dr);
 
@@ -1449,7 +1430,7 @@ public final class DeskUtil
             }
 
             // close the current job
-            getSalesforceService().closeBulkJob(jobIds.get(soType));
+            getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
         }
 
         // update migration status
@@ -1847,7 +1828,7 @@ public final class DeskUtil
         }
 
         // close the bulk job
-        getSalesforceService().closeBulkJob(jobId);
+        getSalesforceService().closeBulkJob(jobId, getDeskService().getMigrationId());
 
         // return the list of records
         return dr;

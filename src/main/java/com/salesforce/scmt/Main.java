@@ -28,7 +28,6 @@ import java.io.IOException;
 import static com.salesforce.scmt.utils.JsonUtil.toJson;
 
 import com.salesforce.scmt.model.ErrorResponse;
-import com.salesforce.scmt.utils.Utils;
 
 //import com.heroku.sdk.jdbc.DatabaseUrl;
 

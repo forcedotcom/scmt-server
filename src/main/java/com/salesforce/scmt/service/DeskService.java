@@ -16,7 +16,6 @@
 package com.salesforce.scmt.service;
 
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_TRACTOR;
-import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.EXCHANGE_FORMULA1;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_DATA_MIGRATION;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_ATTACHMENT;
 import static com.salesforce.scmt.rabbitmq.RabbitConfiguration.QUEUE_DESK_EMAIL;
