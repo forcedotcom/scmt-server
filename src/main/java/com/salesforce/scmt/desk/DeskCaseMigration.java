@@ -178,6 +178,7 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
             // clear the items sent to the queue
             attachmentIdList.subList(0, iMax).clear();
         }
+        
         String[] label = new String[2];
         label[0] = "BypassProcessBuilder";
         label[1] = "1";
