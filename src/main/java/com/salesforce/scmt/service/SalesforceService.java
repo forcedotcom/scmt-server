@@ -186,8 +186,7 @@ public final class SalesforceService
           com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection().updateMetadata(new Metadata[] { cl });
           for (com.sforce.soap.metadata.SaveResult r : updateResults) {
             if (r.isSuccess()) {
-                System.out.println("Updated existing component: " + r.getFullName());
-                System.out.println("Updated profile FLS");
+                System.out.println("Updated Custom Label: " + r.getFullName());
             } else {
                 throw new Exception(r.getErrors()[0].getMessage());
             }
