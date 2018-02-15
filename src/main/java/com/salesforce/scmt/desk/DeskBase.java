@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.desk.java.apiclient.model.ApiResponse;
+import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.model.DeployResponse;
 import com.salesforce.scmt.utils.DeskUtil;
 import com.salesforce.scmt.utils.SalesforceConstants;
@@ -72,7 +73,7 @@ public abstract class DeskBase<D extends Serializable>
         // Set the custom label to 1, indicating bypass process builders. For Desk Trial Org.
         try {
             du.getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
-        } catch (Exception e) {
+        } catch (DeployException e) {
             Utils.logException(e);
         }
 
