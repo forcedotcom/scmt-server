@@ -175,15 +175,15 @@ public final class SalesforceService
         }
     }
 
-    public void updateCustomLabel(String[] ls)
+    public void updateCustomLabel(String fullName, String value)
         throws ConnectionException, DeployException, AsyncApiException, Exception {
           createMetadataConnection();
           
           CustomLabel cl = new CustomLabel();
-          cl.setFullName(ls[0]);
-          cl.setValue(ls[1]);
+          cl.setFullName(fullName);
+          cl.setValue(value);
           cl.setLanguage("en_US");
-          cl.setShortDescription(ls[0]);
+          cl.setShortDescription(fullName);
 
           com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection().updateMetadata(new Metadata[] { cl });
           for (com.sforce.soap.metadata.SaveResult r : updateResults) {
@@ -228,7 +228,6 @@ public final class SalesforceService
                 throw new Exception(r.getErrors()[0].getMessage());
             }
         }
-
     }
 
     public void createDataCategoryGroup(DataCategoryGroupJson dg)

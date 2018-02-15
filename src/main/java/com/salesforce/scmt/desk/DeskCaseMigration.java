@@ -178,7 +178,6 @@ public class DeskCaseMigration<D extends Serializable> extends DeskBase<D>
             // clear the items sent to the queue
             attachmentIdList.subList(0, iMax).clear();
         }
-
         du.updateMigrationStatus(DeskMigrationFields.StatusComplete, "Cases", dr);
     }
 

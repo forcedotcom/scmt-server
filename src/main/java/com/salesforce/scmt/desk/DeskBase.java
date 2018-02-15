@@ -72,10 +72,7 @@ public abstract class DeskBase<D extends Serializable>
 
         // Set the custom label to 1, indicating bypass process builders. For Desk Trial Org.
         try {
-            String[] label = new String[2];
-            label[0] = "BypassProcessBuilder";
-            label[1] = "1";
-            du.getSalesforceService().updateCustomLabel(label);
+            du.getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
         } catch (Exception e) {
             Utils.logException(e);
         }
