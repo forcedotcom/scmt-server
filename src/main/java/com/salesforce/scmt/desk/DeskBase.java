@@ -67,7 +67,6 @@ public abstract class DeskBase<D extends Serializable>
      */
     public void migrate() throws Exception
     {
-
         Utils.log("Entered DeskBase::migrate()");
 
         // Set the custom label to 1, indicating bypass process builders. For Desk Trial Org.
