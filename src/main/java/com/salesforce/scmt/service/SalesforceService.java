@@ -176,7 +176,7 @@ public final class SalesforceService
     }
 
     public void updateCustomLabel(String fullName, String value)
-        throws ConnectionException, DeployException, AsyncApiException, Exception {
+        throws ConnectionException, DeployException, AsyncApiException {
           createMetadataConnection();
           
           CustomLabel cl = new CustomLabel();
@@ -190,7 +190,7 @@ public final class SalesforceService
             if (r.isSuccess()) {
                 System.out.println("Updated Custom Label: " + r.getFullName());
             } else {
-                throw new Exception(r.getErrors()[0].getMessage());
+                throw new DeployException(r.getErrors()[0].getMessage());
             }
         }
 
