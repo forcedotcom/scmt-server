@@ -62,6 +62,7 @@ public class ClosedWorker implements Runnable {
             int failed    = job.getNumberRecordsFailed();
             int processed = job.getNumberRecordsProcessed();
             sf.updateMigration(this.migrationId, failed, processed);
+            sf.updateCustomLabel("BypassProcessBuilder", "0");
         } catch (AsyncApiException|ConnectionException|DeployException e) {
             Utils.logException(e);
         }
