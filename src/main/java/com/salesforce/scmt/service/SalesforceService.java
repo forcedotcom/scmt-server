@@ -59,6 +59,7 @@ import com.sforce.soap.metadata.Queue;
 import com.sforce.soap.metadata.QueueSobject;
 import com.sforce.soap.metadata.ReadResult;
 import com.sforce.soap.metadata.RemoteSiteSetting;
+import com.sforce.soap.metadata.CustomLabel;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
@@ -174,6 +175,28 @@ public final class SalesforceService
         }
     }
 
+    public void updateCustomLabel(String fullName, String value)
+        throws ConnectionException, DeployException, AsyncApiException {
+          createMetadataConnection();
+          
+          CustomLabel cl = new CustomLabel();
+          cl.setFullName(fullName);
+          cl.setValue(value);
+          cl.setLanguage("en_US");
+          cl.setShortDescription(fullName);
+
+          com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection().updateMetadata(new Metadata[] { cl });
+          for (com.sforce.soap.metadata.SaveResult r : updateResults) {
+            if (r.isSuccess()) {
+                System.out.println("Updated Custom Label: " + r.getFullName());
+            } else {
+                throw new DeployException(r.getErrors()[0].getMessage());
+            }
+        }
+
+    }
+
+                
     public void updateFieldPermissions(List<String> fieldNames)
             throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
