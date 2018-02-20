@@ -66,8 +66,8 @@ public class ClosedWorker implements Runnable {
             JobInfo job   = sf.awaitCompletion(jobId);
             SObject mig   = getDeskMigration();
 
-            int failed    = job.getNumberRecordsFailed() + Integer.valueOf((String) mig.getField(DeskMigrationFields.RecordsFailed));
-            int processed = job.getNumberRecordsProcessed() + Integer.valueOf((String) mig.getField(DeskMigrationFields.RecordsTotal));
+            int failed    = job.getNumberRecordsFailed() + Double.valueOf((String) mig.getField(DeskMigrationFields.RecordsFailed)).intValue();
+            int processed = job.getNumberRecordsProcessed() + Double.valueOf((String) mig.getField(DeskMigrationFields.RecordsTotal)).intValue();
 
             sf.updateMigration(migrationId, failed, processed);
             sf.updateCustomLabel("BypassProcessBuilder", "0");
