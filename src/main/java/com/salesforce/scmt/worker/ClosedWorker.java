@@ -15,12 +15,17 @@
 
 package com.salesforce.scmt.worker;
 
+import java.util.List;
+
 import com.salesforce.scmt.utils.Utils;
+import com.salesforce.scmt.utils.SalesforceConstants;
+import com.salesforce.scmt.utils.SalesforceConstants.DeskMigrationFields;
 import com.salesforce.scmt.model.DeployException;
 import com.salesforce.scmt.service.SalesforceService;
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.JobInfo;
 import com.sforce.ws.ConnectionException;
+import com.sforce.soap.partner.sobject.SObject;
 
 public class ClosedWorker implements Runnable {
     /**
@@ -56,14 +61,46 @@ public class ClosedWorker implements Runnable {
     }
 
     public void run() {
-        sf = new SalesforceService(this.serverUrl, this.sessionId);
+        sf = new SalesforceService(serverUrl, sessionId);
         try {
             JobInfo job   = sf.awaitCompletion(jobId);
-            int failed    = job.getNumberRecordsFailed();
-            int processed = job.getNumberRecordsProcessed();
-            sf.updateMigration(this.migrationId, failed, processed);
+            SObject mig   = getDeskMigration();
+
+            int failed    = job.getNumberRecordsFailed() + (int) mig.getField(DeskMigrationFields.RecordsFailed);
+            int processed = job.getNumberRecordsProcessed() + (int) mig.getField(DeskMigrationFields.RecordsTotal);
+
+            sf.updateMigration(migrationId, failed, processed);
         } catch (AsyncApiException|ConnectionException|DeployException e) {
             Utils.logException(e);
         }
+    }
+
+    /**
+     * Query the Desk Migration Record from Salesforce. If none is found we
+     * return a blank Desk Migration with zero failed and total.
+     *
+     * @throws ConnectionException
+     * @return SObject
+     */
+    public SObject getDeskMigration() throws ConnectionException {
+        String query = String.format(
+            "Select %s, %s From %s Where %s = '%s'",
+            DeskMigrationFields.RecordsFailed,
+            DeskMigrationFields.RecordsTotal,
+            SalesforceConstants.OBJ_DESK_MIGRATION,
+            DeskMigrationFields.ID, migrationId
+        );
+
+        List<SObject> result = sf.query(query);
+        if (result != null || !result.isEmpty()) {
+            return result.get(0);
+        }
+
+        SObject migration = new SObject(SalesforceConstants.OBJ_DESK_MIGRATION);
+        migration.setId(migrationId);
+        migration.setField(DeskMigrationFields.RecordsFailed, 0);
+        migration.setField(DeskMigrationFields.RecordsTotal, 0);
+
+        return migration;
     }
 }
