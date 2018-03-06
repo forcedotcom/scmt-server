@@ -855,6 +855,7 @@ public final class SalesforceService
         
         @SuppressWarnings("unused")
         DeployResponse dr = upsertData(SalesforceConstants.DeskMigrationFields.ID, Collections.singletonList(migration));
+        updateCustomLabel("BypassProcessBuilder", "0");
     }
 
     /*
