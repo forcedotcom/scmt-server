@@ -188,7 +188,7 @@ public final class SalesforceService
           com.sforce.soap.metadata.SaveResult[] updateResults = getMetadataConnection().updateMetadata(new Metadata[] { cl });
           for (com.sforce.soap.metadata.SaveResult r : updateResults) {
             if (r.isSuccess()) {
-                System.out.println("Updated Custom Label: " + r.getFullName());
+                System.out.println("Updated Custom Label: " + r.getFullName() + " set to " + value);
             } else {
                 throw new DeployException(r.getErrors()[0].getMessage());
             }
