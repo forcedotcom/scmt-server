@@ -1429,6 +1429,8 @@ public final class DeskUtil
                 recLists.get(soType).subList(0, iMax).clear();
             }
 
+            // Bypass process builder in the trial org
+            getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
             // close the current job
             getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
         }
