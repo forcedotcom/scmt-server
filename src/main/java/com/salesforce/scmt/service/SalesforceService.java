@@ -175,6 +175,21 @@ public final class SalesforceService
         }
     }
 
+    public void deleteRemoteSite(RemoteSite rs)
+      throws ConnectionException, DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+        
+        com.sforce.soap.metadata.DeleteResult[] results = getMetadataConnection().deleteMetadata("RemoteSiteSetting", new String[] { rs.fullName });
+        
+        for (com.sforce.soap.metadata.DeleteResult r : results) {
+            if (r.isSuccess()) {
+                System.out.println("Deleted component: " + r.getFullName());
+            } else {
+                throw new Exception(r.getErrors()[0].getMessage());
+            }
+        }
+    }
+
     public void updateCustomLabel(String fullName, String value)
         throws ConnectionException, DeployException, AsyncApiException {
           createMetadataConnection();
@@ -927,6 +942,30 @@ public final class SalesforceService
             if (e.getMessage().contains("Remote Site Name already exists")) {
                 res.status(200);
                 return "Already Created";
+            }
+        }
+        res.status(201);
+        return "Success";
+    }
+
+    public static String deleteRemoteSite(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+        Utils.log("inside deleteRemoteSite");
+        try {
+            RemoteSite rs = new Gson().fromJson(req.body(), RemoteSite.class);
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            sf.deleteRemoteSite(rs);
+        } catch(com.sforce.ws.SoapFaultException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        } catch(Exception e) {
+            Utils.log("Exception in deleteRemoteSite: "+e.getMessage());
+            if (e.getMessage().contains("no RemoteSiteSetting named")) {
+                res.status(200);
+                return "Not Found";
             }
         }
         res.status(201);

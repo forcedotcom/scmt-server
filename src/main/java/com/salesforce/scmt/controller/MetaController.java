@@ -9,6 +9,7 @@
 package com.salesforce.scmt.controller;
 
 import static spark.Spark.post;
+import static spark.Spark.delete;
 
 import com.salesforce.scmt.service.SalesforceService;
 import com.salesforce.scmt.utils.JsonTransformer;
@@ -20,6 +21,7 @@ public class MetaController
     public MetaController()
     {
         post(PREFIX_URI + "/remotesite", (req, res) -> { return SalesforceService.createRemoteSite(req, res); }, new JsonTransformer() );
+        delete(PREFIX_URI + "/remotesite", (req, res) -> { return SalesforceService.deleteRemoteSite(req, res); }, new JsonTransformer() );
         post(PREFIX_URI + "/migrateTopics", (req, res) -> { return SalesforceService.createDataCategoryGroup(req, res); }, new JsonTransformer() );
         post(PREFIX_URI + "/fieldPermissions", (req, res) -> { return SalesforceService.updateFieldPermissions(req, res); }, new JsonTransformer() );
         
