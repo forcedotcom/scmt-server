@@ -170,6 +170,10 @@ public final class SalesforceService
             if (r.isSuccess()) {
                 System.out.println("Created component: " + r.getFullName());
             } else {
+                com.sforce.soap.metadata.Error[] errors = r.getErrors();
+                for (int j = 0; j < errors.length; j++) {
+                    System.out.println("ERROR creating record: " + errors[j].getMessage());
+                }
                 throw new Exception(r.getErrors()[0].getMessage());
             }
         }
@@ -928,7 +932,7 @@ public final class SalesforceService
     public static String createRemoteSite(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
-
+        
         try {
             RemoteSite rs = new Gson().fromJson(req.body(), RemoteSite.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
@@ -942,6 +946,9 @@ public final class SalesforceService
             if (e.getMessage().contains("Remote Site Name already exists")) {
                 res.status(200);
                 return "Already Created";
+            } else {
+                res.status(500);
+                return e.getMessage();
             }
         }
         res.status(201);
