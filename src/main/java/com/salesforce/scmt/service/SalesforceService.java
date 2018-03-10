@@ -256,6 +256,12 @@ public final class SalesforceService
         //Loop through the results. If one is found, update that result, else create a new datacategory group
         for (com.sforce.soap.metadata.Metadata md : mdInfo) {
             if (md != null) {
+                //Merge the old and new categories
+                DataCategoryGroup oldData = (DataCategoryGroup) md;
+                DataCategory mergeData = mergeDataCategories(dcg.getDataCategory(), oldData.getDataCategory());
+
+                dcg.setDataCategory(mergeData);
+
                 com.sforce.soap.metadata.SaveResult[]  updateResults = getMetadataConnection().updateMetadata(new Metadata[] { dcg });
                 for (com.sforce.soap.metadata.SaveResult r : updateResults) {
                     if (r.isSuccess()) {
@@ -294,6 +300,29 @@ public final class SalesforceService
 
         dc.setDataCategory(subList1);
         return dc;
+    }
+
+    public static DataCategory mergeDataCategories(DataCategory dc1, DataCategory dc2) {
+        DataCategory result = new DataCategory();
+        result.setLabel(dc1.getLabel());
+        result.setName(dc1.getName());
+
+        DataCategory[] merge = new DataCategory[dc1.getDataCategory().length + dc2.getDataCategory().length];
+        List<DataCategory> subList = new ArrayList<DataCategory>();
+
+        for (DataCategory dc : dc1.getDataCategory()) {
+            subList.add(dc);
+        }
+
+        for (DataCategory dc : dc2.getDataCategory()) {
+            subList.add(dc);
+        }
+        subList.toArray(merge);
+
+
+        result.setDataCategory(merge);
+
+        return result;
     }
 
     private static ConnectorConfig getConnectorConfig(String serverUrl, String sessionId)
