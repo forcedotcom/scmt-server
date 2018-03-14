@@ -309,14 +309,17 @@ public final class SalesforceService
 
         DataCategory[] merge = new DataCategory[dc1.getDataCategory().length + dc2.getDataCategory().length];
         List<DataCategory> subList = new ArrayList<DataCategory>();
+        List<String> oldNames = new ArrayList<String>();
+        for (DataCategory dc : dc2.getDataCategory()) {
+            oldNames.add(dc.getName());
+            subList.add(dc);
+        }
 
         for (DataCategory dc : dc1.getDataCategory()) {
-            subList.add(dc);
+            if (!oldNames.contains(dc.getName()))
+                subList.add(dc);
         }
 
-        for (DataCategory dc : dc2.getDataCategory()) {
-            subList.add(dc);
-        }
         subList.toArray(merge);
 
 
