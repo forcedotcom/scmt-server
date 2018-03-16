@@ -91,11 +91,9 @@ public final class RabbitWorker
                 try
                 {
                     String message = new String(body, "UTF-8");
-                    message = Utils.getEnvOrThrow("JAVA_ENV") == "development" ? message : "redacted";
-                    
                     Utils.log("[MQ]   Routing Key:  [" + envelope.getRoutingKey() + "]\n" +
                         "\t Exchange: [" + envelope.getExchange() + "]\n" +
-                        "\t Message:  [" + message + "]");
+                        "\t Message:  [" + Utils.getEnvOrThrow("JAVA_ENV") == "development" ? message : "redacted" + "]");
                     
                     if (envelope.getRoutingKey().equalsIgnoreCase(QUEUE_DESK_DATA_MIGRATION))
                     {
