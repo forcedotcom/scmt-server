@@ -403,7 +403,7 @@ public final class SalesforceService
 
         // print the info we will use to build the connection
         Utils.log("SalesforceService::createPartnerConnection() entered" + "\n\tSession ID:       "
-            Utils.getEnvOrThrow("JAVA_ENV") == "development" ? getSessionId() : "redacted" + "\n\tPartner Endpoint: " + getServerUrl());
+            + Utils.getEnvOrThrow("JAVA_ENV") == "development" ? getSessionId() : "redacted" + "\n\tPartner Endpoint: " + getServerUrl());
 
         // create partner connector configuration
         ConnectorConfig partnerConfig = getConnectorConfig(getServerUrl(), getSessionId());
