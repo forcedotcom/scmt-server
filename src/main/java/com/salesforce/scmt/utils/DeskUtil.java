@@ -1140,6 +1140,9 @@ public final class DeskUtil
         
         // map of job id's
         Map<String, String> jobIds = new HashMap<>();
+
+        // Bypass process builder in the trial org
+        getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
         
         // initialize soType specific items
         for (String soType : soTypes)
@@ -1428,9 +1431,6 @@ public final class DeskUtil
                 // clear the records that were inserted
                 recLists.get(soType).subList(0, iMax).clear();
             }
-
-            // Bypass process builder in the trial org
-            getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
 
             // close the current job
             getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
