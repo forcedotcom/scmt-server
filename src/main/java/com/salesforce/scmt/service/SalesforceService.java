@@ -811,6 +811,11 @@ public final class SalesforceService
 
     public void closeBulkJob(String jobId, String migrationId) throws AsyncApiException
     {
+        closeBulkJob(jobId, migrationId, null);
+    }
+
+    public void closeBulkJob(String jobId, String migrationId, String soType) throws AsyncApiException
+    {
         Utils.log("[BULK] Closing Bulk Job: [" + jobId + "]");
 
         JobInfo job = new JobInfo();
@@ -821,15 +826,15 @@ public final class SalesforceService
 
         // unclear if I can use this
         _bConn.closeJob(jobId);
-        createClosedWorker(jobId, migrationId);
+        createClosedWorker(jobId, migrationId, soType);
     }
 
     /**
      * 
      */
-    public void createClosedWorker(String jobId, String migrationId)
+    public void createClosedWorker(String jobId, String migrationId, String soType)
     {
-        Thread t = new Thread(new ClosedWorker(jobId, migrationId, getServerUrl(), getSessionId()));
+        Thread t = new Thread(new ClosedWorker(jobId, migrationId, getServerUrl(), getSessionId(), soType));
         t.start();
     }
 

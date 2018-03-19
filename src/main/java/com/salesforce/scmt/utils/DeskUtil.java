@@ -1415,7 +1415,7 @@ public final class DeskUtil
         {
             // Bypass process builder in the trial org
             getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
-            
+
             while (recLists.get(soType).size() > 0 && !SalesforceConstants.READ_ONLY)
             {
                 // Email Messages will submit a batch every 3k records in an attempt to not hit the 10mb limit
@@ -1433,7 +1433,7 @@ public final class DeskUtil
             }
 
             // close the current job
-            getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
+            getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId(), soType);
         }
 
         // update migration status
