@@ -77,7 +77,7 @@ public class ClosedWorker implements Runnable {
 
             sf.updateMigration(migrationId, failed, processed);
 
-            if (soType != null && soType == SalesforceConstants.OBJ_EMAIL_MESSAGE) {
+            if (soType == null || soType == SalesforceConstants.OBJ_EMAIL_MESSAGE) {
                 Thread.sleep(30000L);
                 sf.updateCustomLabel("BypassProcessBuilder", "0");
             }
