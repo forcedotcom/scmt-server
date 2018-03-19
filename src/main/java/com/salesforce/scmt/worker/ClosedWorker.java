@@ -71,11 +71,11 @@ public class ClosedWorker implements Runnable {
 
             sf.updateMigration(migrationId, failed, processed);
 
-            Thread.sleep(60000L);
+            Thread.sleep(30000L);
             if (sf.query("Select Id From AsyncApexJob Where JobType = 'ApexToken' And Status != 'Completed'").size() == 0) {
                 sf.updateCustomLabel("BypassProcessBuilder", "0");
             }
-        } catch (AsyncApiException|ConnectionException|DeployException e) {
+        } catch (AsyncApiException|ConnectionException|DeployException|InterruptedException e) {
             Utils.logException(e);
         }
     }
