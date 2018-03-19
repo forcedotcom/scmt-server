@@ -833,6 +833,14 @@ public final class SalesforceService
         t.start();
     }
 
+    /**
+     * Return the amount of not completed jobs of type ApexToken.
+     */
+    public Integer openJobSize()
+        throws ConnectionException, DeployException, AsyncApiException {
+        return query("Select Id From AsyncApexJob Where JobType = 'ApexToken' And Status != 'Completed'").size();
+    }
+
     public JobInfo awaitCompletion(String jobId) throws AsyncApiException {
         createBulkConnection();
         BatchInfoList batchList = getBulkConnection().getBatchInfoList(jobId, ContentType.JSON);
