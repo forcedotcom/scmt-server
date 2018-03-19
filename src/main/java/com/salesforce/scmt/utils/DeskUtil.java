@@ -1409,6 +1409,9 @@ public final class DeskUtil
         }
         // continue to loop while the request is successful and there are subsequent pages of results
         while (bRetry || (resp.isSuccess() && !bRequeue && apiResp.hasNextPage() && SalesforceConstants.RETRIEVE_ALL));
+
+        // Bypass process builder in the trial org
+        getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
         
         // loop through the object types
         for (String soType : soTypes)
@@ -1428,9 +1431,6 @@ public final class DeskUtil
                 // clear the records that were inserted
                 recLists.get(soType).subList(0, iMax).clear();
             }
-
-            // Bypass process builder in the trial org
-            getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
 
             // close the current job
             getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
