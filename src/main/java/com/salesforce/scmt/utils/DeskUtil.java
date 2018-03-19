@@ -1409,13 +1409,13 @@ public final class DeskUtil
         }
         // continue to loop while the request is successful and there are subsequent pages of results
         while (bRetry || (resp.isSuccess() && !bRequeue && apiResp.hasNextPage() && SalesforceConstants.RETRIEVE_ALL));
-
-        // Bypass process builder in the trial org
-        getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
         
         // loop through the object types
         for (String soType : soTypes)
         {
+            // Bypass process builder in the trial org
+            getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
+            
             while (recLists.get(soType).size() > 0 && !SalesforceConstants.READ_ONLY)
             {
                 // Email Messages will submit a batch every 3k records in an attempt to not hit the 10mb limit
