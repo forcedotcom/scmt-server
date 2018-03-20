@@ -386,9 +386,9 @@ public final class SalesforceService
 
         // print the endpoint
         Utils.log(
-            "\n\tSession ID:            " + getSessionId() +
+            "\n\tSession ID:            " + Utils.getEnvOrThrow("JAVA_ENV") == "development" ? getSessionId() : "redacted" +
             "\n\tEndpoint:              " + getServerUrl() +
-            "\n\tConnection Session ID: " + _mConn.getConfig().getSessionId() +
+            "\n\tConnection Session ID: " + Utils.getEnvOrThrow("JAVA_ENV") == "development" ? _mConn.getConfig().getSessionId() : "redacted" +
             "\n\tAuth Endpoint:         " + _mConn.getConfig().getAuthEndpoint());
     }
 
@@ -403,7 +403,7 @@ public final class SalesforceService
 
         // print the info we will use to build the connection
         Utils.log("SalesforceService::createPartnerConnection() entered" + "\n\tSession ID:       "
-            + getSessionId() + "\n\tPartner Endpoint: " + getServerUrl());
+            + Utils.getEnvOrThrow("JAVA_ENV") == "development" ? getSessionId() : "redacted" + "\n\tPartner Endpoint: " + getServerUrl());
 
         // create partner connector configuration
         ConnectorConfig partnerConfig = getConnectorConfig(getServerUrl(), getSessionId());
@@ -438,8 +438,9 @@ public final class SalesforceService
         }
 
         // print the info we will use to build the connection
-        Utils.log("SalesforceService::createBulkConnection() entered" + "\n\tSession ID:    " + getSessionId()
-            + "\n\tBulk Endpoint: " + getBulkEndpoint());
+        Utils.log("SalesforceService::createBulkConnection() entered" + "\n\tSession ID:    " +
+            Utils.getEnvOrThrow("JAVA_ENV") == "development" ? getSessionId() : "redacted" +
+            "\n\tBulk Endpoint: " + getBulkEndpoint());
 
         // create partner connector configuration
         ConnectorConfig bulkConfig = getConnectorConfig(getServerUrl(), getSessionId());
@@ -810,6 +811,11 @@ public final class SalesforceService
 
     public void closeBulkJob(String jobId, String migrationId) throws AsyncApiException
     {
+        closeBulkJob(jobId, migrationId, null);
+    }
+
+    public void closeBulkJob(String jobId, String migrationId, String soType) throws AsyncApiException
+    {
         Utils.log("[BULK] Closing Bulk Job: [" + jobId + "]");
 
         JobInfo job = new JobInfo();
@@ -820,15 +826,15 @@ public final class SalesforceService
 
         // unclear if I can use this
         _bConn.closeJob(jobId);
-        createClosedWorker(jobId, migrationId);
+        createClosedWorker(jobId, migrationId, soType);
     }
 
     /**
      * 
      */
-    public void createClosedWorker(String jobId, String migrationId)
+    public void createClosedWorker(String jobId, String migrationId, String soType)
     {
-        Thread t = new Thread(new ClosedWorker(jobId, migrationId, getServerUrl(), getSessionId()));
+        Thread t = new Thread(new ClosedWorker(jobId, migrationId, getServerUrl(), getSessionId(), soType));
         t.start();
     }
 

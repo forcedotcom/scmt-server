@@ -49,15 +49,21 @@ public class ClosedWorker implements Runnable {
     private String sessionId;
 
     /**
+     * SO Type
+     */
+    private String soType;
+
+    /**
      * Bulk Connection
      */
     private SalesforceService sf;
 
-    public ClosedWorker(String jobId, String migrationId, String serverUrl, String sessionId) {
+    public ClosedWorker(String jobId, String migrationId, String serverUrl, String sessionId, String soType) {
         this.jobId       = jobId;
         this.migrationId = migrationId;
         this.serverUrl   = serverUrl;
         this.sessionId   = sessionId;
+        this.soType      = soType;
     }
 
     public void run() {
@@ -70,8 +76,12 @@ public class ClosedWorker implements Runnable {
             int processed = job.getNumberRecordsProcessed() + Double.valueOf((String) mig.getField(DeskMigrationFields.RecordsTotal)).intValue();
 
             sf.updateMigration(migrationId, failed, processed);
-            sf.updateCustomLabel("BypassProcessBuilder", "0");
-        } catch (AsyncApiException|ConnectionException|DeployException e) {
+
+            if (soType == null || soType == SalesforceConstants.OBJ_EMAIL_MESSAGE) {
+                Thread.sleep(60000L);
+                sf.updateCustomLabel("BypassProcessBuilder", "0");
+            }
+        } catch (AsyncApiException|ConnectionException|DeployException|InterruptedException e) {
             Utils.logException(e);
         }
     }

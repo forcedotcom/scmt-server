@@ -1246,7 +1246,7 @@ public final class DeskUtil
                             while(recLists.get(soType).size() > 0 && !SalesforceConstants.READ_ONLY)
                             {
                                 // Email Messages will submit a batch every 3k records in an attempt to not hit the 10mb limit
-                                int batchMaxSize = (SalesforceConstants.OBJ_EMAIL_MESSAGE.equalsIgnoreCase(soType) ? 600 :
+                                int batchMaxSize = (SalesforceConstants.OBJ_EMAIL_MESSAGE.equalsIgnoreCase(soType) ? 100 :
                                     SalesforceConstants.BULK_MAX_SIZE);
                                 
                                 // get the upper boundary of the record list
@@ -1413,10 +1413,13 @@ public final class DeskUtil
         // loop through the object types
         for (String soType : soTypes)
         {
+            // Bypass process builder in the trial org
+            getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
+
             while (recLists.get(soType).size() > 0 && !SalesforceConstants.READ_ONLY)
             {
                 // Email Messages will submit a batch every 3k records in an attempt to not hit the 10mb limit
-                int batchMaxSize = (SalesforceConstants.OBJ_EMAIL_MESSAGE.equalsIgnoreCase(soType) ? 600
+                int batchMaxSize = (SalesforceConstants.OBJ_EMAIL_MESSAGE.equalsIgnoreCase(soType) ? 100
                     : SalesforceConstants.BULK_MAX_SIZE);
 
                 // get the upper boundary of the record list
@@ -1429,11 +1432,8 @@ public final class DeskUtil
                 recLists.get(soType).subList(0, iMax).clear();
             }
 
-            // Bypass process builder in the trial org
-            getSalesforceService().updateCustomLabel("BypassProcessBuilder", "1");
-
             // close the current job
-            getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId());
+            getSalesforceService().closeBulkJob(jobIds.get(soType), getDeskService().getMigrationId(), soType);
         }
 
         // update migration status
