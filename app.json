@@ -13,7 +13,9 @@
     "SALESFORCE_TRACE_BULK": "1",
     "SALESFORCE_TRACE_METADATA": "1",
     "SALESFORCE_TRACE_PARTNER": "1",
-    "EMAIL_ADDRESS": "desk.scmt@salesforce.com"
+    "EMAIL_ADDRESS": "desk.scmt@salesforce.com",
+    "PACKAGE_NAMESPACE": "SCMT__",
+    "JAVA_ENV": "development"
   },
   "formation": {
     "web": {
