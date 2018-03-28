@@ -75,11 +75,11 @@ public final class DeskWorker
                 (String)config.get("server_url"), (String)config.get("session_id"),
                 (config.containsKey("auditEnabled") ? Boolean.valueOf(config.get("auditEnabled")): false)));
 
-			Integer startId = (config.containsKey("start_id") && !((String) config.get("start_id")).isEmpty() &&
+			Long startId = (config.containsKey("start_id") && !((String) config.get("start_id")).isEmpty() &&
                 // avoid: java.lang.NumberFormatException: For input string: "null"
                 !"null".equalsIgnoreCase((String) config.get("start_id")) &&
                 !"undefined".equalsIgnoreCase((String) config.get("start_id")) ?
-                Integer.parseInt(config.get("start_id")) : null);
+                Long.valueOf(config.get("start_id")) : null);
 
 			//update config
 			config.put("start_id", String.valueOf(startId));

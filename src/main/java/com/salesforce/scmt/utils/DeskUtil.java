@@ -1105,12 +1105,12 @@ public final class DeskUtil
         return dr;
     }
 
-    public DeployResponse migrateDeskInteractions(Map<String, String> config, Integer startId) throws Exception
+    public DeployResponse migrateDeskInteractions(Map<String, String> config, Long startId) throws Exception
     {
         Utils.log("Entered DeskUtil::migrateDeskInteractions()");
 
         // declare last record id
-        int nextRecordId = (startId == null ? 1 : startId);
+        long nextRecordId = (startId == null ? 1 : startId);
         
         // initialize a flag which indicates if this is a delta migration
         boolean delta = (startId != null);
@@ -1167,7 +1167,7 @@ public final class DeskUtil
         int retry500Count = 0;
         int retryBulkCount = 0;
         
-        Set<Integer> fiveHundreds = new HashSet<Integer>();
+        Set<Long> fiveHundreds = new HashSet<Long>();
 
         // loop through retrieving records
         do
@@ -1205,7 +1205,7 @@ public final class DeskUtil
                     if (mSinceId.find())
                     {
                         // Utils.log("Match: " + mSinceId.group(1));
-                        nextRecordId = Integer.valueOf(mSinceId.group(1));
+                        nextRecordId = Long.valueOf(mSinceId.group(1));
                     }
                     
                     // convert the desk interaction to Salesforce SObjects
