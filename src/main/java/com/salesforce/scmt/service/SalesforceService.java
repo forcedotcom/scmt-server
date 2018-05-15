@@ -51,6 +51,7 @@ import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
 import com.sforce.soap.metadata.DataCategory;
 import com.sforce.soap.metadata.DataCategoryGroup;
+import com.sforce.soap.metadata.KnowledgeSettings;
 import com.sforce.soap.metadata.Metadata;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.soap.metadata.PermissionSet;
@@ -1001,6 +1002,34 @@ public final class SalesforceService
         }
         res.status(201);
         return "Success";
+    }
+
+    public static String readKnowledgeSettings(Request req, Response res) throws Exception {
+        String salesforceUrl = req.headers("Salesforce-Url");
+        String salesforceSessionId = req.headers("Salesforce-Session-Id");
+        KnowledgeSettings ks = new KnowledgeSettings();
+
+        try {
+            SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
+            ks = sf.readKnowledgeSettings();
+        } catch (DeployException e) {
+            if (e.getMessage().contains("INVALID_SESSION_ID")) {
+                res.status(401);
+                return "Unauthorized";
+            }
+        }
+        res.status(201);
+        res.body(ks.toString());
+        return "Success";
+    }
+
+    public KnowledgeSettings readKnowledgeSettings()
+            throws DeployException, AsyncApiException, Exception {
+        createMetadataConnection();
+        String name = "Settings";
+        ReadResult readResult = getMetadataConnection().readMetadata("KnowledgeSettings", new String[] { name });
+        Metadata[] mdInfo = readResult.getRecords();
+        return (KnowledgeSettings) mdInfo[0];
     }
 
     public static String createDataCategoryGroup(Request req, Response res) throws Exception {

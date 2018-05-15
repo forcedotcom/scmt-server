@@ -24,6 +24,9 @@ public class MetaController
         delete(PREFIX_URI + "/remotesite", (req, res) -> { return SalesforceService.deleteRemoteSite(req, res); }, new JsonTransformer() );
         post(PREFIX_URI + "/migrateTopics", (req, res) -> { return SalesforceService.createDataCategoryGroup(req, res); }, new JsonTransformer() );
         post(PREFIX_URI + "/fieldPermissions", (req, res) -> { return SalesforceService.updateFieldPermissions(req, res); }, new JsonTransformer() );
-        
+        post(PREFIX_URI + "/knowledgeSettings", (req, res) -> {
+            return SalesforceService.readKnowledgeSettings(req, res);
+        }, new JsonTransformer());
+
     }
 }
