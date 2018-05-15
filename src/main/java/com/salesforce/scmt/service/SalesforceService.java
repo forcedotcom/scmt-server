@@ -1018,6 +1018,7 @@ public final class SalesforceService
                 return "Unauthorized";
             }
         }
+        Utils.log(salesforceSessionId);
         res.status(201);
         res.body(ks.toString());
         return "Success";
