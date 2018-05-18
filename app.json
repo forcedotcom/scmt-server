@@ -9,7 +9,7 @@
     "CLOUDAMQP_HEARTBEAT": "30",
     "CLOUDAMQP_TIMEOUT": "30",
     "DESK_API_LOG_LEVEL": "BASIC",
-    "JAVA_OPTS": "-XX:+UseCompressedOops",
+    "JAVA_OPTS": "-Dhttps.protocols=TLSv1.2",
     "SALESFORCE_TRACE_BULK": "1",
     "SALESFORCE_TRACE_METADATA": "1",
     "SALESFORCE_TRACE_PARTNER": "1",

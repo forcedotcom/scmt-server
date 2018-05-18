@@ -17,6 +17,7 @@ package com.salesforce.scmt.service;
 
 import static java.lang.System.getenv;
 
+import java.beans.XMLDecoder;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import com.sforce.async.OperationEnum;
 import com.sforce.soap.metadata.DataCategory;
 import com.sforce.soap.metadata.DataCategoryGroup;
 import com.sforce.soap.metadata.KnowledgeSettings;
+import com.sforce.soap.metadata.KnowledgeLanguageSettings;
 import com.sforce.soap.metadata.Metadata;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.soap.metadata.PermissionSet;
@@ -69,6 +71,9 @@ import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.bind.XmlObject;
+
+import org.json.XML;
 
 import spark.Request;
 import spark.Response;
@@ -1007,7 +1012,7 @@ public final class SalesforceService
     public static String readKnowledgeSettings(Request req, Response res) throws Exception {
         String salesforceUrl = req.headers("Salesforce-Url");
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
-        KnowledgeSettings ks = new KnowledgeSettings();
+        Metadata ks = new Metadata();
 
         try {
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
@@ -1024,13 +1029,17 @@ public final class SalesforceService
         return "Success";
     }
 
-    public KnowledgeSettings readKnowledgeSettings()
+    public Metadata readKnowledgeSettings()
             throws DeployException, AsyncApiException, Exception {
         createMetadataConnection();
         String name = "Settings";
         ReadResult readResult = getMetadataConnection().readMetadata("KnowledgeSettings", new String[] { name });
         Metadata[] mdInfo = readResult.getRecords();
-        return (KnowledgeSettings) mdInfo[0];
+        //KnowledgeSettings ks = (KnowledgeSettings) mdInfo[0];
+        //String kls = mdInfo.toString();
+        //mdInfo.to
+        //KnowledgeLanguageSettings kls = (KnowledgeLanguageSettings)((KnowledgeSettings) mdInfo[0]).getLanguages();
+        return mdInfo[0];
     }
 
     public static String createDataCategoryGroup(Request req, Response res) throws Exception {
