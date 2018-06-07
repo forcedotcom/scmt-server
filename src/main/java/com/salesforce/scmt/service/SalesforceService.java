@@ -108,7 +108,7 @@ public final class SalesforceService
     	System.out.println("url "+url);
     	
         //removed code that takes out scmt because of issues with custom domains with scmt in them
-        _serverUrl = url.replaceFirst("\\/\\/.*c\\.", "\\/\\/").replaceFirst("visual\\.", "sales");        
+        _serverUrl = url.replaceFirst("\\/\\/c\\.", "\\/\\/").replaceFirst("visual\\.", "sales");        
     }
 
     public String getServerUrl()
