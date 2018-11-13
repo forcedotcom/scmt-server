@@ -23,7 +23,11 @@ public class MetaController
         post(PREFIX_URI + "/remotesite", (req, res) -> { return SalesforceService.createRemoteSite(req, res); }, new JsonTransformer() );
         delete(PREFIX_URI + "/remotesite", (req, res) -> { return SalesforceService.deleteRemoteSite(req, res); }, new JsonTransformer() );
         post(PREFIX_URI + "/migrateTopics", (req, res) -> { return SalesforceService.createDataCategoryGroup(req, res); }, new JsonTransformer() );
-        post(PREFIX_URI + "/fieldPermissions", (req, res) -> { return SalesforceService.updateFieldPermissions(req, res); }, new JsonTransformer() );
+        post(PREFIX_URI + "/fieldPermissions", (req, res) -> {
+            String ret = SalesforceService.updateFieldPermissions(req, res);
+            Thread.sleep(15000);
+            return ret;
+        }, new JsonTransformer() );
         
     }
 }
