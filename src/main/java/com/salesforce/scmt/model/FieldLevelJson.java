@@ -7,10 +7,11 @@
 
 
 package com.salesforce.scmt.model;
+import java.util.List;
 
 public class FieldLevelJson {
 	public String profileFullName;
-	public String[] fields;
+	public List<String> fields;
 
 	public FieldLevelJson() {}
 }
