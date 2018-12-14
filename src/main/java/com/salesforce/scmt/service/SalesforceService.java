@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.salesforce.scmt.model.FieldLevelJson;
 import com.salesforce.scmt.model.DataCategoryGroupJson;
 import com.salesforce.scmt.model.DataCategoryJson;
 import com.salesforce.scmt.model.DeployException;
@@ -216,14 +217,14 @@ public final class SalesforceService
     }
 
                 
-    public void updateFieldPermissions(List<String> fieldNames)
+    public void updateFieldPermissions(String profileFullName, List<String> fields)
             throws ConnectionException, DeployException, AsyncApiException, Exception {
         createMetadataConnection();
 
-        ProfileFieldLevelSecurity[] subList1 = new ProfileFieldLevelSecurity[fieldNames.size()];
+        ProfileFieldLevelSecurity[] subList1 = new ProfileFieldLevelSecurity[fields.size()];
         List<ProfileFieldLevelSecurity> subList = new ArrayList<ProfileFieldLevelSecurity>();
 
-        for (String field : fieldNames) {
+        for (String field : fields) {
             ProfileFieldLevelSecurity pFLS = new ProfileFieldLevelSecurity();
             pFLS.setField(field);
             pFLS.setEditable(true);
@@ -232,8 +233,9 @@ public final class SalesforceService
             subList.add(pFLS);
         }
         subList.toArray(subList1);
+
         com.sforce.soap.metadata.Profile adminProfile = new com.sforce.soap.metadata.Profile();
-        adminProfile.setFullName("Admin");
+        adminProfile.setFullName(profileFullName);
 
         adminProfile.setFieldPermissions(subList1);
         com.sforce.soap.metadata.Metadata adminProfileMetadata = (com.sforce.soap.metadata.Metadata) adminProfile;
@@ -990,9 +992,14 @@ public final class SalesforceService
         String salesforceSessionId = req.headers("Salesforce-Session-Id");
 
         try {
-            List<String> pl = new Gson().fromJson(req.body(), ArrayList.class);
             SalesforceService sf = new SalesforceService(salesforceUrl, salesforceSessionId);
-            sf.updateFieldPermissions(pl);
+            if (req.body().startsWith("[")) {
+                List<String> fields = new Gson().fromJson(req.body(), ArrayList.class);
+                sf.updateFieldPermissions("Admin", fields);
+            } else {
+                FieldLevelJson fieldLevel = new Gson().fromJson(req.body(), FieldLevelJson.class);
+                sf.updateFieldPermissions(fieldLevel.profileFullName, fieldLevel.fields);
+            }
         } catch(com.sforce.ws.SoapFaultException e) {
             if (e.getMessage().contains("INVALID_SESSION_ID")) {
                 res.status(401);
